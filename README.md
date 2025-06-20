@@ -56,9 +56,13 @@
 
 1. Copy the contents of the .env.example to the .env.local. You could do this locally, but you can also do it in the CLI.
 
+    For Windows
+
     ```Windows bash
     copy .env.example .env.local
     ```
+
+    For Mac/Linux
 
     ```Mac/Linux bash
     cp .env.example .env.local
