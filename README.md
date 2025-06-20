@@ -139,10 +139,12 @@ When everything is already set up and installed, this would be your usual workfl
 2. Create a new Feature Branch (adding feature/, fix/, docs/ as prefixes of branch name is good practice)
 
     ```bash
-    git checkout -b feature/organization-header-component
+    git checkout -b feature/example-component
     ```
 
 ##### Development
+
+###### With no interaction with the backend (database)
 
 1. Create the component. Make sure it is under the components directory.
 2. Write the code.
@@ -167,6 +169,40 @@ When everything is already set up and installed, this would be your usual workfl
     ```
 
     So it must be Code -> Test -> Commit, until it is ready to go.
+
+###### With interaction with the backend (database)
+
+1. Create the component. Under the components directory.
+2. Add the "use client" directive. The component that involves interactivity are client components cuz they need to use hooks.
+
+    ```tsx
+    # For example the path of this component is at  src/components/organizations/SubscribeButton.tsx
+    "use client";
+
+    # Rest of the code here
+    ```
+
+3. Write the code.
+4. Write the server action. It is a special function that will run on the server for security. It uses the "use server" directive.
+
+    ```tsx
+    # For example the path of this action is at  app/organizations/[orgId]/actions.ts, it is good practice to put it near the page that uses them
+    "use server"
+
+    # Rest of the code here
+    ```
+
+5. Call the server action from the component that uses it.
+6. Like the instruction above, commit your work in logical steps pls.
+
+    For example:
+
+    ```bash
+    git add . # Actually specify the file here.
+    git commit -m "feat: create subscribe server action"
+    git commit -m "feat: create SubscribeButton client component"
+    git commit -m "feat: wire up subscribe button to server action"
+    ```
 
 ##### Integration
 
