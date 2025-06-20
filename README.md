@@ -4,10 +4,10 @@
 
 ### New Features (New components, pages, etc)
 
-- Create a new branch
-- Work on that branch
-- Test if it works first
-- Merge request
+1. Create a new branch
+2. Work on that branch
+3. Test if it works first
+4. Merge request
 
 ### Database Schema Modifications (e,g. new tables)
 
