@@ -33,6 +33,6 @@
 
 4. Push to production (ONLY KEM SHOULD DO THIS. THIS WILL PUSH THE MIGRATION TO THE LIVE DATABASE)
 
-```bash
-npx supabase db push
-```
+    ```bash
+    npx supabase db push
+    ```
