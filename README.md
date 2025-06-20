@@ -190,4 +190,11 @@ When everything is already set up and installed, this would be your usual workfl
    1. Go to GitHub.
    2. Go to the branch and then press the "Compare & Pull Request" button.
    3. Write clear title and description.
-      1. For descriptions, write: What does this PR do? How to test? and a Screenshot.
+
+   Example:
+
+   Title: feat: Add Organization Header Component
+   Description:
+   - What does this PR do? "Creates a new reusable component for displaying the organization's banner, profile picture, and name."
+   - How to test: "Go to any organization's page to see the new header."
+   - Screenshot: A screenshot showing the new component being used in the webpage.
