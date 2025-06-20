@@ -103,6 +103,12 @@
     SUPABASE_SERVICE_ROLE_KEY="YOUR_LOCAL_OR_PROD_SUPABASE_SERVICE_ROLE_KEY"
     ```
 
+5. When you are done using the local database, remember to stop the database.
+
+    ```bash
+    supabase stop
+    ```
+
 #### Sync the Database Schema
 
 1. Run the reset command to wipe the local database and rerun all migrations in chronological order.
