@@ -74,8 +74,23 @@
     supabase start
     ```
 
-3. If it is successfull, it should show this screen. You can modify the database schema in the Studio which you can access from the Studio URL given.
-   ![Supabase Start Success](./docs/images/supabase.local.success.png)
+3. If it is successful, it should show this screen. You can modify the database schema in the Studio which you can access from the Studio URL given.
+
+    ```Output
+    API URL: 
+    GraphQL URL: 
+    S3 Storage URL: 
+    DB URL: 
+    Studio URL: 
+    Inbucket URL: 
+    JWT secret: super-secret-jwt-token-with-at-least-32-characters-long
+    anon key: 
+    service_role key: 
+    S3 Access Key:
+    S3 Secret Key:
+    S3 Region: local
+    ```
+
 4. Copy the local keys to the .env.local
 
     ```.env.local
@@ -101,3 +116,74 @@
     ```
 
 2. Should generate two links. One for your local machine and one for your network where you can access it from any device as long as it is connected to your network.
+
+### Daily Routine
+
+When everything is already set up and installed, this would be your usual workflow:
+
+#### When creating a new feature (Example: creating an organization header component)
+
+##### Preparation
+
+1. Sync with the main branch
+
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+
+2. Create a new Feature Branch (adding feature/, fix/, docs/ as prefixes of branch name is good practice)
+
+    ```bash
+    git checkout -b feature/organization-header-component
+    ```
+
+##### Development
+
+1. Create the component. Make sure it is under the components directory.
+2. Write the code.
+3. Make sure to test it using the dev server.
+
+    ```bash
+    npm run dev
+    ```
+
+4. Commits MUST NOT BE IN BATCH. Below is an example.
+
+    ```bash
+    # First, add the new file to Git's tracking
+    git add src/components/organizations/OrganizationHeader.tsx
+
+    # Commit the initial structure
+    git commit -m "feat: create initial structure for OrganizationHeader component"
+
+    # ... after adding styles and props ...
+    git add .
+    git commit -m "feat: add styling and props to OrganizationHeader"
+    ```
+
+    So it must be Code -> Test -> Commit, until it is ready to go.
+
+##### Integration
+
+1. Sync with main first to make sure their would be no merge conflicts.
+
+    ```bash
+    # Fetch the latest changes from the remote
+    git fetch origin
+
+    # Merge the latest main branch into your feature branch
+    git merge origin/main
+    ```
+
+2. Push the local Feature Branch to the Remote Repository
+
+   ```bash
+   git push -u origin feature/org-header-component
+   ```
+
+3. Create a Pull Request
+   1. Go to GitHub.
+   2. Go to the branch and then press the "Compare & Pull Request" button.
+   3. Write clear title and description.
+      1. For descriptions, write: What does this PR do? How to test? and a Screenshot.
