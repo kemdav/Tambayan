@@ -5,7 +5,7 @@ import { TestIcon } from "../../components/icons";
 
 export default function Test() {
   return (
-    <div className="flex">
+    <div className="flex justify-center space-x-10 mt-10">
       <Button onClick={() => console.log("Button Clicked")}>
         Default
       </Button>
@@ -19,8 +19,12 @@ export default function Test() {
         Destructive
       </Button>
 
-      <Button onClick={() => console.log("Button Clicked")} variant="outline">
-        Outline
+      <Button onClick={() => console.log("Button Clicked")} variant="link">
+        Link
+      </Button>
+
+      <Button onClick={() => console.log("Button Clicked")} variant="default" disabled={true}>
+       Disabled
       </Button>
     </div>
   );

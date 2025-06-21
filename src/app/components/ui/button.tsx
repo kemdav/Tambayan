@@ -15,7 +15,7 @@ const buttonVariants = cva(
           "bg-action-error text-white shadow-xs hover:bg-action-error/90 focus-visible:ring-action-error/20 dark:focus-visible:ring-action-error/40 dark:bg-action-error/60",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
-        link: "text-primary underline-offset-4 hover:underline",
+        link: "text-info underline-offset-4 hover:underline",
       },
       size: {
         default: "h-9 px-4 py-1 has-[>svg]:px-3",
