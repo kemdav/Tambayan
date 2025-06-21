@@ -148,6 +148,12 @@ When everything is already set up and installed, this would be your usual workfl
     git checkout -b feature/example-component
     ```
 
+3. Add the local branch to the remote
+
+    ```bash
+    git push --set-upstream origin feature/button-component
+    ```
+
 ##### Development
 
 ###### With no interaction with the backend (database)
