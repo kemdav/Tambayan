@@ -1,3 +1,11 @@
+"use client"
+
+import Button from "../components/ui/button"
+
 export default function Test() {
-  return <h1>This is where you test components.</h1>;
+  return (
+  <div>
+    <Button variant="" size="" onClick={() => console.log("Button Clicked")}>Button Text</Button>
+  </div>
+  );
 }
