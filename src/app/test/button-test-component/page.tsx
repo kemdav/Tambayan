@@ -1,8 +1,13 @@
 "use client";
 
-import { Button } from "../components/ui/button";
+import { Button } from "@/app/components/ui/button";
+import { TestIcon } from "@/app/components/icons";
+import { Input } from "@/app/components/ui/input";
+import { SearchIcon } from "@/app/components/icons";
+import { PasswordInput } from "@/app/components/ui/password-input";
+import { ResizableInput } from "@/app/components/ui/resizable-input";
 
-export default function TestPage() {
+export default function ButtonTestPage() {
   return (
     <div className="flex min-h-screen flex-col items-center gap-y-8 bg-gray-500 p-24">
       <div className="flex w-full max-w-4xl flex-col gap-y-6">

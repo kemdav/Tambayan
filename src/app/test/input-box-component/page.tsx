@@ -1,0 +1,35 @@
+"use client";
+
+import { Input } from "@/app/components/ui/input";
+import { SearchIcon } from "@/app/components/icons";
+import { ResizableInput } from "@/app/components/ui/resizable-input";
+import { FormattableInput } from "@/app/components/ui/FormattableInput";
+
+export default function InputBoxComponentPage() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-white p-8">
+      <div className="flex w-full max-w-sm flex-col gap-y-6">
+        <div className="flex flex-col gap-y-2">
+          <span className="font-semibold">Normal input</span>
+          <Input placeholder="Normal input" />
+        </div>
+        <div className="flex flex-col gap-y-2">
+          <span className="font-semibold">Formattable input</span>
+          <FormattableInput placeholder="Formattable input" isFormattable />
+        </div>
+        <div className="flex flex-col gap-y-2">
+          <span className="font-semibold">Search input</span>
+          <Input placeholder="Search" leftIcon={<SearchIcon className="h-4 w-4" />} />
+        </div>
+        <div className="flex flex-col gap-y-2">
+          <span className="font-semibold">Normal resizable input</span>
+          <ResizableInput placeholder="Normal resizable input" />
+        </div>
+        <div className="flex flex-col gap-y-2">
+          <span className="font-semibold">Formattable resizable input</span>
+          <FormattableInput placeholder="Formattable resizable input" isFormattable multiline />
+        </div>
+      </div>
+    </div>
+  );
+}
