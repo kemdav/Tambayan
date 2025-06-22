@@ -61,10 +61,10 @@ const FormattingToolbar: React.FC<{
         title={fmt.title}
         className={cn(
           fmt.style,
-          "h-6 w-6 px-0.5 py-0 text-xs border border-input",
+          "h-6 w-6 px-0.5 py-0 text-xs border border-input transition-colors",
           getActive(fmt.command)
-            ? "bg-primary text-primary-foreground border-primary"
-            : "bg-white text-black border-input"
+            ? "bg-green-500 text-white border-green-500"
+            : "bg-white text-black border-input hover:bg-green-500 hover:text-white"
         )}
         type="button"
         tabIndex={-1}
@@ -124,6 +124,13 @@ export const FormattableInput = React.forwardRef<
     document.execCommand(command, false);
     editableRef.current?.focus();
     setSelectionState((s) => s + 1); // force re-render to update toggle state
+    // Also trigger auto-grow after formatting
+    if (multiline && editableRef.current) {
+      setTimeout(() => {
+        editableRef.current!.style.height = "auto";
+        editableRef.current!.style.height = `${editableRef.current!.scrollHeight}px`;
+      }, 0);
+    }
   };
 
   const getActive = (command: string) => isCommandActive(command);
@@ -137,12 +144,12 @@ export const FormattableInput = React.forwardRef<
             contentEditable
             suppressContentEditableWarning
             className={cn(
-              "border-input placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+              "block w-full max-w-full box-border border-input placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
               "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
               "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-              multiline ? `min-h-[60px] resize-none overflow-hidden` : `h-9` // removed pb-8
+              multiline ? `min-h-[60px] resize-none overflow-hidden break-words` : `h-9 overflow-x-hidden text-ellipsis`
             )}
-            style={multiline ? { whiteSpace: "pre-wrap", wordBreak: "break-word", overflow: "hidden", resize: "none" } : { whiteSpace: "nowrap" }}
+            style={multiline ? { whiteSpace: "pre-wrap", wordBreak: "break-word", overflow: "hidden", resize: "none", minHeight: "60px" } : { whiteSpace: "nowrap", overflowX: "hidden", textOverflow: "ellipsis" }}
             onInput={handleInput}
             onKeyUp={() => setSelectionState((s) => s + 1)}
             onMouseUp={() => setSelectionState((s) => s + 1)}
