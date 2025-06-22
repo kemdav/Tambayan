@@ -10,11 +10,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-action-fresh-green text-primary-foreground shadow-xs hover:bg-primary/90 rounded-md",
+          "bg-action-fresh-green text-primary-foreground shadow-xs hover:bg-action-fresh-green/40 rounded-md",
         destructive:
-          "bg-action-soft-rose text-white shadow-xs hover:bg-action-error/90 focus-visible:ring-action-error/20 dark:focus-visible:ring-action-error/40 dark:bg-action-error/60 rounded-md",
+          "bg-action-soft-rose text-white shadow-xs hover:bg-action-soft-rose/90 focus-visible:ring-action-error/20 dark:focus-visible:ring-action-error/40 dark:bg-action-soft-rose/60 rounded-md",
         navigation:
-          "bg-action-forest-green text-neutral-linen-white shadow-xs hover:bg-shade-1",
+          "bg-action-forest-green text-neutral-linen-white shadow-xs hover:bg-action-forest-green/60",
         link: "text-info underline-offset-4 hover:underline rounded-md",
       },
       size: {
