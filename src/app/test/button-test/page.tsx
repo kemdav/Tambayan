@@ -56,7 +56,7 @@ export default function Test() {
           Disabled
           </Button>
         </div>
-        <div className="row-span-3 col-span-4 bg-tint-4 rounded-2xl"></div>  
+        <div className="row-span-3 col-span-4 rounded-2xl"></div>  
       </div>
     </div>
   );
