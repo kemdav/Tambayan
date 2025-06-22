@@ -1,11 +1,6 @@
 "use client";
 
 import { Button } from "@/app/components/ui/button";
-import { TestIcon } from "@/app/components/icons";
-import { Input } from "@/app/components/ui/input";
-import { SearchIcon } from "@/app/components/icons";
-import { PasswordInput } from "@/app/components/ui/password-input";
-import { ResizableInput } from "@/app/components/ui/resizable-input";
 
 export default function ButtonTestPage() {
   return (
