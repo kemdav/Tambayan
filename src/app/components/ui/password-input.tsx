@@ -32,7 +32,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
         rightIcon={
           internalValue ? (
             <Button
-              variant="ghost"
+              variant="navigation"
               size="icon"
               className="h-7 w-7"
               onClick={() => setShowPassword(!showPassword)}

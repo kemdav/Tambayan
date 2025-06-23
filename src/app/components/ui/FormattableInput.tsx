@@ -10,6 +10,7 @@ interface FormattableInputBaseProps {
   className?: string;
   value?: string;
   onChange?: (value: string) => void;
+  fixedScroll?: boolean;
 }
 
 type FormattableInputProps =
@@ -79,7 +80,7 @@ export const FormattableInput = React.forwardRef<
   HTMLInputElement | HTMLTextAreaElement | HTMLDivElement,
   FormattableInputProps
 >(function FormattableInput(
-  { isFormattable, multiline, className, value, onChange, ...props },
+  { isFormattable, multiline, className, value, onChange, fixedScroll, ...props },
   ref
 ) {
   const editableRef = React.useRef<HTMLDivElement>(null);
@@ -105,20 +106,20 @@ export const FormattableInput = React.forwardRef<
     if (onChange) {
       onChange(e.currentTarget.innerText);
     }
-    // Auto-grow for multiline
-    if (multiline && editableRef.current) {
+    // Auto-grow for multiline (unless fixedScroll)
+    if (multiline && !fixedScroll && editableRef.current) {
       editableRef.current.style.height = "auto";
       editableRef.current.style.height = `${editableRef.current.scrollHeight}px`;
     }
   };
 
-  // Initial auto-grow for multiline
+  // Initial auto-grow for multiline (unless fixedScroll)
   React.useEffect(() => {
-    if (multiline && editableRef.current) {
+    if (multiline && !fixedScroll && editableRef.current) {
       editableRef.current.style.height = "auto";
       editableRef.current.style.height = `${editableRef.current.scrollHeight}px`;
     }
-  }, [multiline, value]);
+  }, [multiline, value, fixedScroll]);
 
   const handleFormat = (command: string) => {
     document.execCommand(command, false);
@@ -147,9 +148,18 @@ export const FormattableInput = React.forwardRef<
               "block w-full max-w-full box-border border-input placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
               "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
               "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-              multiline ? `min-h-[60px] resize-none overflow-hidden break-words` : `h-9 overflow-x-hidden text-ellipsis`
+              multiline && fixedScroll
+                ? "min-h-[100px] max-h-[200px] h-[120px] overflow-y-auto resize-none"
+                : multiline
+                ? "min-h-[60px] resize-none overflow-hidden break-words"
+                : "h-9 overflow-hidden"
             )}
-            style={multiline ? { whiteSpace: "pre-wrap", wordBreak: "break-word", overflow: "hidden", resize: "none", minHeight: "60px" } : { whiteSpace: "nowrap", overflowX: "hidden", textOverflow: "ellipsis" }}
+            style={multiline && fixedScroll
+              ? { whiteSpace: "pre-wrap", wordBreak: "break-word", overflowY: "auto", resize: "none", minHeight: "100px", maxHeight: "200px", height: "120px" }
+              : multiline
+              ? { whiteSpace: "pre-wrap", wordBreak: "break-word", overflow: "hidden", resize: "none", minHeight: "60px" }
+              : { whiteSpace: "nowrap", overflow: "hidden" }
+            }
             onInput={handleInput}
             onKeyUp={() => setSelectionState((s) => s + 1)}
             onMouseUp={() => setSelectionState((s) => s + 1)}
