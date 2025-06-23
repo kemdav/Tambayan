@@ -1,15 +1,18 @@
-"use client"
+"use client";
 
-import { Button } from "../components/ui/button"
-import { TestIcon } from "../components/icons";
+import { Button } from "../components/ui/button";
 
-export default function Test() {
+export default function TestPage() {
   return (
-    <div>
-      <Button onClick={() => console.log("Button Clicked")}>
-        <TestIcon/>
-        Create Post
-      </Button>
+    <div className="flex min-h-screen flex-col items-center gap-y-8 bg-gray-500 p-24">
+      <div className="flex w-full max-w-4xl flex-col gap-y-6">
+        <div className="flex flex-wrap items-center gap-4">
+          <Button variant="default">Default</Button>
+          <Button variant="destructive">Destructive</Button>
+         
+          <Button variant="link">Link</Button>
+        </div>
+      </div>
     </div>
   );
 }

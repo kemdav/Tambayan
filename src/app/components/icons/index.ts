@@ -2,7 +2,10 @@
 // export { UserIcon } from './UserIcon';
 // export { SettingsIcon } from './SettingsIcon';
 
-export {TestIcon} from './TestIcon'
+export * from "./TestIcon";
+export * from "./EyeIcon";
+export * from "./EyeOffIcon";
+export * from "./SearchIcon";
 
 // When used at a page
 // import { PlusIcon, UserIcon } from '@/components/icons';
