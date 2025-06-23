@@ -55,7 +55,7 @@ export default function Test() {
 
           <Button
             onClick={() => console.log("Button Clicked")}
-           // variant="navigation"
+            variant="navigation"
           >
             <TestIcon />
             Navigation
