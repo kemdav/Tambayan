@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import NavBar from "../components/ui/auth-page-ui/nav-bar-auth"
+import { AuthBackgroundWave } from "../components/icons/AuthBackgroundWave";
+import { AuthBackgroundHexagon } from "../components/icons/AuthBackgroundHexagon";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,12 +29,22 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="grid grid-col-1 grid-row-2 h-screen">
-          <div className="bg-neutral-ivory-white">
+        <div className="flex flex-col min-h-screen min-w-[375px]">
+
+          <header className="">
             <NavBar></NavBar>
-          </div>
-          <div className="bg-neutral-ivory-mist">
-          </div>
+          </header>
+          <main className="relative flex-1 flex items-center justify-center overflow-hidden">
+            <div className="absolute top-0 z-0">
+              <AuthBackgroundHexagon className="h-auto w-300 -translate-x-8 -translate-y-4"/>
+            </div>
+            <div className="absolute bottom-0 left-0 w-full z-10">
+              <AuthBackgroundWave className="h-auto w-full"/>
+            </div>
+            <div className="flex-1 flex items-center justify-center relative z-20">
+              {children}
+            </div>
+          </main>
         </div>
       </body>
     </html>

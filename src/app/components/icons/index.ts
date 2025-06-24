@@ -7,6 +7,7 @@ export * from "./EyeIcon";
 export * from "./EyeOffIcon";
 export * from "./SearchIcon";
 export * from "./TambayanIcon";
+export * from "./UserProfileLoginIcon";
 
 // When used at a page
 // import { PlusIcon, UserIcon } from '@/components/icons';
