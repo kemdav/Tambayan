@@ -21,7 +21,7 @@ export default function InputBoxComponentPage() {
         </div>
         <div className="flex flex-col gap-y-2">
           <span className="font-semibold">Search input</span>
-          <Input placeholder="Search" leftIcon={<SearchIcon className="h-4 w-4" />} />
+          <Input placeholder="Search" rightIcon={<SearchIcon className="h-4 w-4" />} />
         </div>
         <div className="flex flex-col gap-y-2">
           <span className="font-semibold">Normal resizable input</span>
