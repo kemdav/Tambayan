@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { marked } from "marked";
+import { remark } from 'remark';
+import html from 'remark-html';
 
 interface MarkdownInputBoxProps {
   value?: string;
@@ -23,11 +24,33 @@ export const MarkdownInputBox: React.FC<MarkdownInputBoxProps> = ({
 }) => {
   const [value, setValue] = React.useState(propValue);
   const [focused, setFocused] = React.useState(false);
+  const [renderedHtml, setRenderedHtml] = React.useState("");
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   React.useEffect(() => {
     setValue(propValue);
   }, [propValue]);
+
+  // Render markdown to HTML when value changes
+  React.useEffect(() => {
+    const renderMarkdown = async () => {
+      if (value) {
+        try {
+          const result = await remark()
+            .use(html)
+            .process(value);
+          setRenderedHtml(String(result));
+        } catch (error) {
+          console.error('Markdown rendering error:', error);
+          setRenderedHtml(value);
+        }
+      } else {
+        setRenderedHtml("");
+      }
+    };
+
+    renderMarkdown();
+  }, [value]);
 
   const handleFocus = () => setFocused(true);
   const handleBlur = () => setFocused(false);
@@ -61,14 +84,14 @@ export const MarkdownInputBox: React.FC<MarkdownInputBoxProps> = ({
       ) : (
         <div
           className={cn(
-            "prose-xl border-input w-full rounded-md border bg-white px-3 py-2 min-h-[120px] max-h-[400px] h-[180px] overflow-y-auto focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+            "prose-xl border-input w-full rounded-md border bg-white min-h-[120px] max-h-[400px] overflow-y-auto focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:ml-0 [&_li]:pl-0",
             !value && "text-muted-foreground"
           )}
           style={{ cursor: "text", ...style }}
           tabIndex={0}
           onClick={handleFocus}
           dangerouslySetInnerHTML={{
-            __html: value ? marked.parse(value) : `<span>${placeholder ?? ""}</span>`,
+            __html: renderedHtml || `<span>${placeholder ?? ""}</span>`,
           }}
         />
       )}
