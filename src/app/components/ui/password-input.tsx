@@ -16,7 +16,16 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
         type={showPassword ? "text" : "password"}
         className={className}
         ref={ref}
-        
+        rightIcon={
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="flex items-center justify-center"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            <Icon className="h-4 w-4 text-gray-500" />
+          </button>
+        }
         {...props}
       />
     );
