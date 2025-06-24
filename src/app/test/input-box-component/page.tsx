@@ -6,6 +6,7 @@ import { ResizableInput } from "@/app/components/ui/resizable-input";
 import { FormattableInput } from "@/app/components/ui/FormattableInput";
 import { FixedScrollTextarea } from "@/app/components/ui/fixed-scroll-textarea";
 import { MarkdownInputBox } from "@/app/components/ui/MarkdownInputBox";
+import { PasswordInput } from "@/app/components/ui/password-input";
 
 export default function InputBoxComponentPage() {
   return (
@@ -22,6 +23,10 @@ export default function InputBoxComponentPage() {
         <div className="flex flex-col gap-y-2">
           <span className="font-semibold">Search input</span>
           <Input placeholder="Seasdasdarch" rightIcon={<SearchIcon className="h-8 w-8" />} />
+        </div>
+        <div className="flex flex-col gap-y-2">
+          <span className="font-semibold">Password input</span>
+          <PasswordInput placeholder="Password" />
         </div>
         <div className="flex flex-col gap-y-2">
           <span className="font-semibold">Normal resizable input</span>
