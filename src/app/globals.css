@@ -61,3 +61,10 @@
   --color-action-olive-gray: #667A6B;
   --color-action-moss-green: #358163;
 }
+
+/* Hide the default browser "reveal password" icon */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-webkit-password-reveal-button {
+  display: none;
+  appearance: none;
+}
