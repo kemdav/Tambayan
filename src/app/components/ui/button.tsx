@@ -16,6 +16,7 @@ const buttonVariants = cva(
         navigation:
           "bg-action-forest-green text-neutral-linen-white shadow-xs hover:bg-action-forest-green/60",
         link: "text-info underline-offset-4 hover:underline rounded-md",
+        ghost: "bg-transparent hover:bg-muted/40 text-inherit shadow-none",
       },
       size: {
         default: "h-9 px-4 py-1 has-[>svg]:px-3",
