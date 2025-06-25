@@ -75,7 +75,7 @@ export default function AuthRegCard() {
         </div>
       </div>
 
-      <div className="grid grid-row-2 lg:grid-col-2 lg:gap-3 lg:mt-3">
+      <div className="grid grid-row-2 lg:gap-3 lg:mt-3 lg:flex">
         <div>
           <p className="text-action-forest-green">Password</p>
           <PasswordInput className="bg-secondary-light-moss/20"></PasswordInput>
