@@ -10,14 +10,14 @@ const CheckboxTestPage = () => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <CheckboxComponent
-        text="All Students"
+        text={<span style={{ color: 'var(action-light-blue)' }}>All Students</span>}
         checked={allStudents}
-        onChange={setAllStudents}
+        onChange={e => setAllStudents(e.target.checked)}    
       />
       <CheckboxComponent
         text={"Specific\nOrganizations"}
         checked={specificOrgs}
-        onChange={setSpecificOrgs}
+        onChange={e => setSpecificOrgs(e.target.checked)}
       />
     </div>
   );
