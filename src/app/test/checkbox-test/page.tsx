@@ -12,12 +12,12 @@ const CheckboxTestPage = () => {
       <CheckboxComponent
         text="All Students"
         checked={allStudents}
-        onChange={setAllStudents}
+        onChange={e => setAllStudents(e.target.checked)}
       />
       <CheckboxComponent
         text={"Specific\nOrganizations"}
         checked={specificOrgs}
-        onChange={setSpecificOrgs}
+        onChange={e => setSpecificOrgs(e.target.checked)}
       />
     </div>
   );

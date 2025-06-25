@@ -1,23 +1,23 @@
-import React from "react";
+import React, { forwardRef, InputHTMLAttributes } from "react";
 
-interface CheckboxComponentProps {
+export interface CheckboxComponentProps extends InputHTMLAttributes<HTMLInputElement> {
   text: string;
-  checked?: boolean;
-  onChange?: (checked: boolean) => void;
 }
 
-const CheckboxComponent: React.FC<CheckboxComponentProps> = ({ text, checked = false, onChange }) => {
-  return (
+export const CheckboxComponent = forwardRef<HTMLInputElement, CheckboxComponentProps>(
+  ({ text, ...props }, ref) => (
     <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer', gap: 8 }}>
       <input
         type="checkbox"
         className="custom-checkbox"
-        checked={checked}
-        onChange={e => onChange?.(e.target.checked)}
+        ref={ref}
+        {...props}
       />
       <span style={{ lineHeight: 1.2 }}>{text}</span>
     </label>
-  );
-};
+  )
+);
+
+CheckboxComponent.displayName = "CheckboxComponent";
 
 export default CheckboxComponent; 
