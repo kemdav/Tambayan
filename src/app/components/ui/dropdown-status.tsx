@@ -54,19 +54,19 @@ export function DropdownStatus({
   heightbutton = "h-10",
   widthdropdown = "w-[145px]",
 
-  buttonTextColor = "text-[#7DBA9D]",
-  buttonBorderColor = "border-[#98BAA9]",
+  buttonTextColor = "text-action-seafoam-green",
+  buttonBorderColor = "border-secondary-muted-sage",
   buttonBgColor = "bg-transparent",
-  buttonHoverTextColor = "hover:text-white",
-  buttonHoverBgColor = "hover:bg-[#7DBA9D]",
-  buttonActiveBgColor = "active:bg-[#358163]",
+  buttonHoverTextColor = "hover:text-neutral-pure-white",
+  buttonHoverBgColor = "hover:bg-action-seafoam-green",
+  buttonActiveBgColor = "active:bg-action-moss-green",
 
-  dropdownTextColor = "text-[#7DBA9D]",
-  dropdownBorderColor = "border-[#98BAA9]",
-  dropdownBgColor = "bg-white",
-  dropdownHoverTextColor = "hover:text-white",
-  dropdownHoverBgColor = "hover:bg-[#7DBA9D]",
-  dropdownActiveBgColor = "active:bg-[#358163]",
+  dropdownTextColor = "text-action-seafoam-green",
+  dropdownBorderColor = "border-secondary-muted-sage",
+  dropdownBgColor = "bg-neutral-pure-white",
+  dropdownHoverTextColor = "hover:text-neutral-pure-white",
+  dropdownHoverBgColor = "hover:bg-action-seafoam-green",
+  dropdownActiveBgColor = "active:bg-action-moss-green",
 }: DropdownStatusProps) {
   const [open, setOpen] = React.useState(false);
   const [selectedOption, setSelectedOption] = React.useState<Option | null>(
