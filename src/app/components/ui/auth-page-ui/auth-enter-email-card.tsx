@@ -14,12 +14,12 @@ export default function AuthEnterEmailCard() {
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   return (
-    <div className="card w-130 h-80">
+    <div className="card w-100 lg:w-130 h-80">
       <div className="flex flex-col justify-center items-center">
         <h1 className="text-action-forest-green text text-4xl font-bold">
           Reset Password
         </h1>
-        <p className="text-action-forest-green text-xs">
+        <p className="text-action-forest-green text-xs text-center">
           Enter your email address and we’ll send you a link to reset your
           password.
         </p>
@@ -46,7 +46,7 @@ export default function AuthEnterEmailCard() {
       </Button>
 
       <div className="flex items-center justify-center">
-        <p className="text-action-forest-green">Remembered your password?</p>
+        <p className="text-action-forest-green text-sm">Remembered your password?</p>
         <Button
           variant="link"
           className="text-action-forest-green"

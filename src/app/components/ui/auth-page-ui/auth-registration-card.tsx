@@ -15,9 +15,9 @@ export default function AuthRegCard() {
   const router = useRouter();
 
   return (
-    <div className="card w-130 h-160 p-10">
+    <div className="card w-100 lg:w-130 h-160 p-10">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="text-action-forest-green text text-4xl font-bold">
+        <h1 className="responsiveCardHeading">
           Student Registration
         </h1>
         <p className="text-action-forest-green text-xs">
@@ -25,24 +25,24 @@ export default function AuthRegCard() {
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-3 mt-5">
-        <div>
+      <div className="grid grid-cols-3 grid-row-1 gap-2 lg:grid-cols-4">
+        <div className="col-span-2 lg:col-span-1 lg:order-1">
           <p className="text-action-forest-green">Last Name</p>
           <Input className="bg-secondary-light-moss/20"></Input>
         </div>
 
-        <div className="col-span-2">
+        <div className="lg:order-3">
+        <p className="text-action-forest-green">Middle Name</p>
+        <Input className="bg-secondary-light-moss/20"></Input>
+        </div>   
+        
+        <div className="col-span-3 lg:col-span-2 lg:order-2">
           <p className="text-action-forest-green">First Name</p>
           <Input className="bg-secondary-light-moss/20"></Input>
-        </div>
-
-        <div>
-          <p className="text-action-forest-green">Middle Name</p>
-          <Input className="bg-secondary-light-moss/20"></Input>
-        </div>
+        </div>  
       </div>
 
-      <div className="flex flex-col mt-3">
+      <div className="flex flex-col lg:mt-3">
         <div>
           <p className="text-action-forest-green">Email</p>
           <Input
@@ -52,7 +52,7 @@ export default function AuthRegCard() {
         </div>
 
         <div>
-          <p className="text-action-forest-green mt-3">University (Temp)</p>
+          <p className="text-action-forest-green lg:mt-3">University (Temp)</p>
           <Input
             rightIcon={<UniversityIcon className="size-6" />}
             className="bg-secondary-light-moss/20"
@@ -60,9 +60,9 @@ export default function AuthRegCard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-3 mt-3">
+      <div className="grid grid-cols-4 gap-3 lg:mt-3">
         <div>
-          <p className="text-action-forest-green">Year (drop)</p>
+          <p className="text-action-forest-green">Year Level</p>
           <Input className="bg-secondary-light-moss/20"></Input>
         </div>
 
@@ -75,13 +75,13 @@ export default function AuthRegCard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-3 mt-3">
-        <div className="col-span-2">
+      <div className="grid grid-row-2 lg:grid-col-2 lg:gap-3 lg:mt-3">
+        <div>
           <p className="text-action-forest-green">Password</p>
           <PasswordInput className="bg-secondary-light-moss/20"></PasswordInput>
         </div>
 
-        <div className="col-span-2">
+        <div>
           <p className="text-action-forest-green">Confirm Password</p>
           <PasswordInput className="bg-secondary-light-moss/20"></PasswordInput>
         </div>
@@ -91,7 +91,7 @@ export default function AuthRegCard() {
         className="text-neutral-linen-white 
         bg-linear-to-r from-action-seafoam-green to-action-forest-green
          hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 
-         font-bold text-xl w-full mt-10"
+         font-bold text-xl w-full mt-5 lg:mt-10"
       >
         Sign Up
       </Button>

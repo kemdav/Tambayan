@@ -75,6 +75,12 @@ input[type="password"]::-webkit-password-reveal-button {
   }
 }
 
+@layer components {
+  .responsiveCardHeading {
+    @apply text-action-forest-green text-2xl lg:text-4xl font-bold;
+  }
+}
+
 .custom-checkbox {
   position: relative;
   width: 16px;

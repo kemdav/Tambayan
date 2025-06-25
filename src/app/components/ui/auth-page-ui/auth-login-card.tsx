@@ -14,9 +14,9 @@ export default function AuthLoginCard() {
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   return (
-    <div className="card w-130 h-100">
+    <div className="card w-100 md:w-130 lg:w-130 h-100">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="text-action-forest-green text text-4xl font-bold">
+        <h1 className="responsiveCardHeading">
           Log In to Your Account
         </h1>
         <p className="text-action-forest-green text-xs">
