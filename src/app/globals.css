@@ -1,64 +1,64 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-@theme {  
+@theme {
   --color-neutral-black: #000000;
-  --color-neutral-linen-white: #FAF7F2;
-  --color-neutral-pure-white: #FFFFFF;
-  --color-neutral-ash-green: #5D6F65;
-  --color-neutral-muted-olive: #667A6B;
-  --color-neutral-cool-sage: #98BAA9;
-  --color-neutral-deep-forest-green: #35443E;
+  --color-neutral-linen-white: #faf7f2;
+  --color-neutral-pure-white: #ffffff;
+  --color-neutral-ash-green: #5d6f65;
+  --color-neutral-muted-olive: #667a6b;
+  --color-neutral-cool-sage: #98baa9;
+  --color-neutral-deep-forest-green: #35443e;
   --color-neutral-olive-gray: #647465;
-  --color-neutral-sage-mist: #9AB09B;
-  --color-neutral-charcoal-green: #28302D;
-  --color-neutral-granite: #29312E;
+  --color-neutral-sage-mist: #9ab09b;
+  --color-neutral-charcoal-green: #28302d;
+  --color-neutral-granite: #29312e;
   --color-neutral-outer-space: #263238;
-  --color-neutral-slate-blue-green: #3E5059;
+  --color-neutral-slate-blue-green: #3e5059;
   --color-neutral-cool-gray: #717171;
-  --color-neutral-ivory-white: #FBFCFC;
-  --color-neutral-slate-gray: #455A64;
-  --color-neutral-warm-sand: #F2EADD;
-  --color-neutral-cloud-white: #F7F6F6;
-  --color-neutral-ivory-mist: #FCFCF3;
+  --color-neutral-ivory-white: #fbfcfc;
+  --color-neutral-slate-gray: #455a64;
+  --color-neutral-warm-sand: #f2eadd;
+  --color-neutral-cloud-white: #f7f6f6;
+  --color-neutral-ivory-mist: #fcfcf3;
 
   --color-primary-moss-green: #358163;
   --color-primary-forest-green: #507252;
-  --color-primary-forest-fern: #307F60;
+  --color-primary-forest-fern: #307f60;
 
-  --color-secondary-pale-sage: #C5DDD0;
-  --color-secondary-muted-sage: #98BAA9;
-  --color-secondary-deep-fern: #4E625A;
-  --color-secondary-light-moss: #ADCEBE;
+  --color-secondary-pale-sage: #c5ddd0;
+  --color-secondary-muted-sage: #98baa9;
+  --color-secondary-deep-fern: #4e625a;
+  --color-secondary-light-moss: #adcebe;
   --color-secondary-deep-jade: #387961;
-  --color-secondary-olive-gray: #667A6B;
+  --color-secondary-olive-gray: #667a6b;
 
   --color-shade-black: #000000;
   --color-shade-olivewood: #719281;
-  --color-shade-light-moss: #ADCEBE;
-  --color-shade-ash-black: #272F2C;
-  --color-shade-charcoal-green: #28302D;
+  --color-shade-light-moss: #adcebe;
+  --color-shade-ash-black: #272f2c;
+  --color-shade-charcoal-green: #28302d;
   --color-shade-outer-space: #263238;
 
-  --color-tint-pale-sage: #C5DDD0;
-  --color-tint-mint-cream: #B6DFC2;
-  --color-tint-seafoam-green: #7DBA9D;
-  --color-tint-beige-cream: #EBE6D3;
-  --color-tint-forest-fern: #307F60;
-  --color-tint-ash-black: #272F2C;
-  --color-tint-warm-sand: #F2EADD;
-  --color-tint-cloud-white: #F7F6F6;
+  --color-tint-pale-sage: #c5ddd0;
+  --color-tint-mint-cream: #b6dfc2;
+  --color-tint-seafoam-green: #7dba9d;
+  --color-tint-beige-cream: #ebe6d3;
+  --color-tint-forest-fern: #307f60;
+  --color-tint-ash-black: #272f2c;
+  --color-tint-warm-sand: #f2eadd;
+  --color-tint-cloud-white: #f7f6f6;
 
-  --color-action-fresh-green: #B7DFB8;
-  --color-action-soft-rose: #DCBABA;
-  --color-action-light-blue: #2196F3;
-  --color-action-seafoam-green: #7DBA9D;
+  --color-action-fresh-green: #b7dfb8;
+  --color-action-soft-rose: #dcbaba;
+  --color-action-light-blue: #2196f3;
+  --color-action-seafoam-green: #7dba9d;
   --color-action-forest-green: #507252;
-  --color-action-fresh-green: #B7DFB8;
-  --color-action-soft-rose: #DCBABA;
-  --color-action-light-blue: #2196F3;
-  --color-action-success-green: #4CAF4F;
-  --color-action-olive-gray: #667A6B;
+  --color-action-fresh-green: #b7dfb8;
+  --color-action-soft-rose: #dcbaba;
+  --color-action-light-blue: #2196f3;
+  --color-action-success-green: #4caf4f;
+  --color-action-olive-gray: #667a6b;
   --color-action-moss-green: #358163;
 }
 
@@ -67,6 +67,18 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-webkit-password-reveal-button {
   display: none;
   appearance: none;
+}
+
+@layer components {
+  .card {
+    @apply bg-neutral-pure-white ring-1 select-none p-10 rounded-4xl;
+  }
+}
+
+@layer components {
+  .responsiveCardHeading {
+    @apply text-action-forest-green text-2xl lg:text-4xl font-bold;
+  }
 }
 
 .custom-checkbox {
@@ -86,13 +98,13 @@ input[type="password"]::-webkit-password-reveal-button {
   border-color: var(--color-action-success-green);
 }
 .custom-checkbox:checked::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 2px;
   top: 0px;
   width: 6px;
   height: 10px;
-  border: solid #fff  ;
+  border: solid #fff;
   border-width: 0 3px 3px 0;
   transform: rotate(45deg);
 }

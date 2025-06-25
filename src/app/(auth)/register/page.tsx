@@ -1,7 +1,10 @@
+import AuthLoginCard from "@/app/components/ui/auth-page-ui/auth-login-card";
+import AuthRegCard from "@/app/components/ui/auth-page-ui/auth-registration-card";
+
 export default function Home() {
   return (
-    <div>
-      <h1 className="bg-mint-500">Register Page</h1>
+    <div className="flex items-center justify-center">
+      <AuthRegCard></AuthRegCard>
     </div>
   );
 }
