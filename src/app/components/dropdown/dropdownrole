@@ -1,0 +1,38 @@
+"use client";
+
+import { useState } from "react";
+import { TestIcon } from "@/app/components/icons";
+
+export default function DropdownRole() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDropdown = () => setIsOpen(!isOpen);
+
+  return (
+    <div className="relative inline-block text-left hover:cursor-pointer">
+      <button
+        onClick={toggleDropdown}
+        className="flex items-center gap-2 text-black pl-4 pr-2 py-2 rounded-lg border border-[#adafa4] min-w-[145px] min-h-[35px] hover:cursor-pointer"
+      >
+        <span>Member</span>
+        <TestIcon className="w-[20px] h-auto ml-auto" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute mt-2 bg-white border border-[#adafa4] rounded-lg shadow-lg z-10 min-w-[145px] min-h-[35px]">
+          <ul className="py-1">
+            <li className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+              Option 1
+            </li>
+            <li className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+              Option 2
+            </li>
+            <li className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+              Option 3
+            </li>
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
