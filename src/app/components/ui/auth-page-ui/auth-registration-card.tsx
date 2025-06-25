@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/app/components/ui/button";
 import { PasswordInput } from "../password-input";
 import { Input } from "../input";
@@ -7,8 +9,11 @@ import {
   CourseIcon,
   UniversityIcon,
 } from "../../icons";
+import { useRouter } from "next/navigation";
 
 export default function AuthRegCard() {
+  const router = useRouter();
+
   return (
     <div className="card w-130 h-160 p-10">
       <div className="flex flex-col justify-center items-center">
@@ -93,7 +98,11 @@ export default function AuthRegCard() {
 
       <div className="flex items-center justify-center">
         <p className="text-action-forest-green">Already have an account?</p>
-        <Button variant="link" className="text-action-forest-green">
+        <Button
+          variant="link"
+          className="text-action-forest-green"
+          onClick={() => router.push("/login")}
+        >
           Log in
         </Button>
       </div>
