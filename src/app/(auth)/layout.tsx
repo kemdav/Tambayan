@@ -29,14 +29,14 @@ export default function RootLayout({
       <header className="">
         <NavBar></NavBar>
       </header>
-      <main className="relative flex-1 flex items-center justify-center overflow-hidden">
+      <main className="relative flex-1 flex lg:items-center justify-center overflow-hidden">
         <div className="absolute top-0 z-0">
           <AuthBackgroundHexagon className="h-auto w-300 -translate-x-8 -translate-y-4" />
         </div>
         <div className="absolute bottom-0 left-0 w-full z-10">
           <AuthBackgroundWave className="h-auto w-full" />
         </div>
-        <div className="flex-1 flex items-center justify-center relative z-20">
+        <div className="mt-10 lg:mt-0 lg:flex-1 lg:flex lg:items-center lg:justify-center relative z-20">
           {children}
         </div>
       </main>
