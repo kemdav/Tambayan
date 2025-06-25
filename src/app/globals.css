@@ -68,3 +68,31 @@ input[type="password"]::-webkit-password-reveal-button {
   display: none;
   appearance: none;
 }
+
+.custom-checkbox {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  background-color: #fff;
+  border: 2px solid var(--color-action-success-green);
+  border-radius: 4px;
+  cursor: pointer;
+  vertical-align: middle;
+  margin-top: 2px;
+}
+.custom-checkbox:checked {
+  background-color: var(--color-action-success-green);
+  border-color: var(--color-action-success-green);
+}
+.custom-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0px;
+  width: 6px;
+  height: 10px;
+  border: solid #fff  ;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
