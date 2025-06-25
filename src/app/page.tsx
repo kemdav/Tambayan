@@ -1,5 +1,15 @@
-"use client";
+"use client"
+import { Button } from "./components/ui/button";
+import {useRouter} from "next/navigation";
 
 export default function Home() {
-  return <div></div>;
+  const router = useRouter();
+  return (
+    <main>
+        <h1 className="text-5xl">Quick Links</h1>
+        <ul>
+          <Button variant="link" className="text-action-light-blue text-3xl" onClick={()=>router.push("\login")}>Authentication Page</Button>
+        </ul>
+    </main>
+  )
 }

@@ -6,6 +6,12 @@ export * from "./TestIcon";
 export * from "./EyeIcon";
 export * from "./EyeOffIcon";
 export * from "./SearchIcon";
+export * from "./TambayanIcon";
+export * from "./UserProfileLoginIcon";
+export * from "./CourseIcon";
+export * from "./EmailIcon";
+export * from "./UniversityIcon";
+export * from "./TambayanTextIcon";
 
 // When used at a page
 // import { PlusIcon, UserIcon } from '@/components/icons';

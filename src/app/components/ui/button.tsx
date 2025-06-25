@@ -15,7 +15,7 @@ const buttonVariants = cva(
           "bg-action-soft-rose text-white shadow-xs hover:bg-action-soft-rose/90 focus-visible:ring-action-error/20 dark:focus-visible:ring-action-error/40 dark:bg-action-soft-rose/60 rounded-md",
         navigation:
           "bg-action-forest-green text-neutral-linen-white shadow-xs hover:bg-action-forest-green/60",
-        link: "text-info underline-offset-4 hover:underline rounded-md",
+        link: "text-info underline-offset-4 underline rounded-md",
         ghost: "bg-transparent hover:bg-muted/40 text-inherit shadow-none",
       },
       size: {
