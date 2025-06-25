@@ -1,7 +1,7 @@
 import React, { forwardRef, InputHTMLAttributes } from "react";
 
 export interface CheckboxComponentProps extends InputHTMLAttributes<HTMLInputElement> {
-  text: string;
+  text: React.ReactNode;
 }
 
 export const CheckboxComponent = forwardRef<HTMLInputElement, CheckboxComponentProps>(
