@@ -6,22 +6,22 @@ import { useRouter } from "next/navigation";
 export default function AuthNavBar() {
   const router = useRouter();
   return (
-    <div className="bg-secondary-muted-sage grid grid-cols-2 p-3">
-      <div className="flex">
+    <div className="bg-secondary-muted-sage grid grid-cols-2">
+      <div className="flex mx-3 my-3">
         <TambayanIcon size={40} />
         <TambayanTextIcon className="w-44"/>
       </div>
-      <div className="flex flex-row-reverse lg:gap-10 lg:mr-20">
+      <div className="flex flex-row-reverse">
         <Button
           variant="navigation"
-          className="text-neutral-ivory-white bg-secondary-muted-sage rounded-4xl"
+          className="bg-secondary-muted-sage text-neutral-ivory-white lg:w-40 h-16"
           onClick={() => router.push("/register")}
         >
           Register
         </Button>
         <Button
           variant="navigation"
-          className="bg-primary-moss-green text-neutral-ivory-white rounded-4xl"
+          className="bg-secondary-muted-sage text-neutral-ivory-white lg:w-40 h-16"
           onClick={() => router.push("/login")}
         >
           Login
