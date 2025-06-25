@@ -60,13 +60,13 @@ export default function AuthRegCard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-3 lg:mt-3">
-        <div>
+      <div className="flex lg:mt-3 gap-3">
+        <div className="w-20">
           <p className="text-action-forest-green">Year Level</p>
           <Input className="bg-secondary-light-moss/20"></Input>
         </div>
 
-        <div className="col-span-3">
+        <div className="col-span-3 grow">
           <p className="text-action-forest-green">Course</p>
           <Input
             className="bg-secondary-light-moss/20"
