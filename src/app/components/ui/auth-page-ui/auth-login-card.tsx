@@ -8,11 +8,13 @@ import { SearchIcon } from "lucide-react";
 import { UserPofileLoginIcon } from "../../icons";
 import CheckboxComponent from "@/app/components/ui/checkbox-component";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AuthLoginCard() {
   const [rememberMe, setRememberMe] = useState(false);
+  const router = useRouter();
   return (
-    <div className="bg-neutral-pure-white ring-1 select-none w-130 h-100 p-10 rounded-4xl">
+    <div className="card w-130 h-100">
       <div className="flex flex-col justify-center items-center">
         <h1 className="text-action-forest-green text text-4xl font-bold">
           Log In to Your Account
@@ -43,7 +45,11 @@ export default function AuthLoginCard() {
           checked={rememberMe}
           onChange={setRememberMe}
         />
-        <Button variant="link" className="text-action-forest-green text-xs">
+        <Button
+          variant="link"
+          className="text-action-forest-green text-xs"
+          onClick={() => router.push("/forgot-password")}
+        >
           Forgot your password?
         </Button>
       </div>

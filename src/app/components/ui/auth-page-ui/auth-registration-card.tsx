@@ -10,7 +10,7 @@ import {
 
 export default function AuthRegCard() {
   return (
-    <div className="bg-neutral-pure-white ring-1 select-none w-130 h-160 p-10 rounded-4xl">
+    <div className="card w-130 h-160 p-10">
       <div className="flex flex-col justify-center items-center">
         <h1 className="text-action-forest-green text text-4xl font-bold">
           Student Registration
