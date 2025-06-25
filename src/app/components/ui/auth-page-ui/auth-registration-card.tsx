@@ -62,7 +62,7 @@ export default function AuthRegCard() {
 
       <div className="grid grid-cols-4 gap-3 mt-3">
         <div>
-          <p className="text-action-forest-green">Year Level</p>
+          <p className="text-action-forest-green">Year (drop)</p>
           <Input className="bg-secondary-light-moss/20"></Input>
         </div>
 
@@ -78,7 +78,7 @@ export default function AuthRegCard() {
       <div className="grid grid-cols-4 gap-3 mt-3">
         <div className="col-span-2">
           <p className="text-action-forest-green">Password</p>
-          <Input className="bg-secondary-light-moss/20"></Input>
+          <PasswordInput className="bg-secondary-light-moss/20"></PasswordInput>
         </div>
 
         <div className="col-span-2">

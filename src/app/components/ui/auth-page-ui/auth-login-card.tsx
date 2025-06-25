@@ -41,9 +41,13 @@ export default function AuthLoginCard() {
       <div className="flex items-center justify-between">
         {/*TODO put the actual checkbox component here*/}
         <CheckboxComponent
-          text={"Remember Me?"}
+          text={
+            <span style={{ color: "var(--color-action-forest-green )" }}>
+              Remember me
+            </span>
+          }
           checked={rememberMe}
-          onChange={setRememberMe}
+          onChange={(e) => setRememberMe(e.target.checked)}
         />
         <Button
           variant="link"
