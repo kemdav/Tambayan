@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "./button";
-import { Input } from "./input";
+import { Input } from "./input/input";
 
 // Utility to get a random Button variant
 const buttonVariants = ["default", "destructive", "navigation", "link", "ghost"] as const;

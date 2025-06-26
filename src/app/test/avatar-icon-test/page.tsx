@@ -1,6 +1,6 @@
 "use client";
 
-import { AvatarIcon } from "@/app/components/ui/avatar-icon-component";
+import { AvatarIcon } from "@/app/components/ui/general/avatar-icon-component";
 
 export default function AvatarIconTestPage() {
   return (

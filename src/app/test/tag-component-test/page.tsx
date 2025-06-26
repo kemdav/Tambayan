@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { TagComponent } from "@/app/components/ui/tag-component";
+import { TagComponent } from "@/app/components/ui/general/tag-component";
 
-import { AvatarIcon } from "@/app/components/ui/avatar-icon-component";
+import { AvatarIcon } from "@/app/components/ui/general/avatar-icon-component";
 
 export default function TagComponentTestPage() {
   return (

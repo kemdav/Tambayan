@@ -1,7 +1,7 @@
 "use-client";
 
 import { Italic } from "lucide-react";
-import { Toggle } from "@/app/components/ui/toggle";
+import { Toggle } from "@/app/components/ui/general/toggle";
 
 export default function ToggleOutline() {
   return (

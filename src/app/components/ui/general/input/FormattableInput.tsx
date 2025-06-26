@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Input, InputProps } from "./input";
 import { ResizableInput, ResizableInputProps } from "./resizable-input";
-import { Toggle } from "./toggle";
+import { Toggle } from "../toggle";
 import { cn } from "@/lib/utils";
 
 interface FormattableInputBaseProps {

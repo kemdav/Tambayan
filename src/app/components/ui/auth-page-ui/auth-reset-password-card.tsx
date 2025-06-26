@@ -1,12 +1,7 @@
 "use client";
 
-import { TambayanIcon } from "../../icons";
-import { Button } from "@/app/components/ui/button";
-import { PasswordInput } from "../password-input";
-import { Input } from "../input";
-import { SearchIcon } from "lucide-react";
-import { EmailIcon } from "../../icons";
-import CheckboxComponent from "@/app/components/ui/checkbox-component";
+import { Button } from "@/app/components/ui/general/button";
+import { PasswordInput } from "@/app/components/ui/general/input/password-input";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 

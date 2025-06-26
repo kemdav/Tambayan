@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/app/components/ui/button";
-import { PasswordInput } from "../password-input";
-import { Input } from "../input";
+import { Button } from "@/app/components/ui/general/button";
+import { PasswordInput } from "@/app/components/ui/general/input/password-input";
+import { Input } from "@/app/components/ui/general/input/input";
 import {
   UserPofileLoginIcon,
   EmailIcon,

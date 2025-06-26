@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/app/components/ui/button";
+import { Button } from "@/app/components/ui/general/button";
 import {
   Command,
   CommandEmpty,
@@ -10,12 +10,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/app/components/ui/dropdown/command";
+} from "@/app/components/ui/general/dropdown/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/app/components/ui/dropdown/popover";
+} from "@/app/components/ui/general/dropdown/popover";
 
 type Option = {
   value: string;

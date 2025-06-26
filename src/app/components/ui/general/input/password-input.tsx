@@ -1,7 +1,7 @@
 "use client";
 
 import { EyeIcon, EyeOffIcon } from "@/app/components/icons";
-import { Input, InputProps } from "@/app/components/ui/input";
+import { Input, InputProps } from "@/app/components/ui/general/input/input";
 import * as React from "react";
 
 export interface PasswordInputProps extends InputProps {}
