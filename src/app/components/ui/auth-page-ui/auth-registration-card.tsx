@@ -17,9 +17,7 @@ export default function AuthRegCard() {
   return (
     <div className="card w-100 lg:w-130 h-160 p-10">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="responsiveCardHeading">
-          Student Registration
-        </h1>
+        <h1 className="responsiveCardHeading">Student Registration</h1>
         <p className="text-action-forest-green text-xs">
           Enter your information to get started.
         </p>
@@ -28,18 +26,18 @@ export default function AuthRegCard() {
       <div className="grid grid-cols-3 grid-row-1 gap-2 lg:grid-cols-4">
         <div className="col-span-2 lg:col-span-1 lg:order-1">
           <p className="text-action-forest-green">Last Name</p>
-          <Input className="bg-secondary-light-moss/20"></Input>
+          <Input className="responsiveAuthInput"></Input>
         </div>
 
         <div className="lg:order-3">
-        <p className="text-action-forest-green">Middle Name</p>
-        <Input className="bg-secondary-light-moss/20"></Input>
-        </div>   
-        
+          <p className="text-action-forest-green">Middle Name</p>
+          <Input className="responsiveAuthInput"></Input>
+        </div>
+
         <div className="col-span-3 lg:col-span-2 lg:order-2">
           <p className="text-action-forest-green">First Name</p>
-          <Input className="bg-secondary-light-moss/20"></Input>
-        </div>  
+          <Input className="responsiveAuthInput"></Input>
+        </div>
       </div>
 
       <div className="flex flex-col lg:mt-3">
@@ -47,7 +45,7 @@ export default function AuthRegCard() {
           <p className="text-action-forest-green">Email</p>
           <Input
             rightIcon={<EmailIcon className="size-6" />}
-            className="bg-secondary-light-moss/20"
+            className="responsiveAuthInput"
           ></Input>
         </div>
 
@@ -55,7 +53,7 @@ export default function AuthRegCard() {
           <p className="text-action-forest-green lg:mt-3">University (Temp)</p>
           <Input
             rightIcon={<UniversityIcon className="size-6" />}
-            className="bg-secondary-light-moss/20"
+            className="responsiveAuthInput"
           ></Input>
         </div>
       </div>
@@ -63,7 +61,7 @@ export default function AuthRegCard() {
       <div className="flex lg:mt-3 gap-3">
         <div className="w-20">
           <p className="text-action-forest-green">Year Level</p>
-          <Input className="bg-secondary-light-moss/20"></Input>
+          <Input className="responsiveAuthInput"></Input>
         </div>
 
         <div className="col-span-3 grow">

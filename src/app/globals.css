@@ -71,13 +71,13 @@ input[type="password"]::-webkit-password-reveal-button {
 
 @layer components {
   .card {
-    @apply bg-neutral-pure-white ring-1 select-none p-10 rounded-4xl;
+    @apply lg:bg-neutral-pure-white lg:ring-1 select-none p-10 rounded-4xl;
   }
-}
-
-@layer components {
   .responsiveCardHeading {
-    @apply text-action-forest-green text-2xl lg:text-4xl font-bold;
+    @apply text-action-forest-green text-3xl lg:text-4xl font-bold;
+  }
+  .responsiveAuthInput {
+    @apply bg-secondary-pale-sage/60 lg:bg-secondary-light-moss/20;
   }
 }
 
