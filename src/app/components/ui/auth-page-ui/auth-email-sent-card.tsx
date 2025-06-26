@@ -1,17 +1,10 @@
 "use client";
 
-import { TambayanIcon } from "../../icons";
-import { Button } from "@/app/components/ui/button";
-import { PasswordInput } from "../password-input";
-import { Input } from "../input";
-import { SearchIcon } from "lucide-react";
-import { EmailIcon } from "../../icons";
-import CheckboxComponent from "@/app/components/ui/checkbox-component";
+import { Button } from "@/app/components/ui/general/button";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AuthEmailSentCard() {
-  const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   return (
     <div className="card w-100 lg:w-130 h-80">

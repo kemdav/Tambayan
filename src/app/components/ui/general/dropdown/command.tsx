@@ -11,7 +11,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/app/components/ui/dropdown/dialog"
+} from "@/app/components/ui/general/dropdown/dialog"
 
 function Command({
   className,
