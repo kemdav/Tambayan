@@ -9,79 +9,82 @@ import {
   CourseIcon,
   UniversityIcon,
 } from "../../icons";
+import DropdownRole from "@/app/components/ui/general/dropdown/dropdown-role";
 import { useRouter } from "next/navigation";
 
 export default function AuthRegCard() {
   const router = useRouter();
 
+    const YrOptions = [
+    { value: "year_1", label: "1" },
+    { value: "year_2", label: "2" },
+    { value: "year_3", label: "3" },
+    { value: "year_4", label: "3" },
+    { value: "year_5", label: "4" }
+  ];
+
   return (
-    <div className="card w-100 lg:w-130 h-160 p-10">
+    <div className="card w-100 lg:w-130 h-160 p-5 lg:p-10">
       <div className="flex flex-col justify-center items-center">
         <h1 className="responsiveCardHeading">Student Registration</h1>
-        <p className="text-action-forest-green text-xs">
+        <p className="textAuthResponsive text-xs">
           Enter your information to get started.
         </p>
       </div>
 
       <div className="grid grid-cols-3 grid-row-1 gap-2 lg:grid-cols-4">
         <div className="col-span-2 lg:col-span-1 lg:order-1">
-          <p className="text-action-forest-green">Last Name</p>
-          <Input className="responsiveAuthInput"></Input>
+          <p className="textAuthResponsive">Last Name</p>
+          <Input className="inputAuthResponsive"></Input>
         </div>
 
         <div className="lg:order-3">
-          <p className="text-action-forest-green">Middle Name</p>
-          <Input className="responsiveAuthInput"></Input>
+          <p className="textAuthResponsive">Middle Name</p>
+          <Input className="inputAuthResponsive"></Input>
         </div>
 
         <div className="col-span-3 lg:col-span-2 lg:order-2">
-          <p className="text-action-forest-green">First Name</p>
-          <Input className="responsiveAuthInput"></Input>
+          <p className="textAuthResponsive">First Name</p>
+          <Input className="inputAuthResponsive"></Input>
         </div>
       </div>
 
       <div className="flex flex-col lg:mt-3">
         <div>
-          <p className="text-action-forest-green">Email</p>
+          <p className="textAuthResponsive">Email</p>
           <Input
             rightIcon={<EmailIcon className="size-6" />}
-            className="responsiveAuthInput"
+            className="inputAuthResponsive"
           ></Input>
         </div>
 
         <div>
-          <p className="text-action-forest-green lg:mt-3">University (Temp)</p>
-          <Input
-            rightIcon={<UniversityIcon className="size-6" />}
-            className="responsiveAuthInput"
-          ></Input>
+          <p className="textAuthResponsive lg:mt-3">University</p>
+          <DropdownRole options={YrOptions} width="w-full"></DropdownRole>
         </div>
       </div>
 
       <div className="flex lg:mt-3 gap-3">
-        <div className="w-20">
-          <p className="text-action-forest-green">Year Level</p>
-          <Input className="responsiveAuthInput"></Input>
+        <div className="">
+          <p className="textAuthResponsive">Year Level</p>
+          <DropdownRole options={YrOptions}></DropdownRole>
         </div>
 
-        <div className="col-span-3 grow">
-          <p className="text-action-forest-green">Course</p>
-          <Input
-            className="bg-secondary-light-moss/20"
-            rightIcon={<CourseIcon className="size-6" />}
-          ></Input>
+        <div className="grow">
+          <p className="textAuthResponsive">Course</p>
+          <DropdownRole options={YrOptions} width="w-full"></DropdownRole>
         </div>
       </div>
 
       <div className="grid grid-row-2 lg:gap-3 lg:mt-3 lg:flex">
         <div>
-          <p className="text-action-forest-green">Password</p>
-          <PasswordInput className="bg-secondary-light-moss/20"></PasswordInput>
+          <p className="textAuthResponsive">Password</p>
+          <PasswordInput className="inputAuthResponsive"></PasswordInput>
         </div>
 
         <div>
-          <p className="text-action-forest-green">Confirm Password</p>
-          <PasswordInput className="bg-secondary-light-moss/20"></PasswordInput>
+          <p className="textAuthResponsive">Confirm Password</p>
+          <PasswordInput className="inputAuthResponsive"></PasswordInput>
         </div>
       </div>
 
@@ -95,10 +98,10 @@ export default function AuthRegCard() {
       </Button>
 
       <div className="flex items-center justify-center">
-        <p className="text-action-forest-green">Already have an account?</p>
+        <p className="textAuthResponsive">Already have an account?</p>
         <Button
           variant="link"
-          className="text-action-forest-green"
+          className="textAuthResponsive"
           onClick={() => router.push("/login")}
         >
           Log in

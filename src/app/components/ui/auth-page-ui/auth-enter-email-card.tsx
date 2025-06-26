@@ -13,10 +13,10 @@ export default function AuthEnterEmailCard() {
   return (
     <div className="card w-100 lg:w-130 h-80">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="text-action-forest-green text text-4xl font-bold">
+        <h1 className="responsiveCardHeading">
           Reset Password
         </h1>
-        <p className="text-action-forest-green text-xs text-center">
+        <p className="textAuthResponsive text-xs text-center">
           Enter your email address and we’ll send you a link to reset your
           password.
         </p>
@@ -24,7 +24,7 @@ export default function AuthEnterEmailCard() {
 
       <div className="flex flex-col gap-5 mt-6">
         <div>
-          <p className="text-action-forest-green">Email Address</p>
+          <p className="textAuthResponsive">Email Address</p>
           <Input
             rightIcon={<EmailIcon className="size-6" />}
             className="bg-secondary-light-moss/20"
@@ -43,10 +43,10 @@ export default function AuthEnterEmailCard() {
       </Button>
 
       <div className="flex items-center justify-center">
-        <p className="text-action-forest-green text-sm">Remembered your password?</p>
+        <p className="textAuthResponsive text-sm">Remembered your password?</p>
         <Button
           variant="link"
-          className="text-action-forest-green"
+          className="textAuthResponsive"
           onClick={() => router.push("/login")}
         >
           Log in instead

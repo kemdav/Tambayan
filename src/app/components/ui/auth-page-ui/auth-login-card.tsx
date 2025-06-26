@@ -15,24 +15,24 @@ export default function AuthLoginCard() {
   return (
     <div className="card w-100 md:w-130 lg:w-130 h-100">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="responsiveCardHeading">
+        <h1 className="responsiveCardHeading text-center">
           Log In to Your Account
         </h1>
-        <p className="text-action-forest-green text-xs">
+        <p className="textAuthResponsive text-xs text-center">
           Please sign in to proceed
         </p>
       </div>
 
       <div className="flex flex-col gap-5 mt-3">
         <div>
-          <p className="text-action-forest-green">Email</p>
+          <p className="textAuthResponsive">Email</p>
           <Input
             rightIcon={<UserPofileLoginIcon />}
             className="bg-secondary-light-moss/20"
           ></Input>
         </div>
         <div>
-          <p className="text-action-forest-green">Password</p>
+          <p className="textAuthResponsive">Password</p>
           <PasswordInput className="bg-secondary-light-moss/20"></PasswordInput>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default function AuthLoginCard() {
         />
         <Button
           variant="link"
-          className="text-action-forest-green text-xs"
+          className="textAuthResponsive text-xs"
           onClick={() => router.push("/forgot-password")}
         >
           Forgot your password?
@@ -67,10 +67,10 @@ export default function AuthLoginCard() {
       </Button>
 
       <div className="flex items-center justify-center">
-        <p className="text-action-forest-green">Don't have an account?</p>
+        <p className="textAuthResponsive">Don't have an account?</p>
         <Button
           variant="link"
-          className="text-action-forest-green"
+          className="textAuthResponsive"
           onClick={() => router.push("register")}
         >
           Sign up
