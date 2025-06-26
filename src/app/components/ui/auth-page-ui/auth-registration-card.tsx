@@ -20,13 +20,13 @@ export default function AuthRegCard() {
     { value: "year_1", label: "1" },
     { value: "year_2", label: "2" },
     { value: "year_3", label: "3" },
-    { value: "year_4", label: "3" },
-    { value: "year_5", label: "4" }
+    { value: "year_4", label: "4" },
+    { value: "year_5", label: "5" }
   ];
 
   // Ideally, the value would be u[University ID]
    const UniversityOptions = [
-    { value: "u1", label: "Cebu Institue of Technology University" },
+    { value: "u1", label: "Cebu Institute of Technology University" },
     { value: "u2", label: "Cebu Technological University" },
   ];
 
