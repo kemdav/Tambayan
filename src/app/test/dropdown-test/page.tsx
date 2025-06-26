@@ -20,6 +20,8 @@ const statusOptions = [
   { value: "banned", label: "Banned" },
 ];
 
+// use the global.css components instead of hex on actual pages
+
 export default function Home() {
   return (
     <main className="flex flex-col space-y-4 items-center mt-50">
