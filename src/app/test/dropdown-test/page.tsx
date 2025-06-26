@@ -1,7 +1,7 @@
 "use client";
 
-import DropdownRole from "@/app/components/ui/dropdown-role";
-import { DropdownStatus } from "@/app/components/ui/dropdown-status";
+import DropdownRole from "@/app/components/ui/dropdown/dropdown-role";
+import { DropdownStatus } from "@/app/components/ui/dropdown/dropdown-status";
 
 const roleOptions = [
   { value: "member", label: "Member" },
