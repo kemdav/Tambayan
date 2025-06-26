@@ -36,7 +36,7 @@ export default function RootLayout({
         <div className="absolute bottom-0 left-0 w-full z-10">
           <AuthBackgroundWave className="h-auto w-full" />
         </div>
-        <div className="mt-10 lg:mt-0 lg:flex-1 lg:flex lg:items-center lg:justify-center relative z-20">
+        <div className="lg:flex-1 lg:flex lg:items-center lg:justify-center relative z-20">
           {children}
         </div>
       </main>

@@ -11,21 +11,21 @@ export default function AuthResetPasswordCard() {
   return (
     <div className="card w-100 lg:w-130 h-100">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="text-action-forest-green text text-3xl lg:text-4xl font-bold">
+        <h1 className="responsiveCardHeading">
           Set a new Password
         </h1>
-        <p className="text-action-forest-green text-xs text-center">
+        <p className="textAuthResponsive text-xs text-center">
           Create a strong password to keep your account secure.
         </p>
       </div>
 
       <div className="flex flex-col gap-5 mt-3">
         <div>
-          <p className="text-action-forest-green">New Password</p>
+          <p className="textAuthResponsive">New Password</p>
           <PasswordInput className="bg-secondary-light-moss/20"></PasswordInput>
         </div>
         <div>
-          <p className="text-action-forest-green">Confirm New Password</p>
+          <p className="textAuthResponsive">Confirm New Password</p>
           <PasswordInput className="bg-secondary-light-moss/20"></PasswordInput>
         </div>
       </div>
@@ -40,12 +40,12 @@ export default function AuthResetPasswordCard() {
       </Button>
 
       <div className="flex items-center justify-center">
-        <p className="text-action-forest-green text-xs">
+        <p className="textAuthResponsive text-xs">
           Remembered your password?
         </p>
         <Button
           variant="link"
-          className="text-action-forest-green"
+          className="textAuthResponsive"
           onClick={() => router.push("/login")}
         >
           Log in instead

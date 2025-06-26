@@ -9,13 +9,13 @@ export default function AuthEmailSentCard() {
   return (
     <div className="card w-100 lg:w-130 h-80">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="text-action-forest-green text text-4xl font-bold">
+        <h1 className="responsiveCardHeading">
           Check your Email
         </h1>
-        <p className="text-action-forest-green text-xs text-center">
+        <p className="textAuthResponsive text-xs text-center">
           A password reset link has been sent to your email address.
         </p>
-        <p className="text-action-forest-green text-xs text-center">
+        <p className="textAuthResponsive text-xs text-center">
           Please check your inbox to proceed.
         </p>
       </div>
@@ -30,7 +30,7 @@ export default function AuthEmailSentCard() {
       </Button>
 
       <div className="flex items-center justify-center">
-        <p className="text-action-forest-green text-xs">
+        <p className="textAuthResponsive text-xs">
           Didn’t get the link? Check your spam or click to resend.
         </p>
       </div>
