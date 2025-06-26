@@ -15,12 +15,25 @@ import { useRouter } from "next/navigation";
 export default function AuthRegCard() {
   const router = useRouter();
 
-    const YrOptions = [
+  // Might consider moving this to another file later on
+  const YrOptions = [
     { value: "year_1", label: "1" },
     { value: "year_2", label: "2" },
     { value: "year_3", label: "3" },
     { value: "year_4", label: "3" },
     { value: "year_5", label: "4" }
+  ];
+
+  // Ideally, the value would be u[University ID]
+   const UniversityOptions = [
+    { value: "u1", label: "Cebu Institue of Technology University" },
+    { value: "u2", label: "Cebu Technological University" },
+  ];
+
+   const CourseOptions = [
+    { value: "bscpe", label: "Bachelors of Science in Computer Engineering" },
+    { value: "bsce", label: "Bachelors of Science in Civil Engineering" },
+    { value: "bscs", label: "Bachelors of Science in Computer Science" }
   ];
 
   return (
@@ -60,7 +73,7 @@ export default function AuthRegCard() {
 
         <div>
           <p className="textAuthResponsive lg:mt-3">University</p>
-          <DropdownRole options={YrOptions} width="w-full"></DropdownRole>
+          <DropdownRole options={UniversityOptions} width="w-full"></DropdownRole>
         </div>
       </div>
 
@@ -72,7 +85,7 @@ export default function AuthRegCard() {
 
         <div className="grow">
           <p className="textAuthResponsive">Course</p>
-          <DropdownRole options={YrOptions} width="w-full"></DropdownRole>
+          <DropdownRole options={CourseOptions} width="w-full"></DropdownRole>
         </div>
       </div>
 
