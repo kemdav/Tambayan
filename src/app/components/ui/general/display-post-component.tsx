@@ -1,6 +1,8 @@
 import * as React from "react";
 import { AvatarIcon } from "./avatar-icon-component";
 import { Button } from "./button";
+import LikeIcon from "@/app/components/icons/LikeIcon";
+import CommentIcon from "@/app/components/icons/CommentIcon";
 
 interface DisplayPostComponentProps {
   posterName: string;
@@ -34,7 +36,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
           <span className="text-xs text-gray-400">{daysSincePosted} days ago</span>
         </div>
       </div>
-      <div className="mb-2 text-sm text-gray-700 whitespace-pre-line">{content}</div>
+      <div className="mb-2 text-sm text-gray-700 whitespace-pre-line break-words overflow-hidden">{content}</div>
       {imageSrc && (
         <div className="mb-2">
           <img src={imageSrc} alt="post" className="rounded-lg max-h-64 object-contain mx-auto" />
@@ -42,10 +44,10 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
       )}
       <div className="flex items-center gap-4 mt-2">
         <Button className="flex items-center gap-1 px-2 py-1 text-xs" onClick={onLike}>
-          <span role="img" aria-label="like">👍</span> {likes}
+          <LikeIcon className="w-4 h-4" /> {likes}
         </Button>
         <Button className="flex items-center gap-1 px-2 py-1 text-xs" onClick={onComment}>
-          <span role="img" aria-label="comment">💬</span> {comments}
+          <CommentIcon className="w-4 h-4" /> {comments}
         </Button>
       </div>
     </div>
