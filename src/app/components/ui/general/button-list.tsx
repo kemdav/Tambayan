@@ -1,18 +1,23 @@
-import React from "react";
+"use client"
+import React, { useState } from "react";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
-import { Button } from "@/app/components/ui/general/button";
+import { Button, buttonVariants } from "@/app/components/ui/general/button";
+
 
 interface ButtonListProps {
   buttons: ButtonConfig[];
   className?: string;
+  selectedId: string | null;
+  onButtonClick: (id: string) => void;
 }
-export const ButtonList = ({ buttons, className }: ButtonListProps) => {
+export const ButtonList = ({ buttons, className, selectedId, onButtonClick }: ButtonListProps) => {
+
   return (
     <div className={className}>
-      {buttons.map((buttonProps) => {
-        // Destructure our custom props from the rest of the standard button attributes.
+      {buttons.map((buttonProps, index) => {
         const {
-          isSelected,
+          id,
+          variant,
           children,
           icon,
           iconPosition = "left",
@@ -21,7 +26,12 @@ export const ButtonList = ({ buttons, className }: ButtonListProps) => {
 
         return (
           <Button
+          id={id}
+          key={index}
             {...restOfProps} 
+            variant={variant}
+            isSelected={id===selectedId}
+            onClick={()=>{onButtonClick(id); console.log(id, selectedId)}}
           >
             {icon && iconPosition === "left" && icon}
             {children}

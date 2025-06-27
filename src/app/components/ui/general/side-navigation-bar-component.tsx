@@ -17,24 +17,32 @@ import { useState } from "react";
 export default function SideNavBar() {
   const myButtons: ButtonConfig[] = [
     {
+        id: "profile",
       children: "Student Profile",
+      variant: "sideNavigation",
       className:
         "sideNavBarButtonText",
       icon: <StudentProfileIcon className="size-10" />,
     },
     {
+        id: "newsfeed",
       children: "Newsfeed",
+      variant: "sideNavigation",
       className:
         "sideNavBarButtonText",
       icon: <NewsfeedIcon className="size-10" />,
     },
     {
+        id: "sub-org",
       children: "Subscribed Organizations",
+      variant: "sideNavigation",
       className:
         "sideNavBarButtonText",
       icon: <SubscribedOrgIcon className="size-10" />,
     },
     {
+        id: "join-org",
+        variant: "sideNavigation",
       children: "Join Organization",
       className: "sideNavBarButtonText",
       icon: <AddIcon className="size-10" />,
@@ -42,6 +50,7 @@ export default function SideNavBar() {
   ];
 
   const [isNavOpen, setIsNavOpen] = useState(true);
+  const [selectedButtonId, setSelectedButtonId] = useState<string>("profile");
 
   return (
     <main className={`bg-tint-forest-fern h-screen transition-all duration-500 ease-in-out ${isNavOpen ? 'w-70' : 'w-15'}`}>
@@ -52,7 +61,7 @@ export default function SideNavBar() {
       </div>
 
       <div>
-        <ButtonList buttons={myButtons} className="flex flex-col gap-3" />
+        <ButtonList buttons={myButtons} className="flex flex-col" selectedId={selectedButtonId} onButtonClick={(id)=>setSelectedButtonId(id)}/>
       </div>
     </main>
   );
