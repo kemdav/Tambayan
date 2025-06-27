@@ -26,30 +26,46 @@ const buttonVariants = cva(
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9",
       },
+      isSelected : {
+        true: "",
+        false: "",
+      },
     },
+    compoundVariants: [
+        {
+          variant: "navigation",
+          isSelected: true,
+          className: "bg-action-forest-green/50",
+        }
+    ],
     defaultVariants: {
       variant: "default",
       size: "default",
+      isSelected: false,
     },
   }
 );
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
 
 function Button({
   className,
   variant,
   size,
+  isSelected,
   asChild = false,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
+}: ButtonProps) {
   const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, className, isSelected }))}
       {...props}
     />
   );

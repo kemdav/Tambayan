@@ -2,8 +2,10 @@
 
 import { Button } from "@/app/components/ui/general/button";
 import { TestIcon } from "../../components/icons";
+import { useState } from "react";
 
 export default function Test() {
+  const [isSelected, setIsSelected] = useState(false);
   return (
     <div className="grid grid-flow-col grid-rows-4 grid-cols-1 gap-4 bg-blue-100 p-10">
       <div className="flex justify-center  bg-tint-4 rounded-2xl">
@@ -54,7 +56,8 @@ export default function Test() {
           </Button>
 
           <Button
-            onClick={() => console.log("Button Clicked")}
+            isSelected={isSelected}
+            onClick={()=>setIsSelected(!isSelected)}
             variant="navigation"
           >
             <TestIcon />
