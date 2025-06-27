@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { MemberCardComponent } from "@/app/components/ui/member-card-component";
+import { MemberCardComponent } from "@/app/components/ui/general/member-card-component";
 
 export default function MemberCardTestPage() {
   return (

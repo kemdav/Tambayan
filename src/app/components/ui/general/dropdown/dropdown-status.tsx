@@ -118,7 +118,7 @@ export function DropdownStatus({
                   <CommandItem
                     key={option.value}
                     value={option.value}
-                    onSelect={(value) => {
+                    onSelect={(value: string) => {
                       setSelectedOption(
                         options.find((o) => o.value === value) || null
                       );
