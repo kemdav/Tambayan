@@ -1,6 +1,6 @@
 "use client";
 import { TambayanIcon, TambayanTextIcon } from "../../icons";
-import { Button } from "@/app/components/ui/button";
+import { Button } from "@/app/components/ui/general/button";
 import { useRouter } from "next/navigation";
 
 export default function AuthNavBar() {

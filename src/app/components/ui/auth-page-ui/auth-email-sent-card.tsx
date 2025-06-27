@@ -1,28 +1,21 @@
 "use client";
 
-import { TambayanIcon } from "../../icons";
-import { Button } from "@/app/components/ui/button";
-import { PasswordInput } from "../password-input";
-import { Input } from "../input";
-import { SearchIcon } from "lucide-react";
-import { EmailIcon } from "../../icons";
-import CheckboxComponent from "@/app/components/ui/checkbox-component";
+import { Button } from "@/app/components/ui/general/button";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AuthEmailSentCard() {
-  const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   return (
     <div className="card w-100 lg:w-130 h-80">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="text-action-forest-green text text-4xl font-bold">
+        <h1 className="responsiveCardHeading">
           Check your Email
         </h1>
-        <p className="text-action-forest-green text-xs text-center">
+        <p className="textAuthResponsive text-xs text-center">
           A password reset link has been sent to your email address.
         </p>
-        <p className="text-action-forest-green text-xs text-center">
+        <p className="textAuthResponsive text-xs text-center">
           Please check your inbox to proceed.
         </p>
       </div>
@@ -37,7 +30,7 @@ export default function AuthEmailSentCard() {
       </Button>
 
       <div className="flex items-center justify-center">
-        <p className="text-action-forest-green text-xs">
+        <p className="textAuthResponsive text-xs">
           Didn’t get the link? Check your spam or click to resend.
         </p>
       </div>

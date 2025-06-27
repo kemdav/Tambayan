@@ -1,12 +1,12 @@
 "use client";
 
-import { Input } from "@/app/components/ui/input";
+import { Input } from "@/app/components/ui/general/input/input";
 import { SearchIcon } from "@/app/components/icons";
-import { ResizableInput } from "@/app/components/ui/resizable-input";
-import { FormattableInput } from "@/app/components/ui/FormattableInput";
-import { FixedScrollTextarea } from "@/app/components/ui/fixed-scroll-textarea";
-import { MarkdownInputBox } from "@/app/components/ui/MarkdownInputBox";
-import { PasswordInput } from "@/app/components/ui/password-input";
+import { ResizableInput } from "@/app/components/ui/general/input/resizable-input";
+import { FormattableInput } from "@/app/components/ui/general/input/FormattableInput";
+import { FixedScrollTextarea } from "@/app/components/ui/general/input/fixed-scroll-textarea";
+import { MarkdownInputBox } from "@/app/components/ui/general/input/MarkdownInputBox";
+import { PasswordInput } from "@/app/components/ui/general/input/password-input";
 
 export default function InputBoxComponentPage() {
   return (

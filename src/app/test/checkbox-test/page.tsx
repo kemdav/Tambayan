@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import CheckboxComponent from "../../components/ui/checkbox-component";
+import CheckboxComponent from "@/app/components/ui/general/checkbox-component";
 
 const CheckboxTestPage = () => {
   const [allStudents, setAllStudents] = useState(false);
