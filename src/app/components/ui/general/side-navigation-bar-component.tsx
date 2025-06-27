@@ -1,3 +1,4 @@
+"use client"
 import { ButtonList } from "@/app/components/ui/general/button-list";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import {
@@ -6,47 +7,52 @@ import {
   StudentProfileIcon,
   SubscribedOrgIcon,
   UserPofileLoginIcon,
+  TambayanTextIcon,
+  TambayanIcon,
+  NavigationButtonIcon,
 } from "@/app/components/icons";
+import { Button } from "./button";
+import { useState } from "react";
 
 export default function SideNavBar() {
   const myButtons: ButtonConfig[] = [
     {
-      id: "save-btn",
       children: "Student Profile",
       className:
-        "h-10 justify-start bg-tint-forest-fern transition delay-150 duration-5000 ease-in-out hover:translate-200 hover:bg-neutral-deep-forst-green text-neutral-pure-white",
-      icon: <UserPofileLoginIcon className="bg-action-light-blue" />,
+        "sideNavBarButtonText",
+      icon: <StudentProfileIcon className="size-10" />,
     },
     {
-      id: "cancel-btn",
       children: "Newsfeed",
       className:
-        "button-secondary justify-start bg-tint-forest-fern hover:bg-primary-forest-green text-neutral-pure-white",
-      icon: <UserPofileLoginIcon className="bg-action-light-blue" />,
+        "sideNavBarButtonText",
+      icon: <NewsfeedIcon className="size-10" />,
     },
     {
-      id: "delete-btn",
       children: "Subscribed Organizations",
       className:
-        "button-danger justify-start bg-tint-forest-fern text-neutral-pure-white",
-      icon: <UserPofileLoginIcon className="bg-action-light-blue" />,
+        "sideNavBarButtonText",
+      icon: <SubscribedOrgIcon className="size-10" />,
     },
     {
-      id: "disabled-btn",
       children: "Join Organization",
-      className: "justify-start bg-tint-forest-fern text-neutral-pure-white",
-      icon: <UserPofileLoginIcon className="bg-action-light-blue" />,
+      className: "sideNavBarButtonText",
+      icon: <AddIcon className="size-10" />,
     },
   ];
 
+  const [isNavOpen, setIsNavOpen] = useState(true);
+
   return (
-    <main className="bg-tint-forest-fern w-60 h-screen">
-      <div>
-        <h1>Heading</h1>
+    <main className={`bg-tint-forest-fern h-screen transition-all duration-500 ease-in-out ${isNavOpen ? 'w-70' : 'w-15'}`}>
+      <div className="flex items-center">
+        <TambayanIcon className="size-20"></TambayanIcon>
+        <TambayanTextIcon className=""></TambayanTextIcon>
+        <Button className="bg-white/0 hover:bg-white/0" onClick={()=>setIsNavOpen(!isNavOpen)}><NavigationButtonIcon className="size-10 text-secondary-light-moss"></NavigationButtonIcon></Button>
       </div>
 
       <div>
-        <ButtonList buttons={myButtons} className="flex flex-col" />
+        <ButtonList buttons={myButtons} className="flex flex-col gap-3" />
       </div>
     </main>
   );

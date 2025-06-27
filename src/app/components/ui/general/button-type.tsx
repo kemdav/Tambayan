@@ -1,7 +1,7 @@
 import type React from "react";
 
 export type ButtonConfig = {
-  id: string | number;
+  isSelected?: false;
   children: React.ReactNode;
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";

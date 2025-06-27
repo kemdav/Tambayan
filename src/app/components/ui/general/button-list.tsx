@@ -12,7 +12,7 @@ export const ButtonList = ({ buttons, className }: ButtonListProps) => {
       {buttons.map((buttonProps) => {
         // Destructure our custom props from the rest of the standard button attributes.
         const {
-          id,
+          isSelected,
           children,
           icon,
           iconPosition = "left",
@@ -21,8 +21,7 @@ export const ButtonList = ({ buttons, className }: ButtonListProps) => {
 
         return (
           <Button
-            key={id} // Use our required `id` for the key
-            {...restOfProps} // Spread the remaining props (onClick, className, disabled, etc.)
+            {...restOfProps} 
           >
             {icon && iconPosition === "left" && icon}
             {children}

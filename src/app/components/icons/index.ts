@@ -16,6 +16,6 @@ export * from "./AddIcon";
 export * from "./NewsfeedIcon";
 export * from "./StudentProfileIcon";
 export * from "./SubscribedOrgIcon";
-
+export * from "./NavigationButtonIcon";
 // When used at a page
 // import { PlusIcon, UserIcon } from '@/components/icons';
