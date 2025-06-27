@@ -12,6 +12,10 @@ export * from "./CourseIcon";
 export * from "./EmailIcon";
 export * from "./UniversityIcon";
 export * from "./TambayanTextIcon";
+export * from "./AddIcon";
+export * from "./NewsfeedIcon";
+export * from "./StudentProfileIcon";
+export * from "./SubscribedOrgIcon";
 
 // When used at a page
 // import { PlusIcon, UserIcon } from '@/components/icons';
