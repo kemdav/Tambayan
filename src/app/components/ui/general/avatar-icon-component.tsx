@@ -43,7 +43,7 @@ export const AvatarIcon: React.FC<AvatarIconProps> = ({
   return (
     <div
       className={cn(
-        "relative inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-4 border-black transition-transform duration-200 ease-in-out",
+        "relative inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-black transition-transform duration-200 ease-in-out",
         isEditable && "cursor-pointer hover:scale-105 hover:shadow-lg",
         className
       )}
