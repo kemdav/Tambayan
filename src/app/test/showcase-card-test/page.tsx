@@ -16,6 +16,7 @@ export default function Home() {
         memberCount={245}
         eventCount={12}
         avatarUrl="/kemdavid.png"
+        coverPhotoUrl="/kemdavid.png"
         buttons={[
           {
             label: "View",

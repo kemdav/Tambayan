@@ -22,6 +22,7 @@ interface ShowcaseCardProps {
   eventCount: number;
   buttons: ButtonProps[];
   avatarUrl?: string;
+  coverPhotoUrl?: string;
 }
 
 export default function ShowcaseCard({
@@ -35,14 +36,16 @@ export default function ShowcaseCard({
   eventCount = 0,
   buttons,
   avatarUrl,
+  coverPhotoUrl,
 }: ShowcaseCardProps) {
   return (
     <div className="rounded-xl shadow-md bg-white border border-gray-200 h-[347px] w-[294px]">
       <div
         className={cn(
-          bgColor,
+          !coverPhotoUrl && bgColor,
           "rounded-t-xl flex justify-center items-center h-[96px] relative"
         )}
+        style={coverPhotoUrl ? { backgroundImage: `url(${coverPhotoUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
       >
         <AvatarIcon src={avatarUrl} className="absolute left-4 top-full -mt-7 z-10 w-14 h-14 bg-white" />
       </div>
