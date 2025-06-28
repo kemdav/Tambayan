@@ -27,7 +27,7 @@ export const ButtonList = ({ buttons, className, selectedId, onButtonClick }: Bu
         return (
           <Button
           id={id}
-          key={index}
+          key={id}
             {...restOfProps} 
             variant={variant}
             isSelected={id===selectedId}
