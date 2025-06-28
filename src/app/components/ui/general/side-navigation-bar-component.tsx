@@ -16,12 +16,13 @@ import { useState } from "react";
 
 interface Props {
   myButtons: ButtonConfig[];
+  selectedButtonId: string;
+  onButtonSelect: (id: string) => void; 
 }
 
-export default function SideNavBar({myButtons}:Props) {
+export default function SideNavBar({myButtons, selectedButtonId, onButtonSelect}:Props) {
 
   const [isNavOpen, setIsNavOpen] = useState(true);
-  const [selectedButtonId, setSelectedButtonId] = useState<string>("profile");
 
   return (
     <main className={`bg-tint-forest-fern h-screen transition-all duration-500 ease-in-out ${isNavOpen ? 'w-70' : 'w-15'}`}>
@@ -32,7 +33,7 @@ export default function SideNavBar({myButtons}:Props) {
       </div>
 
       <div>
-        <ButtonList buttons={myButtons} className="flex flex-col" selectedId={selectedButtonId} onButtonClick={(id)=>setSelectedButtonId(id)}/>
+        <ButtonList buttons={myButtons} className="flex flex-col" selectedId={selectedButtonId} onButtonClick={onButtonSelect}/>
       </div>
     </main>
   );
