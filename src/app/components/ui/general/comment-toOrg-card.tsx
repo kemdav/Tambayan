@@ -29,6 +29,10 @@ export const CommentToOrgCard: React.FC<CommentToOrgCardProps> = ({
   postOrg,
 }) => {
   const [showMenu, setShowMenu] = React.useState(false);
+  const [hidden, setHidden] = React.useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
+
+  if (hidden) return null;
 
   return (
     <div className="border rounded-2xl p-4 bg-white shadow-sm max-w-2xl w-full mx-auto relative">
@@ -42,9 +46,8 @@ export const CommentToOrgCard: React.FC<CommentToOrgCardProps> = ({
         </button>
         {showMenu && (
           <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-20">
-            <button className="w-full text-left px-4 py-2 hover:bg-secondary-pale-sage">Delete</button>
-            <button className="w-full text-left px-4 py-2 hover:bg-secondary-pale-sage">Hide Comment</button>
-            <button className="w-full text-left px-4 py-2 hover:bg-secondary-pale-sage">Delete Comment</button>
+            <button className="w-full text-left px-4 py-2 hover:bg-secondary-pale-sage" onClick={() => { setHidden(true); setShowMenu(false); }}>Hide Comment</button>
+            <button className="w-full text-left px-4 py-2 hover:bg-secondary-pale-sage" onClick={() => { setShowDeleteConfirm(true); setShowMenu(false); }}>Delete Comment</button>
           </div>
         )}
       </div>
@@ -64,7 +67,19 @@ export const CommentToOrgCard: React.FC<CommentToOrgCardProps> = ({
       <div className="mb-2 text-sm text-gray-700 whitespace-pre-line break-words overflow-hidden">
         {replyText}
       </div>
-      <div className="text-xs text-gray-300 text-right">ftu...</div>
+      <div className="text-xs text-gray-300 text-right">meow</div>
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm relative">
+            <h2 className="text-lg font-bold mb-4">Delete Comment?</h2>
+            <p className="mb-4">Are you sure you want to delete this comment? This action cannot be undone.</p>
+            <div className="flex justify-end gap-2">
+              <button className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+              <button className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700" onClick={() => { setHidden(true); setShowDeleteConfirm(false); }}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
