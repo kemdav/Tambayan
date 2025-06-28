@@ -16,6 +16,7 @@ const orgOptions = [
 
 export function CreatePostComponent() {
   const [title, setTitle] = React.useState("");
+  const titleRef = React.useRef<HTMLDivElement>(null);
   const [content, setContent] = React.useState("");
   const [org, setOrg] = React.useState<string | null>(null);
   const [photo, setPhoto] = React.useState<File | null>(null);
@@ -31,12 +32,18 @@ export function CreatePostComponent() {
   const [postData, setPostData] = React.useState<any>(null);
 
   const handlePost = () => {
+    // Get HTML from FormattableInput's contentEditable div
+    let htmlTitle = title;
+    if (titleRef.current) {
+      htmlTitle = titleRef.current.innerHTML;
+    }
     setPosted(true);
     setPostData({
       posterName: orgOptions.find(o => o.value === org)?.label || "Unknown Org",
       avatarSrc: null,
       daysSincePosted: 0,
-      content: title + (title && content ? "\n" : "") + content + (event ? `\nEvent: ${event}` : ""),
+      title: htmlTitle, // HTML string from FormattableInput
+      content: content, // markdown string from MarkdownInputBox
       imageSrc: photo ? URL.createObjectURL(photo) : undefined,
       likes: 0,
       comments: 0,
@@ -69,6 +76,7 @@ export function CreatePostComponent() {
     <>
       <div className="rounded-2xl border border-gray-200 bg-white p-6 flex flex-col gap-4 shadow-sm w-full max-w-3xl mx-auto mb-4">
         <FormattableInput
+          ref={titleRef}
           placeholder="Post Title"
           value={title}
           onChange={val => setTitle(val as string)}
@@ -94,12 +102,6 @@ export function CreatePostComponent() {
           buttonHoverTextColor="hover:text-white"
           buttonHoverBgColor="hover:bg-secondary-light-moss"
           buttonActiveBgColor="active:bg-secondary-light-moss"
-          dropdownTextColor="text-neutral-muted-olive"
-          dropdownBorderColor="border-secondary-light-moss"
-          dropdownBgColor="bg-neutral-mint-white"
-          dropdownHoverTextColor="hover:text-white"
-          dropdownHoverBgColor="hover:bg-secondary-light-moss"
-          dropdownActiveBgColor="active:bg-secondary-light-moss"
           // We'll handle selection below
         />
         <div className="flex items-center gap-6 border-b pb-2 mt-2">
@@ -152,7 +154,7 @@ export function CreatePostComponent() {
       </div>
       {posted && postData && (
         <div className="mt-8 w-full max-w-3xl mx-auto">
-          <DisplayPostComponent {...postData} title={title} />
+          <DisplayPostComponent {...postData} />
         </div>
       )}
     </>
