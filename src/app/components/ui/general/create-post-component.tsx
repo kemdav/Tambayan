@@ -6,7 +6,6 @@ import { Input } from "./input/input";
 import DropdownRole from "@/app/components/ui/general/dropdown/dropdown-role";
 import { DisplayPostComponent } from "./display-post-component";
 import { FormattableInput } from "./input/FormattableInput";
-import { MarkdownInputBox } from "./input/MarkdownInputBox";
 
 const orgOptions = [
   { value: "icpep", label: "ICPEP" },
@@ -16,34 +15,34 @@ const orgOptions = [
 
 export function CreatePostComponent() {
   const [title, setTitle] = React.useState("");
-  const titleRef = React.useRef<HTMLDivElement>(null);
   const [content, setContent] = React.useState("");
+  const contentRef = React.useRef<HTMLDivElement>(null);
   const [org, setOrg] = React.useState<string | null>(null);
   const [photo, setPhoto] = React.useState<File | null>(null);
-  const [video, setVideo] = React.useState<File | null>(null);
   const [event, setEvent] = React.useState("");
   const [tags, setTags] = React.useState<string[]>([]);
   const [tagInput, setTagInput] = React.useState("");
   const [showPhoto, setShowPhoto] = React.useState(false);
-  const [showVideo, setShowVideo] = React.useState(false);
   const [showEvent, setShowEvent] = React.useState(false);
   const [showTag, setShowTag] = React.useState(false);
   const [posted, setPosted] = React.useState(false);
   const [postData, setPostData] = React.useState<any>(null);
 
   const handlePost = () => {
-    // Get HTML from FormattableInput's contentEditable div
-    let htmlTitle = title;
-    if (titleRef.current) {
-      htmlTitle = titleRef.current.innerHTML;
+    // Get HTML from FormattableInput's contentEditable div for content
+    let htmlContent = content;
+    if (contentRef.current) {
+      htmlContent = contentRef.current.innerHTML;
     }
     setPosted(true);
     setPostData({
-      posterName: orgOptions.find(o => o.value === org)?.label || "Unknown Org",
+      posterName: "Unknown Org",
+      orgLabel: orgOptions.find(o => o.value === org)?.label || "",
+      event: event,
       avatarSrc: null,
       daysSincePosted: 0,
-      title: htmlTitle, // HTML string from FormattableInput
-      content: content, // markdown string from MarkdownInputBox
+      title: title,
+      content: htmlContent,
       imageSrc: photo ? URL.createObjectURL(photo) : undefined,
       likes: 0,
       comments: 0,
@@ -75,20 +74,22 @@ export function CreatePostComponent() {
   return (
     <>
       <div className="rounded-2xl border border-gray-200 bg-white p-6 flex flex-col gap-4 shadow-sm w-full max-w-3xl mx-auto mb-4">
-        <FormattableInput
-          ref={titleRef}
+        <Input
+          type="text"
           placeholder="Post Title"
           value={title}
-          onChange={val => setTitle(val as string)}
-          isFormattable={true}
+          onChange={e => setTitle(e.target.value)}
           className="mb-2"
         />
         <label className="text-sm font-medium text-neutral-muted-olive">Post Content</label>
-        <MarkdownInputBox
+        <FormattableInput
+          ref={contentRef}
           value={content}
-          onChange={setContent}
+          onChange={val => setContent(val as string)}
+          isFormattable={true}
+          multiline={true}
           placeholder="What's happening in your organization?"
-          minRows={4}
+          className="mb-2"
         />
         <label className="text-sm font-medium text-neutral-muted-olive">Select Organization:</label>
         <DropdownRole
@@ -102,11 +103,16 @@ export function CreatePostComponent() {
           buttonHoverTextColor="hover:text-white"
           buttonHoverBgColor="hover:bg-secondary-light-moss"
           buttonActiveBgColor="active:bg-secondary-light-moss"
-          // We'll handle selection below
+          dropdownTextColor="text-neutral-muted-olive"
+          dropdownBorderColor="border-secondary-light-moss"
+          dropdownBgColor="bg-neutral-mint-white"
+          dropdownHoverTextColor="hover:text-white"
+          dropdownHoverBgColor="hover:bg-secondary-light-moss"
+          dropdownActiveBgColor="active:bg-secondary-light-moss"
+          onSelect={setOrg}
         />
         <div className="flex items-center gap-6 border-b pb-2 mt-2">
           <button type="button" className="text-neutral-cool-gray hover:underline" onClick={() => setShowPhoto(v => !v)}>Photo</button>
-          <button type="button" className="text-neutral-cool-gray hover:underline" onClick={() => setShowVideo(v => !v)}>Video</button>
           <button type="button" className="text-neutral-cool-gray hover:underline" onClick={() => setShowEvent(v => !v)}>Event</button>
           <button type="button" className="text-neutral-cool-gray hover:underline" onClick={() => setShowTag(v => !v)}>Tag</button>
           <div className="flex-1" />
@@ -116,12 +122,6 @@ export function CreatePostComponent() {
           <div className="mt-2">
             <Input type="file" accept="image/*" onChange={e => setPhoto(e.target.files?.[0] || null)} />
             {photo && <span className="text-xs ml-2">{photo.name}</span>}
-          </div>
-        )}
-        {showVideo && (
-          <div className="mt-2">
-            <Input type="file" accept="video/*" onChange={e => setVideo(e.target.files?.[0] || null)} />
-            {video && <span className="text-xs ml-2">{video.name}</span>}
           </div>
         )}
         {showEvent && (
