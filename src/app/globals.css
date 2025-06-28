@@ -85,6 +85,12 @@ input[type="password"]::-webkit-password-reveal-button {
 .sideNavBarButton {
   @apply h-12;
 }
+.horizontalNavBarButton {
+  @apply h-12 text-sm;
+}
+.horizontalNavBarButtonIcons {
+  @apply size-10;
+}
 
 .custom-checkbox {
   position: relative;
