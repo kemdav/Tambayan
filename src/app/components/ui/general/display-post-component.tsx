@@ -3,6 +3,8 @@ import { AvatarIcon } from "./avatar-icon-component";
 import { Button } from "./button";
 import LikeIcon from "@/app/components/icons/LikeIcon";
 import CommentIcon from "@/app/components/icons/CommentIcon";
+import { remark } from "remark";
+import html from "remark-html";
 
 interface DisplayPostComponentProps {
   posterName: string;
@@ -31,6 +33,24 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   onLike,
   onComment,
 }) => {
+  const [renderedContent, setRenderedContent] = React.useState("");
+
+  React.useEffect(() => {
+    const renderMarkdown = async () => {
+      if (content) {
+        try {
+          const result = await remark().use(html).process(content);
+          setRenderedContent(String(result));
+        } catch (error) {
+          setRenderedContent(content);
+        }
+      } else {
+        setRenderedContent("");
+      }
+    };
+    renderMarkdown();
+  }, [content]);
+
   return (
     <div className="border rounded-2xl p-4 bg-white shadow-sm max-w-2xl w-full mx-auto">
       <div className="flex items-center gap-3 mb-2">
@@ -40,7 +60,29 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
           <span className="text-xs text-gray-400">{daysSincePosted} days ago</span>
         </div>
       </div>
-      <div className="mb-2 text-sm text-gray-700 whitespace-pre-line break-words overflow-hidden">{content}</div>
+      {title && (
+        <div
+          className="mb-1 text-base"
+          dangerouslySetInnerHTML={{ __html: title }}
+        />
+      )}
+      <div
+        className="mb-2 text-sm text-gray-700 whitespace-pre-line break-words overflow-hidden prose"
+        dangerouslySetInnerHTML={{ __html: renderedContent }}
+      />
+      {tags.length > 0 && (
+        <div className="flex gap-2 mb-2 flex-wrap">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="bg-secondary-pale-sage text-neutral-black rounded-full px-3 py-1 text-xs font-normal"
+              style={{ minWidth: "2rem", textAlign: "center" }}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
       {imageSrc && (
         <div className="mb-2">
           <img src={imageSrc} alt="post" className="rounded-lg max-h-64 object-contain mx-auto" />
