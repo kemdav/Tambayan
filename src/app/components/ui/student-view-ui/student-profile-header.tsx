@@ -27,6 +27,6 @@ export default function StudentProfileHeader({isEditable=false}:Props){
                     <AvatarIcon className="size-35 bg-white" isEditable={isEditable}></AvatarIcon>
                 </div>
             </div>
-        </main>
+        </header>
     );
 }
