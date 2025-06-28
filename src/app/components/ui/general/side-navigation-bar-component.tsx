@@ -25,7 +25,7 @@ export default function SideNavBar({myButtons, selectedButtonId, onButtonSelect}
   const [isNavOpen, setIsNavOpen] = useState(true);
 
   return (
-    <main className={`bg-tint-forest-fern h-screen transition-all duration-500 ease-in-out ${isNavOpen ? 'w-70' : 'w-15'}`}>
+    <main className={`h-screen transition-all duration-500 ease-in-out ${isNavOpen ? 'bg-tint-forest-fern w-70' : 'w-15 bg-action-forest-green/0'}`}>
       <div className="flex items-center">
         <TambayanIcon className="size-20"></TambayanIcon>
         <TambayanTextIcon className=""></TambayanTextIcon>
@@ -33,7 +33,7 @@ export default function SideNavBar({myButtons, selectedButtonId, onButtonSelect}
       </div>
 
       <div>
-        <ButtonList buttons={myButtons} className="flex flex-col" selectedId={selectedButtonId} onButtonClick={onButtonSelect}/>
+        <ButtonList buttons={myButtons} className={`flex flex-col ${isNavOpen ? 'duration-1000' : '-translate-x-100'}`} selectedId={selectedButtonId} onButtonClick={onButtonSelect}/>
       </div>
     </main>
   );
