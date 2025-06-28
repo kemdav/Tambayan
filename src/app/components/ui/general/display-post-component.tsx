@@ -161,8 +161,8 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
         posterName={posterName}
         avatarSrc={avatarSrc}
         daysSincePosted={daysSincePosted}
-        content={initialContent}
-        imageSrc={initialImageSrc}
+        content={displayContent}
+        imageSrc={displayImage}
         comments={[]}
       />
       {showEdit && (
