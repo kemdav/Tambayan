@@ -12,7 +12,17 @@ export default function TagComponentTestPage() {
     <main className="w-full">
         <div className="h-dvh max-w-6xl">
             <StudentProfileHeader isEditable={false}></StudentProfileHeader>
-            <StudentProfileCard className="h-1/2" myButtons={myButtons} selectedButtonId={selectedNavId} onButtonSelect={setSelectedNavId}></StudentProfileCard>
+            <StudentProfileCard className="h-1/2" 
+            myButtons={myButtons} 
+            selectedButtonId={selectedNavId}
+             onButtonSelect={setSelectedNavId}
+             studentId="23-3788-246"
+    studentCourse="Computer Science"
+    studentEmail="kemphilip.david@cit.edu"
+    studentYear="3rd Year"
+    studentJoinDate="September 17, 2004"
+    studentEventsJoined="6"
+    studentTotalOrg="3"></StudentProfileCard>
         </div>
     </main>
   );
