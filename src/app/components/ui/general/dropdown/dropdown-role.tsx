@@ -42,6 +42,7 @@ interface DropDownProps {
   dropdownHoverTextColor?: string;
   dropdownHoverBgColor?: string;
   dropdownActiveBgColor?: string;
+  onSelect?: (value: string) => void;
 }
 
 export default function DropDownRole({
@@ -63,6 +64,7 @@ export default function DropDownRole({
   dropdownHoverTextColor = "hover:text-neutral-pure-white",
   dropdownHoverBgColor = "hover:bg-action-seafoam-green",
   dropdownActiveBgColor = "active:bg-action-moss-green",
+  onSelect,
 }: DropDownProps) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
@@ -111,8 +113,10 @@ export default function DropDownRole({
                   key={option.value}
                   value={option.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
+                    const newValue = currentValue === value ? "" : currentValue;
+                    setValue(newValue);
                     setOpen(false);
+                    if (onSelect) onSelect(newValue);
                   }}
                   className={cn(
                     "cursor-pointer",
