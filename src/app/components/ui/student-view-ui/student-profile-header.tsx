@@ -9,7 +9,7 @@ interface Props {
 
 export default function StudentProfileHeader({isEditable=false}:Props){
     return (
-        <main className="bg-white relative w-full h-73">
+        <header className="bg-white relative w-full h-73">
             <div className="absolute flex flex-col w-full h-full">
                 <div className="z-0 aspect-[16/9] bg-action-light-blue overflow-hidden w-full rounded-2xl">
                     <AvatarIcon className="border-0 rounded-2xl object-center object-cover w-full h-full" isEditable={isEditable}></AvatarIcon>
