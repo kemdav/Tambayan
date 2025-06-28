@@ -31,7 +31,7 @@ export const ButtonList = ({ buttons, className, selectedId, onButtonClick }: Bu
             {...restOfProps} 
             variant={variant}
             isSelected={id===selectedId}
-            onClick={()=>{onButtonClick(id); console.log(id, selectedId)}}
+            onClick={()=>{onButtonClick(id);}}
           >
             {icon && iconPosition === "left" && icon}
             {children}
