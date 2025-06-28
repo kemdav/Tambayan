@@ -82,6 +82,9 @@ input[type="password"]::-webkit-password-reveal-button {
 .textAuthResponsive {
   @apply text-shade-charcoal-green lg:text-action-forest-green;
 }
+.sideNavBarButton {
+  @apply h-12;
+}
 
 .custom-checkbox {
   position: relative;
