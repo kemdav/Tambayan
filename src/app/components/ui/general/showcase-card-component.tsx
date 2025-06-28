@@ -47,7 +47,11 @@ export default function ShowcaseCard({
         )}
         style={coverPhotoUrl ? { backgroundImage: `url(${coverPhotoUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
       >
-        <AvatarIcon src={avatarUrl} className="absolute left-4 top-full -mt-7 z-10 w-14 h-14 bg-white" />
+        <AvatarIcon 
+          src={avatarUrl} 
+          alt={avatarUrl ? "User avatar" : "Default avatar"} 
+          className="absolute left-4 top-full -mt-7 z-10 w-14 h-14 bg-white" 
+        />
       </div>
 
       <div className="pt-10 pb-4 px-4 text-left">
