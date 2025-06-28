@@ -15,6 +15,8 @@ const buttonVariants = cva(
           "bg-action-soft-rose text-white shadow-xs hover:bg-action-soft-rose/90 focus-visible:ring-action-error/20 dark:focus-visible:ring-action-error/40 dark:bg-action-soft-rose/60 rounded-md",
         navigation:
           "bg-action-forest-green text-neutral-linen-white shadow-xs hover:bg-action-forest-green/60",
+        sideNavigation:
+          "sideNavBarButton justify-start text-lg h-12 bg-tint-forest-fern hover:bg-primary-forest-green text-neutral-pure-white shadow-none",
         link: "text-info underline-offset-4 underline rounded-md",
         outline:
         "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
@@ -33,9 +35,9 @@ const buttonVariants = cva(
     },
     compoundVariants: [
         {
-          variant: "navigation",
+          variant: "sideNavigation",
           isSelected: true,
-          className: "bg-action-forest-green/50",
+          className: "bg-primary-forest-green",
         }
     ],
     defaultVariants: {
