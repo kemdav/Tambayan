@@ -21,6 +21,7 @@ interface ShowcaseCardProps {
   memberCount: number;
   eventCount: number;
   buttons: ButtonProps[];
+  avatarUrl?: string;
 }
 
 export default function ShowcaseCard({
@@ -33,6 +34,7 @@ export default function ShowcaseCard({
   memberCount = 0,
   eventCount = 0,
   buttons,
+  avatarUrl,
 }: ShowcaseCardProps) {
   return (
     <div className="rounded-xl shadow-md bg-white border border-gray-200 h-[347px] w-[294px]">
@@ -42,7 +44,7 @@ export default function ShowcaseCard({
           "rounded-t-xl flex justify-center items-center h-[96px] relative"
         )}
       >
-        <AvatarIcon className="absolute left-4 top-full -mt-7 z-10 w-14 h-14 bg-white" />
+        <AvatarIcon src={avatarUrl} className="absolute left-4 top-full -mt-7 z-10 w-14 h-14 bg-white" />
       </div>
 
       <div className="pt-10 pb-4 px-4 text-left">

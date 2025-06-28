@@ -9,16 +9,17 @@ export default function Home() {
       <ShowcaseCard
         title="Computer Science Society"
         subtitle="College of Engineering"
-        bgColor="bg-blue-500"
+        bgColor="bg-[#B7C9A8]"
         tagText="Active"
-        tagBgColor="bg-green-100"
-        tagTextColor="text-green-800"
+        tagBgColor="bg-[#E6F2DF]"
+        tagTextColor="text-[#4B5D3A]"
         memberCount={245}
         eventCount={12}
+        avatarUrl="/kemdavid.png"
         buttons={[
           {
             label: "View",
-            bgColor: "bg-blue-500",
+            bgColor: "bg-[#7B9272]",
             textColor: "text-white",
             onClick: () => void 0,
           },
