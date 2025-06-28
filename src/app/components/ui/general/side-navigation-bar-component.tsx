@@ -13,6 +13,7 @@ import {
 } from "@/app/components/icons";
 import { Button } from "./button";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 interface Props {
   myButtons: ButtonConfig[];
@@ -21,7 +22,7 @@ interface Props {
 }
 
 export default function SideNavBar({myButtons, selectedButtonId, onButtonSelect}:Props) {
-
+  const pathname = usePathname();
   const [isNavOpen, setIsNavOpen] = useState(true);
 
   return (

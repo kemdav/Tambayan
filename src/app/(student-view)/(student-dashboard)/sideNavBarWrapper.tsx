@@ -9,6 +9,7 @@ export const myButtons: ButtonConfig[] = [
     {
         id: "profile",
       children: "Student Profile",
+      href:"/profile",
       variant: "sideNavigation",
       className:
         "sideNavBarButtonText",
@@ -18,6 +19,7 @@ export const myButtons: ButtonConfig[] = [
         id: "newsfeed",
       children: "Newsfeed",
       variant: "sideNavigation",
+      href:"/newsfeed",
       className:
         "sideNavBarButtonText",
       icon: <NewsfeedIcon className="size-10" />,
@@ -26,6 +28,7 @@ export const myButtons: ButtonConfig[] = [
         id: "sub-org",
       children: "Subscribed Organizations",
       variant: "sideNavigation",
+      href:"/subscribed",
       className:
         "sideNavBarButtonText",
       icon: <SubscribedOrgIcon className="size-10" />,
@@ -33,6 +36,7 @@ export const myButtons: ButtonConfig[] = [
     {
         id: "join-org",
         variant: "sideNavigation",
+        href:"/join",
       children: "Join Organization",
       className: "sideNavBarButtonText",
       icon: <AddIcon className="size-10" />,
@@ -43,7 +47,7 @@ export const myButtons: ButtonConfig[] = [
     const [selectedNavId, setSelectedNavId] = useState<string>("profile");
     return (<div className="">
           <SideNavBar myButtons={myButtons} selectedButtonId={selectedNavId} onButtonSelect={setSelectedNavId}></SideNavBar>
-        </div>);
+      </div>);
   }
 
   interface Props {
