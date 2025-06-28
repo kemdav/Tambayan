@@ -87,7 +87,7 @@ export default function DropDownRole({
             buttonHoverTextColor,
             buttonHoverBgColor,
             buttonActiveBgColor,
-            "justify-between cursor-pointer transition-all duration-150 ease-in-out active:scale-95"
+            "rounded-[5px] justify-between cursor-pointer transition-all duration-150 ease-in-out active:scale-95"
           )}
         >
           {selectedLabel || placeholder}
