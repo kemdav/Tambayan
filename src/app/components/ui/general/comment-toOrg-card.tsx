@@ -67,7 +67,7 @@ export const CommentToOrgCard: React.FC<CommentToOrgCardProps> = ({
       <div className="mb-2 text-sm text-gray-700 whitespace-pre-line break-words overflow-hidden">
         {replyText}
       </div>
-      <div className="text-xs text-gray-300 text-right">meow</div>
+      <div className="text-xs text-gray-300 text-right">Commented</div>
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm relative">
