@@ -11,7 +11,7 @@ export default function TagComponentTestPage() {
   return (
     <main className="w-full">
         <div className="h-dvh max-w-6xl">
-            <StudentProfileHeader></StudentProfileHeader>
+            <StudentProfileHeader isEditable={false}></StudentProfileHeader>
             <StudentProfileCard className="h-1/2" myButtons={myButtons} selectedButtonId={selectedNavId} onButtonSelect={setSelectedNavId}></StudentProfileCard>
         </div>
     </main>
