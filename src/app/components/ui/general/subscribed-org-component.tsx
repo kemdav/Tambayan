@@ -34,6 +34,7 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs })
         <Input
           leftIcon={<SearchIcon width={20} height={20} />}
           placeholder="Search Organizations.."
+          aria-label="Search organizations"
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="w-full"
