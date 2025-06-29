@@ -45,7 +45,7 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs })
           <div className="text-gray-500 text-center w-full">No organizations found.</div>
         ) : (
           filteredOrgs.map((orgProps) => (
-            <div key={orgProps.id} className="flex-shrink-0">
+            <div key={orgProps.orgID} className="flex-shrink-0">
               <ShowcaseCard {...orgProps} />
             </div>
           ))

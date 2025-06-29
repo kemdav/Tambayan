@@ -5,6 +5,7 @@ const sampleOrgs = [
   {
     title: "Computer Science Society",
     subtitle: "College of Engineering",
+    orgID: "1",
     bgColor: "bg-green-200",
     tagText: "Active",
     tagBgColor: "bg-green-100",
@@ -21,6 +22,7 @@ const sampleOrgs = [
     title: "Debate Club",
     subtitle: "College of Arts",
     bgColor: "bg-green-300",
+    orgID: "12",
     tagText: "Active",
     tagBgColor: "bg-green-100",
     tagTextColor: "text-green-800",
@@ -35,6 +37,7 @@ const sampleOrgs = [
   {
     title: "Music Club",
     subtitle: "College of Arts",
+    orgID: "14",
     bgColor: "bg-green-200",
     tagText: "Inactive",
     tagBgColor: "bg-red-100",
