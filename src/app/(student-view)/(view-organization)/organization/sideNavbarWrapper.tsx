@@ -8,7 +8,7 @@ import { useState } from "react";
 export const myButtons: ButtonConfig[] = [
     {
         id: "profile",
-      children: "Student Profile",
+      children: "Back",
       href:"/profile",
       variant: "sideNavigation",
       className:
@@ -17,7 +17,7 @@ export const myButtons: ButtonConfig[] = [
     },
     {
         id: "newsfeed",
-      children: "Newsfeed",
+      children: "Official Post",
       variant: "sideNavigation",
       href:"/newsfeed",
       className:
@@ -26,7 +26,7 @@ export const myButtons: ButtonConfig[] = [
     },
     {
         id: "sub-org",
-      children: "Subscribed Organizations",
+      children: "Community Post",
       variant: "sideNavigation",
       href:"/subscribed",
       className:
@@ -37,7 +37,7 @@ export const myButtons: ButtonConfig[] = [
         id: "join-org",
         variant: "sideNavigation",
         href:"/join",
-      children: "Join Organization",
+      children: "Upcoming Events",
       className: "sideNavBarButtonText",
       icon: <AddIcon className="size-10" />,
     },
@@ -45,7 +45,7 @@ export const myButtons: ButtonConfig[] = [
       id: "logout",
       variant: "sideNavigation",
       href:"/login",
-      children: "Logout",
+      children: "Wiki",
       className: "sideNavBarButtonText",
       icon: <LogOutIcon className="size-10" />,
     }
@@ -62,7 +62,7 @@ export const myButtons: ButtonConfig[] = [
     children : React.ReactNode;
   }
 
-  export default function StudentVerticalNavigation({children}: Props){
+  export function StudentVerticalNavigation({children}: Props){
     return (
       <div className="relative flex h-dvh">
         <div className="z-20 fixed">

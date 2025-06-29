@@ -9,7 +9,7 @@ export default function TagComponentTestPage() {
     const [selectedNavId, setSelectedNavId] = useState<string>("post");
 
   return (
-    <main className="w-full grid place-items-center">
+    <main className="w-full grid place-items-center items-start">
         <div className="h-auto w-full max-w-3xl shadow-lg/100 p-4">
             <StudentProfileHeader isEditable={false}></StudentProfileHeader>
             <StudentProfileCard className="h-1/2" 
