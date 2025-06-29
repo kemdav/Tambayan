@@ -13,6 +13,7 @@ interface ButtonProps {
 
 interface ShowcaseCardProps {
   title: string;
+  orgID: string
   subtitle: string;
   bgColor?: string;
   tagText: string;

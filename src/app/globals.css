@@ -21,7 +21,7 @@
   --color-neutral-warm-sand: #f2eadd;
   --color-neutral-cloud-white: #f7f6f6;
   --color-neutral-ivory-mist: #fcfcf3;
-  --color-neutral-mint-white: #F1F5F4;
+  --color-neutral-mint-white: #f1f5f4;
 
   --color-primary-moss-green: #358163;
   --color-primary-forest-green: #507252;
@@ -122,4 +122,11 @@ input[type="password"]::-webkit-password-reveal-button {
   border: solid #fff;
   border-width: 0 3px 3px 0;
   transform: rotate(45deg);
+}
+.scrollbar-hidden {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
