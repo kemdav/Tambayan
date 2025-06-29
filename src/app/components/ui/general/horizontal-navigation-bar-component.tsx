@@ -25,7 +25,7 @@ export default function HorizontalNavBar({myButtons, selectedButtonId, onButtonS
   return (
     <main>
       <div>
-        <ButtonList buttons={myButtons} className="flex" selectedId={selectedButtonId} onButtonClick={onButtonSelect}/>
+        <ButtonList buttons={myButtons} className="flex flex-wrap" selectedId={selectedButtonId} onButtonClick={onButtonSelect}/>
       </div>
     </main>
   );
