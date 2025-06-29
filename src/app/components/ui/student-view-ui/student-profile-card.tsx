@@ -2,6 +2,10 @@
 import HorizontalNavBar from "../general/horizontal-navigation-bar-component";
 import { ButtonConfig } from "../general/button-type";
 import { Button } from "../general/button";
+import { DisplayPostComponent } from "../general/display-post-component";
+import type { Poster, Commenter } from '@/lib/types/types';
+import { CommentComponent } from "../general/comment-component";
+import CommentToOrgCard from "../general/comment-toOrg-card";
 
 interface Props extends studentProps {
     className?: string;
@@ -52,6 +56,140 @@ const AboutPage = ({studentId, studentCourse, studentEmail, studentYear, student
     );
 }
 
+export const Posts: Poster[] = [
+    {
+        postID:"1942",
+        posterName:"Excel Duran",
+        daysSincePosted:3,
+        content:"This is my fifth post",
+        likes:3,
+        comments:3,
+    },
+    {
+        postID:"2343",
+        posterName:"Excel Duran",
+        daysSincePosted:4,
+        content:"This is my fourth post",
+        likes:3,
+        comments:3,
+    },
+    {
+        postID:"5742",
+        posterName:"Excel Duran",
+        daysSincePosted:6,
+        content:"This is my third post",
+        likes:3,
+        comments:3,
+    },
+    {
+        postID:"2341",
+        posterName:"Excel Duran",
+        daysSincePosted:8,
+        content:"This is my second post",
+        likes:3,
+        comments:3,
+    },
+    {
+        postID:"572142",
+        posterName:"Excel Duran",
+        daysSincePosted:10,
+        content:"This is my first post",
+        likes:3,
+        comments:3,
+    }
+  ];
+
+
+const PostPage = () => {
+    return (
+        <div className="mt-3">
+            {Posts.length === 0 ? (<p>No users found</p>) : (
+                <ul className="space-y-4">
+                    {Posts.map((Posts) => (
+                        <DisplayPostComponent key={Posts.postID} posterName={Posts.posterName}
+                        daysSincePosted={Posts.daysSincePosted}
+                        content={Posts.content}
+                        likes={Posts.likes}
+                        comments={Posts.comments}/>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+}
+
+export const Comments: Commenter[] = [
+    {
+        commentID:"1942",
+        postTitle:"This is a test.",
+        organizationPosted:"ICPEP",
+        commenterName:"Excel Duran",
+        daysSinceCommented:3,
+        content:"This is my fifth comment",
+        likes:3,
+        comments:3,
+    },
+    {
+        commentID:"2343",
+        postTitle:"This is a test.",
+        organizationPosted:"ICPEP",
+        commenterName:"Excel Duran",
+        daysSinceCommented:4,
+        content:"This is my fourth comment",
+        likes:3,
+        comments:3,
+    },
+    {
+        commentID:"5742",
+        postTitle:"This is a test.",
+        organizationPosted:"ICPEP",
+        commenterName:"Excel Duran",
+        daysSinceCommented:6,
+        content:"This is my third comment",
+        likes:3,
+        comments:3,
+    },
+    {
+        commentID:"2341",
+        postTitle:"This is a test.",
+        organizationPosted:"ICPEP",
+        commenterName:"Excel Duran",
+        daysSinceCommented:8,
+        content:"This is my second comment",
+        likes:3,
+        comments:3,
+    },
+    {
+        commentID:"572142",
+        postTitle:"This is a test.",
+        organizationPosted:"ICPEP",
+        commenterName:"Excel Duran",
+        daysSinceCommented:10,
+        content:"This is my first comment",
+        likes:3,
+        comments:3,
+    }
+  ];
+
+const CommentPage = () => {
+    return (
+        <div className="mt-3">
+            {Posts.length === 0 ? (<p>No users found</p>) : (
+                <ul className="space-y-4">
+                    {Comments.map((Comments) => (
+                        <CommentToOrgCard key={Comments.commentID}
+                        commenterName={Comments.commenterName}
+                        daysSinceCommented={Comments.daysSinceCommented}
+                        replyText={Comments.content}
+                        postTitle={Comments.postTitle}
+                        postOrg={Comments.organizationPosted}/>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+}
+
 
 export default function StudentProfileCard({ className, myButtons, selectedButtonId, onButtonSelect,studentId, studentCourse, studentEmail, studentYear, studentJoinDate, studentEventsJoined, studentTotalOrg  }: Props) {
     const combinedClassName = `flex flex-col ${className || ''}`;
@@ -60,6 +198,8 @@ export default function StudentProfileCard({ className, myButtons, selectedButto
         <div className={combinedClassName}>
             <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect}></HorizontalNavBar>
             {selectedButtonId === "about" && <AboutPage studentId={studentId} studentCourse={studentCourse} studentEmail={studentEmail} studentYear={studentYear} studentJoinDate={studentJoinDate} studentEventsJoined={studentEventsJoined} studentTotalOrg={studentTotalOrg}/>}
+            {selectedButtonId === "post" && <PostPage></PostPage>}
+            {selectedButtonId === "comment" && <CommentPage></CommentPage>}
         </div>
     );
 }

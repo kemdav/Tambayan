@@ -10,19 +10,19 @@ export default function TagComponentTestPage() {
 
   return (
     <main className="w-full grid place-items-center">
-        <div className="h-dvh w-full max-w-6xl ">
+        <div className="h-dvh w-full max-w-3xl ">
             <StudentProfileHeader isEditable={false}></StudentProfileHeader>
             <StudentProfileCard className="h-1/2" 
             myButtons={myButtons} 
             selectedButtonId={selectedNavId}
              onButtonSelect={setSelectedNavId}
              studentId="23-3788-246"
-    studentCourse="Computer Science"
-    studentEmail="kemphilip.david@cit.edu"
-    studentYear="3rd Year"
-    studentJoinDate="September 17, 2004"
-    studentEventsJoined="6"
-    studentTotalOrg="3"></StudentProfileCard>
+            studentCourse="Computer Science"
+            studentEmail="kemphilip.david@cit.edu"
+            studentYear="3rd Year"
+            studentJoinDate="September 17, 2004"
+            studentEventsJoined="6"
+            studentTotalOrg="3"></StudentProfileCard>
         </div>
     </main>
   );

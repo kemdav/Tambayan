@@ -63,6 +63,10 @@
   --color-action-moss-green: #358163;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 /* Hide the default browser "reveal password" icon */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-webkit-password-reveal-button {

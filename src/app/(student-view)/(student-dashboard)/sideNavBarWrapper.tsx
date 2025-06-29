@@ -57,7 +57,7 @@ export const myButtons: ButtonConfig[] = [
   export default function StudentVerticalNavigation({children}: Props){
     return (
       <div className="relative flex h-dvh">
-        <div className="absolute z-20">
+        <div className="z-20 fixed">
           <SideBar></SideBar>
         </div>
         <div className="grow flex">
