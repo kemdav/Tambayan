@@ -1,21 +1,21 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import ShowcaseCard from "./showcase-card-component";
+import OrgRecruitCard from "./org-recruit-card";
 import { Input } from "./input/input";
 import { SearchIcon } from "@/app/components/icons/SearchIcon";
 
 import type { ComponentProps } from "react";
 
-// Export the card background color for use in the page
-export const SUBSCRIBED_ORG_CARD_BG = "#f8f5ef";
+export const JOIN_ORG_CARD_BG = "#f8f5ef";
 
-interface SubscribedOrgComponentProps {
-  orgs: Array<ComponentProps<typeof ShowcaseCard>>;
-  onButtonClick?: (orgID: string) => void;
+interface JoinOrgCardProps {
+  orgs: Array<ComponentProps<typeof OrgRecruitCard>>;
+  onViewClick?: (orgID: string) => void;
+  onJoinClick?: (orgID: string) => void;
 }
 
-const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs, onButtonClick }) => {
+const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ orgs, onViewClick, onJoinClick }) => {
   const [search, setSearch] = useState("");
 
   const filteredOrgs = useMemo(() => {
@@ -26,12 +26,20 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs, o
     );
   }, [search, orgs]);
 
-  // Default click handler
-  const handleButtonClick = (orgID: string) => {
-    if (onButtonClick) {
-      onButtonClick(orgID);
+  // Default click handlers
+  const handleViewClick = (orgID: string) => {
+    if (onViewClick) {
+      onViewClick(orgID);
     } else {
-      console.log("clicked", orgID);
+      console.log("View clicked", orgID);
+    }
+  };
+
+  const handleJoinClick = (orgID: string) => {
+    if (onJoinClick) {
+      onJoinClick(orgID);
+    } else {
+      console.log("Join clicked", orgID);
     }
   };
 
@@ -56,12 +64,10 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs, o
         ) : (
           filteredOrgs.map((orgProps) => (
             <div key={orgProps.orgID} className="flex-shrink-0">
-              <ShowcaseCard
+              <OrgRecruitCard
                 {...orgProps}
-                buttons={orgProps.buttons.map(btn => ({
-                  ...btn,
-                  onClick: () => handleButtonClick(orgProps.orgID)
-                }))}
+                onView={() => handleViewClick(orgProps.orgID)}
+                onJoin={() => handleJoinClick(orgProps.orgID)}
               />
             </div>
           ))
@@ -71,4 +77,4 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs, o
   );
 };
 
-export default SubscribedOrgComponent; 
+export default JoinOrgCard; 
