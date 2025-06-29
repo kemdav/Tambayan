@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import { Button, buttonVariants } from "@/app/components/ui/general/button";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 
 interface ButtonListProps {
@@ -13,6 +13,7 @@ interface ButtonListProps {
 }
 export const ButtonList = ({ buttons, className, selectedId, onButtonClick }: ButtonListProps) => {
 const router = useRouter();
+ const currentPathname = usePathname();
   return (
     <div className={className}>
       {buttons.map((buttonProps, index) => {
@@ -33,7 +34,7 @@ const router = useRouter();
             {...restOfProps} 
             variant={variant}
             isSelected={id===selectedId}
-            onClick={()=>{onButtonClick(id); if (href){router.push(href)}}}
+            onClick={()=>{onButtonClick(id); if (href){router.push(`${href}`)}}}
           >
             {icon && iconPosition === "left" && icon}
             {children}

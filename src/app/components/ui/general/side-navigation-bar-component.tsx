@@ -12,7 +12,7 @@ import {
   NavigationButtonIcon,
 } from "@/app/components/icons";
 import { Button } from "./button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 interface Props {
@@ -23,7 +23,8 @@ interface Props {
 
 export default function SideNavBar({myButtons, selectedButtonId, onButtonSelect}:Props) {
   const pathname = usePathname();
-  const [isNavOpen, setIsNavOpen] = useState(true);
+  const [isNavOpen, setIsNavOpen] = useState(false);
+
 
   return (
     <main className={`h-screen transition-all duration-500 ease-in-out ${isNavOpen ? 'bg-tint-forest-fern w-70' : 'w-15 bg-action-forest-green/0'}`}>

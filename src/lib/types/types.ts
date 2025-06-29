@@ -19,11 +19,12 @@ export interface Commenter {
 }
 
 export interface Student {
-    studentID:string;
+    studentID: number;
     firstName: string;
     lastName: string;
     email: string;
     password: string;
+    picture: string; // Change to right datatype later
     universityID: string;
     course: string;
     yearLevel: number;

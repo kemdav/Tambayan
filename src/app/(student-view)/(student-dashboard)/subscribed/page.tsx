@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 const sampleOrgs = [
   {
-    title: "Computer Science Society",
+    title: "ICPEP",
     subtitle: "College of Engineering",
     orgID: "1",
     bgColor: "bg-green-200",
@@ -21,7 +21,7 @@ const sampleOrgs = [
     coverPhotoUrl: undefined,
   },
   {
-    title: "Debate Club",
+    title: "Debate Organization",
     subtitle: "College of Arts",
     bgColor: "bg-green-300",
     orgID: "12",
@@ -37,7 +37,7 @@ const sampleOrgs = [
     coverPhotoUrl: undefined,
   },
   {
-    title: "Music Club",
+    title: "Music Organization",
     subtitle: "College of Arts",
     orgID: "14",
     bgColor: "bg-green-200",
@@ -58,11 +58,11 @@ export default function SubscribedOrgTestPage() {
   const router = useRouter();
    const handleNavigate = (orgID: string) => {
     console.log(`Parent component is navigating to organization: ${orgID}`);
-    router.push(`/organization/${orgID}`);
+    router.push(`/organization/${orgID}/newsfeed`);
   };
   return (
     <div className="w-full grid place-items-center items-start">
-      <div className="h-auto w-full max-w-3xl shadow-lg/100 p-4">
+      <div className="h-auto w-full max-w-3xl shadow-lg/100 p-10">
         <SubscribedOrgComponent orgs={sampleOrgs} onButtonClick={handleNavigate} />
       </div>
     </div>

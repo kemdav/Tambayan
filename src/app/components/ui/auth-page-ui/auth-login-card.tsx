@@ -62,6 +62,7 @@ export default function AuthLoginCard() {
         bg-linear-to-r from-action-seafoam-green to-action-forest-green
          hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 
          font-bold text-xl w-full mt-3"
+         onClick={()=>router.push("/profile")}
       >
         Log In
       </Button>

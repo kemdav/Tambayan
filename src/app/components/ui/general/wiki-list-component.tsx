@@ -16,7 +16,7 @@ interface WikiListProps {
 
 export default function WikiListComponent({ textcolor, cards }: WikiListProps) {
   return (
-    <div className="flex justify-center items-center min-h-screen px-4 bg-gray-100">
+    <div className="flex justify-center mt-10 min-h-screen px-4 bg-gray-100">
       <div className="w-full max-w-5xl h-[450px] bg-white border border-gray-300 rounded-md shadow-md p-6 flex flex-col">
         {/* Header */}
         <h1 className={`text-2xl font-bold text-left mb-2 ${textcolor}`}>
