@@ -35,7 +35,7 @@ export const CommentToOrgCard: React.FC<CommentToOrgCardProps> = ({
   if (hidden) return null;
 
   return (
-    <div className="border rounded-2xl p-4 bg-white shadow-sm max-w-xs w-full mx-auto relative">
+    <div className="border rounded-2xl p-4 bg-white shadow-sm w-full mx-auto relative">
       <div className="absolute top-4 right-4 z-10">
         <button
           className="p-1 rounded-full hover:bg-gray-100"
