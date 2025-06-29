@@ -2,8 +2,9 @@
 
 import React from "react";
 import JoinOrgCard, { JOIN_ORG_CARD_BG } from "@/app/components/ui/general/join-org-card";
+import { useRouter } from "next/navigation";
 
-const sampleOrgs = [
+  const sampleOrgs = [
   {
     title: "Computer Science Society",
     subtitle: "College of Engineering",
@@ -16,8 +17,6 @@ const sampleOrgs = [
     eventCount: 12,
     avatarUrl: undefined,
     coverPhotoUrl: undefined,
-    onView: () => alert("View Computer Science Society"),
-    onJoin: () => alert("Join Computer Science Society"),
   },
   {
     title: "Debate Club",
@@ -31,8 +30,6 @@ const sampleOrgs = [
     eventCount: 8,
     avatarUrl: undefined,
     coverPhotoUrl: undefined,
-    onView: () => alert("View Debate Club"),
-    onJoin: () => alert("Join Debate Club"),
   },
   {
     title: "Music Club",
@@ -46,16 +43,22 @@ const sampleOrgs = [
     eventCount: 0,
     avatarUrl: undefined,
     coverPhotoUrl: undefined,
-    onView: () => alert("View Music Club"),
-    onJoin: () => alert("Join Music Club"),
   },
 ];
-
 export default function JoinOrgCardTestPage() {
+  const router = useRouter();
+  const handleView = (orgID: string) => {
+    router.push(`/organization/${orgID}`);
+  };
+
+  const handleJoin = (orgID: string) => {
+    alert(`Joining organization with ID: ${orgID}`);
+  };
+
   return (
     <div className="min-h-screen p-6" style={{ background: JOIN_ORG_CARD_BG }}>
       <h1 className="text-2xl font-bold mb-6">Join Organizations</h1>
-      <JoinOrgCard orgs={sampleOrgs} />
+      <JoinOrgCard orgs={sampleOrgs}  onViewClick={handleView} onJoinClick={handleJoin}/>
     </div>
   );
 } 
