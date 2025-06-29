@@ -6,6 +6,7 @@ interface CardItem {
   id: string;
   title: string;
   icon?: React.ReactNode;
+  onClick?: () => void; // optional onClick per card
 }
 
 interface WikiListProps {
@@ -31,9 +32,11 @@ export default function WikiListComponent({ textcolor, cards }: WikiListProps) {
           {cards.map((card) => (
             <button
               key={card.id}
+              onClick={card.onClick} // assign onClick from prop if provided
               className="w-full h-[59px] bg-green-50 border border-green-300 rounded-md flex items-center px-6 text-left
                 hover:bg-green-100 transition duration-150 ease-in-out cursor-pointer
                 active:scale-95 active:transition-transform active:duration-75"
+              type="button"
             >
               {card.icon && (
                 <span className="mr-3 text-green-600 text-lg">{card.icon}</span>
