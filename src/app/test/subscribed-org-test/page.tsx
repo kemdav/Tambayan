@@ -1,5 +1,7 @@
+"use client";
 import React from "react";
 import SubscribedOrgComponent, { SUBSCRIBED_ORG_CARD_BG } from "@/app/components/ui/general/subscribed-org-component";
+import { useRouter } from "next/navigation";
 
 const sampleOrgs = [
   {
@@ -53,10 +55,15 @@ const sampleOrgs = [
 ];
 
 export default function SubscribedOrgTestPage() {
+  const router = useRouter();
+   const handleNavigate = (orgID: string) => {
+    console.log(`Parent component is navigating to organization: ${orgID}`);
+    router.push(`/organization/${orgID}`);
+  };
   return (
     <div className="min-h-screen p-6" style={{ background: SUBSCRIBED_ORG_CARD_BG }}>
       <h1 className="text-2xl font-bold mb-6">Subscribed Organizations</h1>
-      <SubscribedOrgComponent orgs={sampleOrgs} />
+      <SubscribedOrgComponent orgs={sampleOrgs} onButtonClick={handleNavigate} />
     </div>
   );
 } 
