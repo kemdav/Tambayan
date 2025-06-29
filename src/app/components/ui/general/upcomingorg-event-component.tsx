@@ -23,32 +23,31 @@ export default function UpcomingorgEventComponent({
   events,
 }: UpcomingorgEventComponentProps) {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center w-full bg-gray-50 p-4">
       <div
         className={cn(
-          "flex flex-col p-6 w-[1106px] h-[709px] border rounded-[10px] border-black bg-white"
+          "flex flex-col p-4 sm:p-6 w-full max-w-4xl h-full max-h-[709px] bg-white rounded-lg shadow-md border-t-4 border-t-gray-800"
         )}
         style={{ overflow: "hidden" }}
       >
-        <h1 className="text-2xl font-bold text-green-700 border-b border-green-300 mb-4 pb-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-green-700 border-b border-green-300 mb-4 pb-2">
           Upcoming Events
         </h1>
-
         <div className="flex flex-col gap-4 overflow-y-auto pr-2 flex-1 min-h-0 scrollbar-hidden">
-          {events.map((event, index) => (
+          {events.map((event) => (
             <div
               key={event.id}
-              className="relative border border-gray-300 rounded-md p-4 bg-gray-100 h-[152px] shrink-0"
+              className="border border-gray-200 rounded-lg p-4 bg-white"
             >
-              <h1 className="text-lg font-semibold">{event.title}</h1>
-              <p className="text-sm text-gray-700">{event.description}</p>
-              <p className="text-xs text-gray-500 mt-1">
+              <h1 className="text-lg font-semibold text-gray-900">{event.title}</h1>
+              <p className="text-sm text-gray-700 mt-1">{event.description}</p>
+              <p className="text-xs text-gray-500 mt-2">
                 Posted on: {event.date}
               </p>
-              <div className="absolute bottom-4 left-4">
+              <div className="mt-3">
                 <Button
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm",
+                    "flex items-center gap-2 px-2.5 py-1.5 rounded-md font-medium text-xs",
                     event.buttonColorClass
                   )}
                   onClick={event.onButtonClick}
@@ -58,7 +57,10 @@ export default function UpcomingorgEventComponent({
                       {event.buttonIcon}
                     </span>
                   )}
-                  <span>{event.buttonLabel}</span>
+                  <span className="hidden sm:inline">{event.buttonLabel}</span>
+                  <span className="sm:hidden">
+                    {event.buttonLabel.includes("Deregister") ? "Deregister" : "Register"}
+                  </span>
                 </Button>
               </div>
             </div>

@@ -27,6 +27,7 @@ const DeregisterIcon = (
   </svg>
 );
 
+// Added more events to demonstrate scrolling and the grid layout
 const baseEvents = [
   {
     id: "event-1",
@@ -51,6 +52,18 @@ const baseEvents = [
     title: "Cloud Computing Talk",
     description: "Intro to AWS, Azure, and GCP for students.",
     date: "October 2, 2025",
+  },
+  {
+    id: "event-5",
+    title: "Cybersecurity Workshop",
+    description: "Hands-on workshop on ethical hacking and network security.",
+    date: "November 5, 2025",
+  },
+  {
+    id: "event-6",
+    title: "UI/UX Design Sprint",
+    description: "Collaborate to design and prototype a new app in 48 hours.",
+    date: "December 1, 2025",
   },
 ];
 
@@ -80,7 +93,8 @@ export default function UpcomingorgEventTest() {
   });
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    // The wrapper here already has responsive padding, which is good.
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 p-2 sm:p-4">
       <UpcomingorgEventComponent events={events} />
     </div>
   );
