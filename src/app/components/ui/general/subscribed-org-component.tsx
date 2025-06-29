@@ -34,6 +34,7 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs })
         <Input
           leftIcon={<SearchIcon width={20} height={20} />}
           placeholder="Search Organizations.."
+          aria-label="Search organizations"
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="w-full"
@@ -43,8 +44,8 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs })
         {filteredOrgs.length === 0 ? (
           <div className="text-gray-500 text-center w-full">No organizations found.</div>
         ) : (
-          filteredOrgs.map((orgProps, idx) => (
-            <div key={idx} className="flex-shrink-0">
+          filteredOrgs.map((orgProps) => (
+            <div key={orgProps.id} className="flex-shrink-0">
               <ShowcaseCard {...orgProps} />
             </div>
           ))
