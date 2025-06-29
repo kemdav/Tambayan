@@ -43,7 +43,7 @@ export function CreatePostComponent() {
       daysSincePosted: 0,
       title: title,
       content: htmlContent,
-      imageSrc: photoURL,
+      imageSrc: photo ? URL.createObjectURL(photo) : null,
       likes: 0,
       comments: 0,
       tags: tags,
