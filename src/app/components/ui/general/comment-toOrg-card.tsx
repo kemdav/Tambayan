@@ -35,7 +35,7 @@ export const CommentToOrgCard: React.FC<CommentToOrgCardProps> = ({
   if (hidden) return null;
 
   return (
-    <div className="border rounded-2xl p-4 bg-white shadow-sm max-w-2xl w-full mx-auto relative">
+    <div className="border rounded-2xl p-4 bg-white shadow-sm max-w-xs w-full mx-auto relative">
       <div className="absolute top-4 right-4 z-10">
         <button
           className="p-1 rounded-full hover:bg-gray-100"
@@ -51,7 +51,7 @@ export const CommentToOrgCard: React.FC<CommentToOrgCardProps> = ({
           </div>
         )}
       </div>
-      <div className="flex items-center gap-3 mb-2">
+      <div className="flex items-center gap-3 mb-2 pr-12">
         <AvatarIcon src={commenterAvatarSrc} alt={commenterName} className="h-8 w-8 text-base" />
         <div className="flex flex-col">
           <span className="font-semibold text-sm text-neutral-muted-olive">
