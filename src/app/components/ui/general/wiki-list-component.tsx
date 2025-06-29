@@ -25,8 +25,7 @@ export default function WikiListComponent({ textcolor, cards }: WikiListProps) {
 
         {/* Scrollable list area */}
         <div
-          className="flex-1 overflow-y-auto space-y-4 pr-1"
-          style={{ overflowX: "hidden" }} // hide horizontal scrollbar
+          className="flex-1 overflow-y-auto overflow-x-hidden space-y-4 pr-1"
         >
           {cards.map((card) => (
             <button
