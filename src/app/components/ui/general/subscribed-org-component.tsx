@@ -12,9 +12,10 @@ export const SUBSCRIBED_ORG_CARD_BG = "#f8f5ef";
 
 interface SubscribedOrgComponentProps {
   orgs: Array<ComponentProps<typeof ShowcaseCard>>;
+  onButtonClick?: (orgID: string) => void;
 }
 
-const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs }) => {
+const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs, onButtonClick }) => {
   const [search, setSearch] = useState("");
 
   const filteredOrgs = useMemo(() => {
@@ -24,6 +25,15 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs })
       org.subtitle.toLowerCase().includes(search.toLowerCase())
     );
   }, [search, orgs]);
+
+  // Default click handler
+  const handleButtonClick = (orgID: string) => {
+    if (onButtonClick) {
+      onButtonClick(orgID);
+    } else {
+      console.log("clicked", orgID);
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 w-full max-w-6xl mx-auto">
@@ -46,7 +56,13 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ orgs })
         ) : (
           filteredOrgs.map((orgProps) => (
             <div key={orgProps.orgID} className="flex-shrink-0">
-              <ShowcaseCard {...orgProps} />
+              <ShowcaseCard
+                {...orgProps}
+                buttons={orgProps.buttons.map(btn => ({
+                  ...btn,
+                  onClick: () => handleButtonClick(orgProps.orgID)
+                }))}
+              />
             </div>
           ))
         )}
