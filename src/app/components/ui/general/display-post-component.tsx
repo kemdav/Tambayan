@@ -24,6 +24,8 @@ interface DisplayPostComponentProps {
   onLike?: () => void;
   onComment?: () => void;
   orgLabel?: string;
+  recipient?: string;
+  isDetailed?: boolean;
 }
 
 const EllipsisIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -54,6 +56,8 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   onLike,
   onComment,
   orgLabel: initialOrgLabel,
+  recipient,
+  isDetailed = true,
 }) => {
   const [showComment, setShowComment] = React.useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -109,7 +113,13 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
           <AvatarIcon src={avatarSrc} alt={posterName} className="h-8 w-8 text-base" />
           <div className="flex flex-col">
             <span className="font-semibold text-sm text-neutral-muted-olive flex items-center gap-2">
-              {posterName}
+              {isDetailed ? (
+                <>
+                  {posterName}{recipient ? ` to ${recipient}` : ''}
+                </>
+              ) : (
+                posterName
+              )}
             </span>
             <span className="text-xs text-gray-400">{daysSincePosted} days ago</span>
           </div>
