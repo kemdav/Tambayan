@@ -5,9 +5,10 @@ import { TagComponent } from "../general/tag-component";
 
 interface Props {
     isEditable?: boolean;
+    name?:string;
 }
 
-export default function StudentProfileHeader({isEditable=false}:Props){
+export default function StudentProfileHeader({isEditable=false, name="Excel Duran"}:Props){
     return (
         <header className="bg-white relative w-full h-73">
             <div className="absolute flex flex-col w-full h-full">
@@ -17,7 +18,7 @@ export default function StudentProfileHeader({isEditable=false}:Props){
                 </div>
                 <div className="min-h-20 max-h-25 h-full">
                     <div className="flex flex-col">
-                        <h1 className="ml-37 text-primary-forest-green font-bold text-2xl">Excel Duran</h1>
+                        <h1 className="ml-37 text-primary-forest-green font-bold text-2xl">{name}</h1>
                         {/* <div className="flex ml-37 gap-2">
                             <UniversityIcon className="size-7"/>
                        </div> */}

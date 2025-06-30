@@ -1,5 +1,7 @@
+import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import {StudentVerticalNavigation} from "./sideNavbarWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,7 +24,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="">
-    </div>
+      <StudentVerticalNavigation>{children}</StudentVerticalNavigation>
   );
 }
