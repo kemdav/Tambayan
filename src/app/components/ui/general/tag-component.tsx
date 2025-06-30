@@ -30,7 +30,7 @@ export function TagComponent({ tags, tagInput, onTagInputChange, onAddTag, onRem
       <div className="flex gap-2">
         <Input
           type="text"
-          placeholder="Type tags, separated by commas"
+          placeholder="Type tags"
           value={tagInput}
           onChange={e => onTagInputChange(e.target.value)}
           onKeyDown={e => {

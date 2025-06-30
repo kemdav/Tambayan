@@ -26,6 +26,9 @@ interface DisplayPostComponentProps {
   orgLabel?: string;
   recipient?: string;
   isDetailed?: boolean;
+  eventLocation?: string;
+  eventDate?: string;
+  registrationPeriod?: string;
 }
 
 const EllipsisIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -57,7 +60,10 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   onComment,
   orgLabel: initialOrgLabel,
   recipient,
-  isDetailed = true,
+  isDetailed = false,
+  eventLocation,
+  eventDate,
+  registrationPeriod,
 }) => {
   const [showComment, setShowComment] = React.useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -114,11 +120,11 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
           <div className="flex flex-col">
             <span className="font-semibold text-sm text-neutral-muted-olive flex items-center gap-2">
               {isDetailed ? (
-                <>
-                  {posterName}{recipient ? ` to ${recipient}` : ''}
-                </>
-              ) : (
                 posterName
+              ) : (
+                <>
+                  {posterName}{recipient ? ` to ${recipient.toUpperCase()}` : ''}
+                </>
               )}
             </span>
             <span className="text-xs text-gray-400">{daysSincePosted} days ago</span>
@@ -132,6 +138,21 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
         {displayEvent && (
           <div className="mb-2 text-base">
             <span className="font-bold">Event:</span> {displayEvent}
+          </div>
+        )}
+        {eventLocation && (
+          <div className="mb-1 text-sm text-gray-700">
+            <span className="font-semibold">Location:</span> {eventLocation}
+          </div>
+        )}
+        {eventDate && (
+          <div className="mb-1 text-sm text-gray-700">
+            <span className="font-semibold">Date:</span> {eventDate}
+          </div>
+        )}
+        {registrationPeriod && (
+          <div className="mb-2 text-sm text-gray-700">
+            <span className="font-semibold">Registration Period:</span> {registrationPeriod}
           </div>
         )}
         <div

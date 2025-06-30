@@ -87,16 +87,18 @@ export function CreatePostComponent({
             onSelect={onPostTypeChange}
           />
         </div>
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Select Organization:</label>
-          <DropdownRole
-            options={orgOptions}
-            placeholder={org ? orgOptions.find(o => o.value === org)?.label : "Select Organization"}
-            width="w-full"
-            height="h-10"
-            onSelect={onOrgChange}
-          />
-        </div>
+        {postType === "default" && (
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Select Organization:</label>
+            <DropdownRole
+              options={orgOptions}
+              placeholder={org ? orgOptions.find(o => o.value === org)?.label : "Select Organization"}
+              width="w-full"
+              height="h-10"
+              onSelect={onOrgChange}
+            />
+          </div>
+        )}
       </div>
       {postType === "default" && (
         <>
@@ -115,42 +117,34 @@ export function CreatePostComponent({
               onChange={val => onContentChange(val as string)}
               isFormattable={true}
               multiline={true}
-              placeholder="What's happening in your organization?"
-              className="mb-2 pr-10"
+              placeholder="What's happening in your organizaticfbcbcbon?"
+              className="mb-2"
             />
-            {/* Clip icon for photo attachment */}
-            <button
-              type="button"
-              className="absolute bottom-3 left-3 p-1 rounded hover:bg-gray-100"
-              onClick={() => document.getElementById('photo-upload-input')?.click()}
-              tabIndex={-1}
-            >
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M16.5 13.5V7.75a4.75 4.75 0 10-9.5 0v8.5a6.25 6.25 0 0012.5 0V7" stroke="#719281" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M8 12.5V7.75a4 4 0 118 0v8.5a4.75 4.75 0 11-9.5 0V7" stroke="#719281" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </button>
-            <input
-              id="photo-upload-input"
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={e => onPhotoChange && onPhotoChange(e.target.files?.[0] || null)}
-            />
-            {photoFile && <span className="text-xs ml-2">{photoFile.name}</span>}
-          </div>
-          {/* Tags UI using TagComponent */}
-          <div className="mb-2">
-            <label className="text-sm font-medium text-neutral-muted-olive">Tags</label>
-            <TagComponent
-              tags={tags}
-              tagInput={tagInput}
-              onTagInputChange={onTagInputChange ?? (() => {})}
-              onAddTag={onAddTag ?? (() => {})}
-              onRemoveTag={onRemoveTag}
-            />
+            <div className="mt-10">
+              <button
+                type="button"
+                className="px-3 py-1 rounded bg-gray-100 hover:bg-secondary-light-moss hover:text-white text-sm font-medium transition-colors"
+                onClick={() => document.getElementById('photo-upload-input')?.click()}
+                tabIndex={-1}
+                aria-label="Attach photo"
+              >
+                Attach Image
+              </button>
+              <input
+                id="photo-upload-input"
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={e => onPhotoChange && onPhotoChange(e.target.files?.[0] || null)}
+              />
+              {photoFile && <span className="text-xs ml-2">{photoFile.name}</span>}
+            </div>
           </div>
         </>
       )}
       {postType === "event" && (
         <>
+          <label className="text-sm font-medium text-neutral-muted-olive">Event Title</label>
           <Input
             type="text"
             placeholder="Event Title"
@@ -167,6 +161,27 @@ export function CreatePostComponent({
             placeholder="What's happening in your organization?"
             className="mb-2"
           />
+          {/* Attach Image button below description */}
+          <div className="mt-10">
+            <button
+              type="button"
+              className="px-3 py-1 rounded bg-gray-100 hover:bg-secondary-light-moss hover:text-white text-sm font-medium transition-colors"
+              onClick={() => document.getElementById('photo-upload-input')?.click()}
+              tabIndex={-1}
+              aria-label="Attach photo"
+            >
+              Attach Image
+            </button>
+            <input
+              id="photo-upload-input"
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={e => onPhotoChange && onPhotoChange(e.target.files?.[0] || null)}
+            />
+            {photoFile && <span className="text-xs ml-2">{photoFile.name}</span>}
+          </div>
+          <label className="text-sm font-medium text-neutral-muted-olive">Location</label>
           <Input
             type="text"
             placeholder="Location"
@@ -174,6 +189,7 @@ export function CreatePostComponent({
             onChange={e => onEventLocationChange && onEventLocationChange(e.target.value)}
             className="mb-2"
           />
+          <label className="text-sm font-medium text-neutral-muted-olive">Date</label>
           <Input
             type="text"
             placeholder="Date"
@@ -181,6 +197,7 @@ export function CreatePostComponent({
             onChange={e => onEventDateChange && onEventDateChange(e.target.value)}
             className="mb-2"
           />
+          <label className="text-sm font-medium text-neutral-muted-olive">Registration Period</label>
           <Input
             type="text"
             placeholder="Registration Period"
