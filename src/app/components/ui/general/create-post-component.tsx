@@ -49,6 +49,7 @@ interface CreatePostComponentProps {
   onRegistrationEndChange?: (date: Date | undefined) => void;
   // Button text (optional)
   postButtonText?: string;
+  isEditMode?: boolean;
 }
 
 export function CreatePostComponent({
@@ -78,6 +79,7 @@ export function CreatePostComponent({
   registrationEnd,
   onRegistrationEndChange,
   postButtonText = "Post",
+  isEditMode = false,
 }: CreatePostComponentProps) {
   return (
     <div className={`rounded-2xl border border-gray-200 bg-white p-6 flex flex-col gap-4 shadow-sm w-full mx-auto mb-4 ${className}`}>
@@ -125,25 +127,30 @@ export function CreatePostComponent({
               placeholder="What's happening in your organizaticfbcbcbon?"
               className="mb-2"
             />
-            <div className="mt-10">
-              <button
-                type="button"
-                className="px-3 py-1 rounded bg-gray-100 hover:bg-secondary-light-moss hover:text-white text-sm font-medium transition-colors"
-                onClick={() => document.getElementById('photo-upload-input')?.click()}
-                tabIndex={-1}
-                aria-label="Attach photo"
-              >
-                Attach Image
-              </button>
-              <input
-                id="photo-upload-input"
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={e => onPhotoChange && onPhotoChange(e.target.files?.[0] || null)}
-              />
-              {photoFile && <span className="text-xs ml-2">{photoFile.name}</span>}
-            </div>
+            {!isEditMode && (
+              <div className="mt-10">
+                <button
+                  type="button"
+                  className="px-3 py-1 rounded bg-gray-100 hover:bg-secondary-light-moss hover:text-white text-sm font-medium transition-colors"
+                  onClick={() => document.getElementById('photo-upload-input')?.click()}
+                  tabIndex={-1}
+                  aria-label="Attach photo"
+                >
+                  Attach Image
+                </button>
+                <input
+                  id="photo-upload-input"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={e => {
+                    onPhotoChange && onPhotoChange(e.target.files?.[0] || null);
+                    e.target.value = "";
+                  }}
+                />
+                {photoFile && <span className="text-xs ml-2">{photoFile.name}</span>}
+              </div>
+            )}
           </div>
         </>
       )}
@@ -166,26 +173,30 @@ export function CreatePostComponent({
             placeholder="What's happening in your organization?"
             className="mb-2"
           />
-          {/* Attach Image button below description */}
-          <div className="mt-10">
-            <button
-              type="button"
-              className="px-3 py-1 rounded bg-gray-100 hover:bg-secondary-light-moss hover:text-white text-sm font-medium transition-colors"
-              onClick={() => document.getElementById('photo-upload-input')?.click()}
-              tabIndex={-1}
-              aria-label="Attach photo"
-            >
-              Attach Image
-            </button>
-            <input
-              id="photo-upload-input"
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={e => onPhotoChange && onPhotoChange(e.target.files?.[0] || null)}
-            />
-            {photoFile && <span className="text-xs ml-2">{photoFile.name}</span>}
-          </div>
+          {!isEditMode && (
+            <div className="mt-10">
+              <button
+                type="button"
+                className="px-3 py-1 rounded bg-gray-100 hover:bg-secondary-light-moss hover:text-white text-sm font-medium transition-colors"
+                onClick={() => document.getElementById('photo-upload-input')?.click()}
+                tabIndex={-1}
+                aria-label="Attach photo"
+              >
+                Attach Image
+              </button>
+              <input
+                id="photo-upload-input"
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={e => {
+                  onPhotoChange && onPhotoChange(e.target.files?.[0] || null);
+                  e.target.value = "";
+                }}
+              />
+              {photoFile && <span className="text-xs ml-2">{photoFile.name}</span>}
+            </div>
+          )}
           <label className="text-sm font-medium text-neutral-muted-olive">Location</label>
           <Input
             type="text"
