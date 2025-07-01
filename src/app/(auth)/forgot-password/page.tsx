@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
     if (error) {
       setError(error.message);
     } else {
-      router.push("/forgot-send-email");
+      router.push(`/forgot-send-email?email=${encodeURIComponent(email)}`);
     }
   };
 
