@@ -86,7 +86,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
 
   return (
     <>
-      <div className="border rounded-2xl p-4 bg-white shadow-sm max-w-2xl w-full mx-auto relative">
+      <div className="border rounded-2xl p-4 bg-white shadow-sm max-w-4xl w-full mx-auto relative">
         <div className="absolute top-4 right-4 z-10">
           <Popover>
             <PopoverTrigger asChild>

@@ -9,6 +9,8 @@ import CommentToOrgCard from "../general/comment-toOrg-card";
 import { useState } from "react";
 import { UpcomingEventComponent } from "../general/upcoming-event-component";
 import UpcomingorgEventComponent from "../general/upcomingorg-event-component";
+import DropDownRole from "../general/dropdown/dropdown-role";
+import { DropdownStatus } from "../general/dropdown/dropdown-status";
 
 interface Props extends studentProps {
     className?: string;
@@ -100,10 +102,19 @@ export const Posts: Poster[] = [
     }
 ];
 
-
+const options = [
+  { value: "recent", label: "Most Recent" },
+  { value: "oldest", label: "Oldest" },
+  { value: "mostLikedAllTime", label: "Most Liked All Time" },
+  { value: "mostLikedMonth", label: "Most Liked Month" },
+  { value: "mostLikedWeek", label: "Most Liked Week" }
+];
 const PostPage = () => {
     return (
         <div className="mt-3">
+            <div className="mb-3">
+                <DropDownRole options={options} placeholder="Filtering" width="w-xs"></DropDownRole>
+            </div>
             {Posts.length === 0 ? (<p>No users found</p>) : (
                 <ul className="space-y-4">
                     {Posts.map((Posts) => (
@@ -111,7 +122,8 @@ const PostPage = () => {
                             daysSincePosted={Posts.daysSincePosted}
                             content={Posts.content}
                             likes={Posts.likes}
-                            comments={Posts.comments} />
+                            comments={Posts.comments}
+                            recipient="ICPEP" />
                     ))}
                 </ul>
             )}

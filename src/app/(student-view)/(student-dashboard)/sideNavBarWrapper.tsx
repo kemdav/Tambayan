@@ -4,7 +4,12 @@ import { Button } from "@/app/components/ui/general/button";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import { CreatePostComponent } from "@/app/components/ui/general/create-post-component";
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
+import SearchBar from "@/app/components/ui/student-view-ui/search-bar";
 import { useState } from "react";
+
+interface Props {
+  children: React.ReactNode;
+}
 
 export const myButtons: ButtonConfig[] = [
   {
@@ -59,10 +64,6 @@ const SideBar = () => {
   </div>);
 }
 
-interface Props {
-  children: React.ReactNode;
-}
-
 function CreatePost() {
   <CreatePostComponent></CreatePostComponent>
 }
@@ -70,6 +71,7 @@ function CreatePost() {
 export default function StudentVerticalNavigation({ children }: Props) {
 
   const [isCreatePostOpen, setCreatePostOpen] = useState(false);
+  const [selectedNavId, setSelectedNavId] = useState<string>("profile");
 
   return (
     <>
@@ -85,10 +87,11 @@ export default function StudentVerticalNavigation({ children }: Props) {
       )}
 
       <div className="relative flex h-dvh">
-        <div className="z-20 fixed">
+        <div className="z-20 fixed overflow-y-auto">
           <SideBar></SideBar>
         </div>
-        <div className="grow flex">
+        <div className="flex-grow flex flex-col items-center pt-5">
+          <SearchBar className="w-full max-w-4xl"></SearchBar>
           {children}
         </div>
         <div className="z-20 fixed bottom-0 right-0 sm:mx-10 sm:my-10 opacity-50 md:opacity-100">
