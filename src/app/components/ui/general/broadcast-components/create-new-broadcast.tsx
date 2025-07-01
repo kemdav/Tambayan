@@ -1,6 +1,6 @@
 import React from "react";
-import { Input } from "./input/input";
-import { Button } from "./button";
+import { Input } from "../input/input";
+import { Button } from "../button";
 
 interface RecipientOptions {
   allStudents: boolean;
