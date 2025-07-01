@@ -194,14 +194,6 @@ export function CreatePostComponent({
             onChange={e => onEventLocationChange && onEventLocationChange(e.target.value)}
             className="mb-2"
           />
-          <label className="text-sm font-medium text-neutral-muted-olive">Date</label>
-          <Input
-            type="text"
-            placeholder="Date"
-            value={eventDate}
-            onChange={e => onEventDateChange && onEventDateChange(e.target.value)}
-            className="mb-2"
-          />
           <div className="flex flex-row gap-4 mb-2">
             <div className="flex-1">
               <label className="text-sm font-medium text-neutral-muted-olive">Registration Start</label>
