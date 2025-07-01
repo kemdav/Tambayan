@@ -1,9 +1,35 @@
+"use client";
 import AuthEnterEmailCard from "@/app/components/ui/auth-page-ui/auth-enter-email-card";
+import { supabase } from "@/lib/supabase/client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function Home() {
+export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleReset = async () => {
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    setLoading(false);
+    if (error) {
+      setError(error.message);
+    } else {
+      router.push("/forgot-send-email");
+    }
+  };
+
   return (
-    <div>
-      <AuthEnterEmailCard />
-    </div>
+    <AuthEnterEmailCard
+      email={email}
+      onEmailChange={e => setEmail(e.target.value)}
+      onReset={handleReset}
+      loading={loading}
+      error={error}
+      onLogin={() => router.push("/login")}
+    />
   );
 }
