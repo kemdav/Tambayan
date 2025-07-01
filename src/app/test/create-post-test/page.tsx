@@ -9,7 +9,8 @@ export default function CreatePostTestPage() {
   const [content, setContent] = React.useState("");
   const [eventLocation, setEventLocation] = React.useState("");
   const [eventDate, setEventDate] = React.useState("");
-  const [registrationPeriod, setRegistrationPeriod] = React.useState("");
+  const [registrationStart, setRegistrationStart] = React.useState<Date | undefined>();
+  const [registrationEnd, setRegistrationEnd] = React.useState<Date | undefined>();
   const [submitted, setSubmitted] = React.useState<any>(null);
 
   // Tag and photo state
@@ -42,7 +43,8 @@ export default function CreatePostTestPage() {
       content,
       eventLocation,
       eventDate,
-      registrationPeriod,
+      registrationStart,
+      registrationEnd,
       tags,
       photoFileName: photoFile?.name || null,
     });
@@ -65,8 +67,10 @@ export default function CreatePostTestPage() {
         onEventLocationChange={setEventLocation}
         eventDate={eventDate}
         onEventDateChange={setEventDate}
-        registrationPeriod={registrationPeriod}
-        onRegistrationPeriodChange={setRegistrationPeriod}
+        registrationStart={registrationStart}
+        onRegistrationStartChange={setRegistrationStart}
+        registrationEnd={registrationEnd}
+        onRegistrationEndChange={setRegistrationEnd}
         tags={tags}
         tagInput={tagInput}
         onTagInputChange={setTagInput}

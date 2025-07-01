@@ -6,6 +6,7 @@ import { Input } from "./input/input";
 import DropdownRole from "@/app/components/ui/general/dropdown/dropdown-role";
 import { FormattableInput } from "./input/FormattableInput";
 import { TagComponent } from "./tag-component";
+import { DateTimePicker } from "@/app/components/ui/general/date-picker/date-picker-component";
 
 const orgOptions = [
   { value: "icpep", label: "ICPEP" },
@@ -42,8 +43,10 @@ interface CreatePostComponentProps {
   onEventLocationChange?: (location: string) => void;
   eventDate?: string;
   onEventDateChange?: (date: string) => void;
-  registrationPeriod?: string;
-  onRegistrationPeriodChange?: (period: string) => void;
+  registrationStart?: Date;
+  onRegistrationStartChange?: (date: Date | undefined) => void;
+  registrationEnd?: Date;
+  onRegistrationEndChange?: (date: Date | undefined) => void;
   // Button text (optional)
   postButtonText?: string;
 }
@@ -70,8 +73,10 @@ export function CreatePostComponent({
   onEventLocationChange,
   eventDate = "",
   onEventDateChange,
-  registrationPeriod = "",
-  onRegistrationPeriodChange,
+  registrationStart,
+  onRegistrationStartChange,
+  registrationEnd,
+  onRegistrationEndChange,
   postButtonText = "Post",
 }: CreatePostComponentProps) {
   return (
@@ -197,14 +202,16 @@ export function CreatePostComponent({
             onChange={e => onEventDateChange && onEventDateChange(e.target.value)}
             className="mb-2"
           />
-          <label className="text-sm font-medium text-neutral-muted-olive">Registration Period</label>
-          <Input
-            type="text"
-            placeholder="Registration Period"
-            value={registrationPeriod}
-            onChange={e => onRegistrationPeriodChange && onRegistrationPeriodChange(e.target.value)}
-            className="mb-2"
-          />
+          <div className="flex flex-row gap-4 mb-2">
+            <div className="flex-1">
+              <label className="text-sm font-medium text-neutral-muted-olive">Registration Start</label>
+              <DateTimePicker date={registrationStart} setDate={onRegistrationStartChange} />
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium text-neutral-muted-olive">Registration End</label>
+              <DateTimePicker date={registrationEnd} setDate={onRegistrationEndChange} />
+            </div>
+          </div>
         </>
       )}
       <div className="flex justify-end mt-2">

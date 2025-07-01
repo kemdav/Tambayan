@@ -10,7 +10,8 @@ export default function CreatePostWDDisplayTestPage() {
   const [content, setContent] = React.useState("");
   const [eventLocation, setEventLocation] = React.useState("");
   const [eventDate, setEventDate] = React.useState("");
-  const [registrationPeriod, setRegistrationPeriod] = React.useState("");
+  const [registrationStart, setRegistrationStart] = React.useState<Date | undefined>();
+  const [registrationEnd, setRegistrationEnd] = React.useState<Date | undefined>();
   const [photoFile, setPhotoFile] = React.useState<File | null>(null);
   const [tags, setTags] = React.useState<string[]>([]);
   const [tagInput, setTagInput] = React.useState("");
@@ -43,7 +44,7 @@ export default function CreatePostWDDisplayTestPage() {
       event: postType === "event" ? title : undefined,
       eventLocation: postType === "event" ? eventLocation : undefined,
       eventDate: postType === "event" ? eventDate : undefined,
-      registrationPeriod: postType === "event" ? registrationPeriod : undefined,
+      registrationPeriod: postType === "event" && registrationStart && registrationEnd ? `${registrationStart.toLocaleString()} - ${registrationEnd.toLocaleString()}` : undefined,
       isDetailed: postType === "event",
     });
   };
@@ -65,8 +66,10 @@ export default function CreatePostWDDisplayTestPage() {
         onEventLocationChange={setEventLocation}
         eventDate={eventDate}
         onEventDateChange={setEventDate}
-        registrationPeriod={registrationPeriod}
-        onRegistrationPeriodChange={setRegistrationPeriod}
+        registrationStart={registrationStart}
+        onRegistrationStartChange={setRegistrationStart}
+        registrationEnd={registrationEnd}
+        onRegistrationEndChange={setRegistrationEnd}
         photoFile={photoFile}
         onPhotoChange={setPhotoFile}
         tags={tags}
