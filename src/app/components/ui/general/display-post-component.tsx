@@ -26,6 +26,7 @@ interface DisplayPostComponentProps {
   orgLabel?: string;
   recipient?: string;
   isDetailed?: boolean;
+  onAvatarClicked?:()=>void,
 }
 
 const EllipsisIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -58,6 +59,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   orgLabel: initialOrgLabel,
   recipient,
   isDetailed = true,
+  onAvatarClicked,
 }) => {
   const [showComment, setShowComment] = React.useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -110,7 +112,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
           </Popover>
         </div>
         <div className="flex items-center gap-3 mb-2">
-          <AvatarIcon src={avatarSrc} alt={posterName} className="h-8 w-8 text-base" />
+          <AvatarIcon src={avatarSrc} alt={posterName} className="h-8 w-8 text-base" isClickable={true} onAvatarClicked={onAvatarClicked}/>
           <div className="flex flex-col">
             <span className="font-semibold text-sm text-neutral-muted-olive flex items-center gap-2">
               {isDetailed ? (
