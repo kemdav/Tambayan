@@ -1,3 +1,7 @@
+"use client";
+
+import { BroadcastComponentTool } from "@/app/components/ui/general/broadcast-components/broadcast-component-tool";
+
 export default function BroadcastToolPage() {
-  return <div className="flex items-center justify-center min-h-screen"><h1 className="text-3xl font-bold">Broadcast Tool Page</h1></div>;
+  return <div className="w-full flex justify-center items-center min-h-screen ml-8"><BroadcastComponentTool /></div>;
 }

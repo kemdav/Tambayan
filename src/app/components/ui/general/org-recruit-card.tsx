@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import { AvatarIcon } from "./avatar-icon-component";
 import { cn } from "@/lib/utils";
@@ -40,7 +38,7 @@ export default function OrgRecruitCard({
   joinDisabled = false,
 }: OrgRecruitCardProps) {
   return (
-    <div className="rounded-xl shadow-md bg-white border border-gray-200 h-[347px] w-[294px]">
+    <div className="rounded-xl shadow-md bg-white border border-gray-200 h-[320px] w-[220px] flex flex-col justify-between">
       <div
         className={cn(
           !coverPhotoUrl && bgColor,

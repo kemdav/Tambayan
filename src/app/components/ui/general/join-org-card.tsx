@@ -44,7 +44,7 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ orgs, onViewClick, onJoinClic
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 w-full max-w-6xl mx-auto">
+    <div className="bg-white rounded-2xl shadow-md p-6 w-full max-w-7xl h-full min-h-screen">
       <div className="mb-4">
         <span className="font-bold text-xl">Organization Oversight</span>
       </div>
@@ -58,7 +58,7 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ orgs, onViewClick, onJoinClic
           className="w-full"
         />
       </div>
-      <div className="flex flex-wrap gap-6 justify-center md:justify-start mt-6">
+      <div className="flex flex-wrap gap-6 justify-center md:justify-start mt-6 max-h-[40rem] overflow-y-auto">
         {filteredOrgs.length === 0 ? (
           <div className="text-gray-500 text-center w-full">No organizations found.</div>
         ) : (
