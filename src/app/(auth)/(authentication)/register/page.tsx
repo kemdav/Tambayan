@@ -1,8 +1,10 @@
+//register page.tsx
 "use client";
 import AuthRegCard from "@/app/components/ui/auth-page-ui/auth-registration-card";
-import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+// We only need the `signup` action here
+import { signup } from '../action'
 
 const universityOptions = [
   { value: "u1", label: "Cebu Institute of Technology University" },
@@ -34,50 +36,49 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
+  
+  // --- MODIFICATION START ---
+  // Create a handler to bridge the client state and the server action
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
     setError(null);
+    setLoading(true);
+
+    // Perform client-side validation first
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      setLoading(false);
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      setLoading(false);
       return;
     }
     if (!university || !course || !year) {
       setError("Please select university, course, and year");
-      return;
-    }
-    setLoading(true);
-    // 1. Create the user in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    if (authError) {
-      setError(authError.message);
       setLoading(false);
       return;
     }
-    // 2. Create their profile in the public.student table
-    const { error: profileError } = await supabase
-      .from("student")
-      .insert({
-        user_id: authData.user?.id,
-        fname: firstName,
-        lname: lastName,
-        mname: middleName,
-        email,
-        universityid: university,
-        course,
-        year,
-      });
+    
+    // Create a FormData object and populate it with state
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('fname', firstName);
+    formData.append('lname', lastName);
+    formData.append('mname', middleName);
+    formData.append('universityid', university);
+    formData.append('course', course);
+    formData.append('yearlevel', year);
+
+    // Call the server action with the complete FormData
+    await signup(formData);
+
     setLoading(false);
-    if (profileError) {
-      setError(profileError.message);
-      return;
-    }
-    // 3. Redirect or show success message
-    router.push("/forgot-send-email"); // Or wherever you want to send them
-  };
+  }
+  // --- MODIFICATION END ---
+
 
   return (
     <div className="flex items-center justify-center">
@@ -88,9 +89,6 @@ export default function RegisterPage() {
         email={email}
         password={password}
         confirmPassword={confirmPassword}
-        university={university}
-        course={course}
-        year={year}
         loading={loading}
         error={error}
         universityOptions={universityOptions}
@@ -105,6 +103,7 @@ export default function RegisterPage() {
         onUniversityChange={setUniversity}
         onCourseChange={setCourse}
         onYearChange={setYear}
+        // Pass the new handler to the onSubmit prop
         onSubmit={handleRegister}
         onLogin={() => router.push("/login")}
       />

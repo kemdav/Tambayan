@@ -1,6 +1,6 @@
+
 "use client";
 
-import { TambayanIcon } from "../../icons";
 import { Button } from "@/app/components/ui/general/button";
 import { PasswordInput } from "@/app/components/ui/general/input/password-input";
 import { Input } from "@/app/components/ui/general/input/input";
@@ -52,6 +52,7 @@ export default function AuthLoginCard({
           <Input
             rightIcon={<UserPofileLoginIcon />}
             className="bg-secondary-light-moss/20"
+            name="email" 
             value={email}
             onChange={onEmailChange}
             type="email"
@@ -62,6 +63,7 @@ export default function AuthLoginCard({
           <p className="textAuthResponsive">Password</p>
           <PasswordInput
             className="bg-secondary-light-moss/20"
+            name="password" 
             value={password}
             onChange={onPasswordChange}
             required

@@ -1,18 +1,14 @@
+//auth-registration-card.tsx
 "use client";
 
 import { Button } from "@/app/components/ui/general/button";
 import { PasswordInput } from "@/app/components/ui/general/input/password-input";
 import { Input } from "@/app/components/ui/general/input/input";
 import {
-  UserPofileLoginIcon,
   EmailIcon,
-  CourseIcon,
-  UniversityIcon,
 } from "../../icons";
 import DropdownRole from "@/app/components/ui/general/dropdown/dropdown-role";
-import { useRouter } from "next/navigation";
 import React from "react";
-import { supabase } from "@/lib/supabase/client";
 
 interface Option {
   value: string;
@@ -26,9 +22,6 @@ interface AuthRegCardProps {
   email: string;
   password: string;
   confirmPassword: string;
-  university: string;
-  course: string;
-  year: string;
   loading: boolean;
   error: string | null;
   universityOptions: Option[];
@@ -43,6 +36,7 @@ interface AuthRegCardProps {
   onUniversityChange: (value: string) => void;
   onCourseChange: (value: string) => void;
   onYearChange: (value: string) => void;
+  // --- MODIFICATION: Changed prop to a standard event handler ---
   onSubmit: (e: React.FormEvent) => void;
   onLogin: () => void;
 }
@@ -54,9 +48,6 @@ export default function AuthRegCard({
   email,
   password,
   confirmPassword,
-  university,
-  course,
-  year,
   loading,
   error,
   universityOptions,
@@ -74,30 +65,6 @@ export default function AuthRegCard({
   onSubmit,
   onLogin,
 }: AuthRegCardProps) {
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
-      if (authError) {
-        console.error("Supabase Auth Error:", authError.message);
-        return;
-      }
-
-      await supabase.from('student').insert({
-        user_id: authData.user.id,
-        fname: firstName,
-        lname: lastName,
-        mname: middleName,
-        university: university,
-        course: course,
-        year: year,
-      });
-
-      onSubmit(e);
-    } catch (error) {
-      console.error("Registration Error:", error);
-    }
-  };
 
   return (
     <div className="card w-100 lg:w-130 h-160 p-5 lg:p-10">
@@ -107,8 +74,9 @@ export default function AuthRegCard({
           Enter your information to get started.
         </p>
       </div>
-
-      <form onSubmit={handleSubmit}>
+      
+      {/* --- MODIFICATION: Added onSubmit to the form tag --- */}
+      <form onSubmit={onSubmit}>
         <div className="grid grid-cols-3 grid-row-1 gap-2 lg:grid-cols-4">
           <div className="col-span-2 lg:col-span-1 lg:order-1">
             <p className="textAuthResponsive">Last Name</p>
@@ -176,11 +144,10 @@ export default function AuthRegCard({
         {error && (
           <div className="text-red-500 text-sm text-center mt-2">{error}</div>
         )}
-
+        
+        {/* --- MODIFICATION: Removed formAction, it's now a standard submit button --- */}
         <Button
-          className="text-neutral-linen-white \
-        bg-linear-to-r from-action-seafoam-green to-action-forest-green\n         hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 \
-         font-bold text-xl w-full mt-5 lg:mt-10"
+          className="text-neutral-linen-white bg-linear-to-r from-action-seafoam-green to-action-forest-green hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 font-bold text-xl w-full mt-5 lg:mt-10"
           type="submit"
           disabled={loading}
         >
