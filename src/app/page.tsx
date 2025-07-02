@@ -8,7 +8,8 @@ export default function Home() {
     <main>
         <h1 className="text-5xl">Quick Links</h1>
         <ul>
-          <Button variant="link" className="text-action-light-blue text-3xl" onClick={()=>router.push("\login")}>Authentication Page</Button>
+          <Button variant="link" className="text-action-light-blue text-3xl" onClick={()=>router.push("/login")}>Authentication Page</Button>
+          <Button variant="link" className="text-action-light-blue text-3xl" onClick={()=>router.push("/admin/dashboard")}>admin dashboard</Button>
         </ul>
     </main>
   )

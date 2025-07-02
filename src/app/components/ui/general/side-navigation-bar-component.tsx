@@ -14,6 +14,7 @@ import {
 import { Button } from "./button";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import React from "react";
 
 interface Props {
   myButtons: ButtonConfig[];
@@ -25,6 +26,13 @@ export default function SideNavBar({myButtons, selectedButtonId, onButtonSelect}
   const pathname = usePathname();
   const [isNavOpen, setIsNavOpen] = useState(false);
 
+  const navButtons = myButtons.map(btn => ({
+    ...btn,
+    variant: 'sideNavigation' as const,
+    icon: btn.icon
+      ? <span className="text-white w-6 h-6 flex items-center">{btn.icon}</span>
+      : undefined,
+  }));
 
   return (
     <main className={`h-screen transition-all duration-500 ease-in-out ${isNavOpen ? 'bg-tint-forest-fern w-70' : 'w-15 bg-action-forest-green/0'}`}>
@@ -35,7 +43,7 @@ export default function SideNavBar({myButtons, selectedButtonId, onButtonSelect}
       </div>
 
       <div>
-        <ButtonList buttons={myButtons} className={`flex flex-col ${isNavOpen ? 'duration-1000' : '-translate-x-100'}`} selectedId={selectedButtonId} onButtonClick={onButtonSelect}/>
+        <ButtonList buttons={navButtons} className={`flex flex-col ${isNavOpen ? 'duration-1000' : '-translate-x-100'}`} selectedId={selectedButtonId} onButtonClick={onButtonSelect}/>
       </div>
     </main>
   );

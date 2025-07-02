@@ -16,7 +16,7 @@ const buttonVariants = cva(
         navigation:
           "bg-action-forest-green text-neutral-linen-white shadow-xs hover:bg-action-forest-green/60",
         sideNavigation:
-          "sideNavBarButton justify-start text-lg h-12 bg-tint-forest-fern hover:bg-primary-forest-green text-neutral-pure-white shadow-none",
+          "sideNavBarButton justify-start text-lg h-12 bg-tint-forest-fern hover:bg-action-success-green/25 text-neutral-pure-white shadow-none rounded-[40px] w-full",
         horizontalNavigation:
           "bg-background justify-center text-lg h-12 text-tint-forest-fern transition-all duration-500 ease-in-out",
         link: "text-info underline-offset-4 underline rounded-md",
@@ -39,7 +39,7 @@ const buttonVariants = cva(
         {
           variant: "sideNavigation",
           isSelected: true,
-          className: "bg-primary-forest-green",
+          className: "bg-action-forest-green rounded-[10px]",
         },
         {
           variant: "horizontalNavigation",
