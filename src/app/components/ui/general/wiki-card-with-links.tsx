@@ -90,18 +90,20 @@ export default function WikiCardWithLinks({ hasPermission = false }: WikiCardWit
               </div>
 
               <div className="ml-auto relative" ref={menuRef}>
-                <button
-                  type="button"
-                  className="p-2 text-green-600 hover:bg-green-100 rounded-full z-30"
-                  onClick={e => {
-                    e.stopPropagation();
-                    setOpenMenuId(openMenuId === card.id ? null : card.id);
-                  }}
-                >
-                  <FaEllipsisV />
-                </button>
+                {hasPermission && (
+                  <button
+                    type="button"
+                    className="p-2 text-green-600 hover:bg-green-100 rounded-full z-30"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setOpenMenuId(openMenuId === card.id ? null : card.id);
+                    }}
+                  >
+                    <FaEllipsisV />
+                  </button>
+                )}
 
-                {openMenuId === card.id && (
+                {hasPermission && openMenuId === card.id && (
                   <div className="absolute right-0 top-10 bg-white border border-gray-200 rounded shadow z-50 min-w-[120px]">
                     <button
                       type="button"
