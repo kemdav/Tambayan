@@ -7,6 +7,7 @@ export default function Home() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100">
       <ShowcaseCard
+        orgID="cs-society"
         title="Computer Science Society"
         subtitle="College of Engineering"
         bgColor="bg-[#B7C9A8]"
