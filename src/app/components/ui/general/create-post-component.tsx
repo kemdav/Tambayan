@@ -84,16 +84,18 @@ export function CreatePostComponent({
   return (
     <div className={`rounded-2xl border border-gray-200 bg-white p-6 flex flex-col gap-4 shadow-sm w-full mx-auto mb-4 ${className}`}>
       <div className="flex flex-row gap-4 w-full">
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Create Post:</label>
-          <DropdownRole
-            options={postTypeOptions}
-            placeholder={postTypeOptions.find(o => o.value === postType)?.label || "Select Post Type"}
-            width="w-full"
-            height="h-10"
-            onSelect={onPostTypeChange}
-          />
-        </div>
+        {!isEditMode && (
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Create Post:</label>
+            <DropdownRole
+              options={postTypeOptions}
+              placeholder={postTypeOptions.find(o => o.value === postType)?.label || "Select Post Type"}
+              width="w-full"
+              height="h-10"
+              onSelect={onPostTypeChange}
+            />
+          </div>
+        )}
         {postType === "default" && (
           <div className="flex-1">
             <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Select Organization:</label>
@@ -205,7 +207,7 @@ export function CreatePostComponent({
             onChange={e => onEventLocationChange && onEventLocationChange(e.target.value)}
             className="mb-2"
           />
-          <div className="flex flex-row gap-4 mb-2">
+          <div className="flex flex-col gap-2 mb-2 sm:flex-row sm:gap-4">
             <div className="flex-1">
               <label className="text-sm font-medium text-neutral-muted-olive">Registration Start</label>
               <DateTimePicker date={registrationStart} setDate={onRegistrationStartChange} />
