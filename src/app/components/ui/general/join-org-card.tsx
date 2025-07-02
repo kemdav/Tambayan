@@ -58,7 +58,7 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ orgs, onViewClick, onJoinClic
           className="w-full"
         />
       </div>
-      <div className="flex flex-wrap gap-6 justify-center md:justify-start mt-6 max-h-[40rem] overflow-y-auto">
+      <div className="flex flex-wrap gap-6 justify-center md:justify-start mt-6 max-h-[45rem] overflow-y-auto">
         {filteredOrgs.length === 0 ? (
           <div className="text-gray-500 text-center w-full">No organizations found.</div>
         ) : (
