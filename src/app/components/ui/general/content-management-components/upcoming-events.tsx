@@ -26,8 +26,8 @@ export default function UpcomingEventComponent({
       </div>
 
       <div className="flex-1 p-4 space-y-4 overflow-y-auto scrollbar-hidden">
-        {contents.map((post, index) => (
-          <div key={index}>
+        {contents.map((post) => (
+          <div key={post.id}>
             <h1 className="font-bold text-[15px]">{post.title}</h1>
             <p className="text-sm text-[#455A64] mt-2">Date : {post.date}</p>
             <p className="mt-1.5 text-sm text-[#455A64] line-clamp-2 border-b border-gray-300 pb-2">
