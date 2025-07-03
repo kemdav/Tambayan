@@ -20,7 +20,7 @@ export default function Home() {
           className="text-action-light-blue text-3xl"
           onClick={() => router.push("/admin/dashboard")}
         >
-          meow
+          Admin Dashboard
         </Button>
       </ul>
     </main>
