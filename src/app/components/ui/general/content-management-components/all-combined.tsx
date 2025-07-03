@@ -9,6 +9,7 @@ import { Plus } from "lucide-react";
 export default function ContentManagementComponent() {
   const recentPosts = [
     {
+      id: "123",
       title: "Welcome New Members!",
       date: "2 days ago",
       content:
@@ -18,6 +19,7 @@ export default function ContentManagementComponent() {
 
   const upcomingEvent = [
     {
+      id: "123",
       title: "Annual General Meeting",
       date: "June 15, 2025 | 3:00 PM",
       location: "Student Center",
@@ -26,6 +28,7 @@ export default function ContentManagementComponent() {
 
   const wikiOrganization = [
     {
+      id: "123",
       title: "About Our Organization",
       date: "June 15, 2025",
     },

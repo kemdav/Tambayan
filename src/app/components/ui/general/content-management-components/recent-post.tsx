@@ -2,6 +2,7 @@ import { FileText } from "lucide-react";
 import { Button } from "@/app/components/ui/general/button";
 
 interface RecentPost {
+  id: string;
   title: string;
   date: string;
   content: string;

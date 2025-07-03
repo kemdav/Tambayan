@@ -2,6 +2,7 @@ import { Book } from "lucide-react";
 import { Button } from "@/app/components/ui/general/button";
 
 interface WikiOptions {
+  id: string;
   title: string;
   date: string;
 }
