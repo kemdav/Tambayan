@@ -6,7 +6,7 @@ import UpcomingEventComponent from "./upcoming-events";
 import OrgWikiComponent from "./organization-wiki";
 import { Plus } from "lucide-react";
 
-export default function CombinedComponents() {
+export default function ContentManagementComponent() {
   const recentPosts = [
     {
       title: "Welcome New Members!",
@@ -34,12 +34,12 @@ export default function CombinedComponents() {
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-gray-100 px-4 py-6">
       <div className="w-full max-w-[1120px] h-full max-h-[700px] bg-action-moss-green border rounded-[10px] p-4 flex flex-col space-y-4 overflow-hidden">
-        <div className="flex space-x-4">
-          <Button>
+        <div className="flex flex-wrap gap-2">
+          <Button className="flex items-center gap-1">
             <Plus className="w-5 h-5" />
             New Post
           </Button>
-          <Button>
+          <Button className="flex items-center gap-1">
             <Plus className="w-5 h-5" />
             New Event
           </Button>
@@ -47,20 +47,26 @@ export default function CombinedComponents() {
         </div>
 
         <div className="flex flex-col md:flex-row md:space-x-5 space-y-5 md:space-y-0 flex-1 overflow-auto">
-          <RecentPostComponent
-            contents={recentPosts}
-            onClickCreateNew={() => console.log("Create Entered Recent")}
-            onClickViewAll={() => console.log("View All Entered Recent")}
-          />
-          <UpcomingEventComponent
-            contents={upcomingEvent}
-            onClickCreateNew={() => console.log("Create Entered")}
-            onClickViewAll={() => console.log("View All Entered")}
-          />
-          <OrgWikiComponent
-            contents={wikiOrganization}
-            onClickEdit={() => console.log("Edit Wiki Entered")}
-          />
+          <div className="flex-1 min-w-[300px]">
+            <RecentPostComponent
+              contents={recentPosts}
+              onClickCreateNew={() => console.log("Create Entered Recent")}
+              onClickViewAll={() => console.log("View All Entered Recent")}
+            />
+          </div>
+          <div className="flex-1 min-w-[300px]">
+            <UpcomingEventComponent
+              contents={upcomingEvent}
+              onClickCreateNew={() => console.log("Create Entered")}
+              onClickViewAll={() => console.log("View All Entered")}
+            />
+          </div>
+          <div className="flex-1 min-w-[300px]">
+            <OrgWikiComponent
+              contents={wikiOrganization}
+              onClickEdit={() => console.log("Edit Wiki Entered")}
+            />
+          </div>
         </div>
       </div>
     </div>
