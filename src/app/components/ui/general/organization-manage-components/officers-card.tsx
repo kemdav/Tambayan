@@ -5,6 +5,7 @@ import { ButtonConfig } from '../button-type';
 import { DisplayPostComponent } from '../display-post-component';
 import { UpcomingEventComponent } from '../upcoming-event-component';
 import HorizontalNavBar from '../horizontal-navigation-bar-component';
+import ContentManagementComponent from '../content-management-components/all-combined';
 
 interface Props {
     className?: string;
@@ -134,7 +135,7 @@ const ContentMagementPage = ( ) => {
     const router = useRouter();
     return (
         <div className="mt-3">
-            <ContentMagementPage></ContentMagementPage>
+            <ContentManagementComponent></ContentManagementComponent>
         </div>
     );
 }
@@ -150,7 +151,6 @@ export default function OfficersCard({ className, myButtons, selectedButtonId, o
     return (
         <div className={combinedClassName}>
             <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect}></HorizontalNavBar>
-            {selectedButtonId === "member" && <OfficialPostPage></OfficialPostPage>}
             {selectedButtonId === "content" && <ContentMagementPage></ContentMagementPage>}
         </div>
     );

@@ -35,7 +35,7 @@ export default function ContentManagementComponent() {
   ];
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center bg-gray-100 px-4 py-6">
+    <div className="flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-[1120px] h-full max-h-[700px] bg-action-moss-green border rounded-[10px] p-4 flex flex-col space-y-4 overflow-hidden">
         <div className="flex flex-wrap gap-2">
           <Button className="flex items-center gap-1">
