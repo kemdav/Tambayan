@@ -1,8 +1,15 @@
-"use client";
 import * as React from "react";
-import { CreateDisplayPostCombined } from "@/app/components/ui/general/create-display-post-combined";
+import { CreatePostComponent } from "./create-post-component";
+import { DisplayPostComponent } from "./display-post-component";
 
-export default function CreatePostWDDisplayTestPage() {
+interface CreateDisplayPostCombinedProps {
+  onPostSuccess?: () => void;
+  className?: string;
+}
+
+export const CreateDisplayPostCombined: React.FC<
+  CreateDisplayPostCombinedProps
+> = ({ onPostSuccess, className }) => {
   const [postType, setPostType] = React.useState("default");
   const [org, setOrg] = React.useState<string | null>(null);
   const [title, setTitle] = React.useState("");
@@ -19,9 +26,8 @@ export default function CreatePostWDDisplayTestPage() {
   const [tags, setTags] = React.useState<string[]>([]);
   const [tagInput, setTagInput] = React.useState("");
   const [displayData, setDisplayData] = React.useState<any>(null);
-  const [postSuccess, setPostSuccess] = React.useState(false);
 
-  // Tag handlers (if you want to use tags in DisplayPostComponent)
+  // Tag handlers
   const handleAddTag = () => {
     const trimmed = tagInput.trim();
     if (trimmed && !tags.includes(trimmed)) {
@@ -34,7 +40,7 @@ export default function CreatePostWDDisplayTestPage() {
   };
 
   const handlePost = () => {
-    setDisplayData({
+    const data = {
       posterName: "Unknown",
       recipient: postType === "default" ? org || undefined : undefined,
       avatarSrc: null,
@@ -53,26 +59,44 @@ export default function CreatePostWDDisplayTestPage() {
           ? `${registrationStart.toLocaleString()} - ${registrationEnd.toLocaleString()}`
           : undefined,
       isDetailed: postType === "event",
-    });
-  };
-
-  const handlePostSuccess = () => {
-    setPostSuccess(true);
-    // You can also show a toast or alert here
-    alert("Post successfully created!");
+    };
+    setDisplayData(data);
+    if (onPostSuccess) onPostSuccess();
   };
 
   return (
-    <div className="min-h-screen bg-neutral-mint-white flex flex-col items-center justify-center p-4">
-      <CreateDisplayPostCombined
-        className="max-w-2xl w-full"
-        onPostSuccess={handlePostSuccess}
-      />
-      {postSuccess && (
-        <div className="mt-4 text-green-600 font-semibold">
-          Post was successfully posted!
-        </div>
+    <div className={className}>
+      {!displayData ? (
+        <CreatePostComponent
+          className="w-full"
+          postType={postType}
+          onPostTypeChange={setPostType}
+          org={org}
+          onOrgChange={setOrg}
+          title={title}
+          onTitleChange={setTitle}
+          content={content}
+          onContentChange={setContent}
+          onPost={handlePost}
+          eventLocation={eventLocation}
+          onEventLocationChange={setEventLocation}
+          eventDate={eventDate}
+          onEventDateChange={setEventDate}
+          registrationStart={registrationStart}
+          onRegistrationStartChange={setRegistrationStart}
+          registrationEnd={registrationEnd}
+          onRegistrationEndChange={setRegistrationEnd}
+          photoFile={photoFile}
+          onPhotoChange={setPhotoFile}
+          tags={tags}
+          tagInput={tagInput}
+          onTagInputChange={setTagInput}
+          onAddTag={handleAddTag}
+          onRemoveTag={handleRemoveTag}
+        />
+      ) : (
+        <DisplayPostComponent {...displayData} />
       )}
     </div>
   );
-}
+};
