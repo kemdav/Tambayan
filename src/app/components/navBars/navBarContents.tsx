@@ -1,7 +1,7 @@
 import { AddIcon, NewsfeedIcon, StudentProfileIcon, SubscribedOrgIcon } from "@/app/components/icons";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
 
-export const myButtons: ButtonConfig[] = [
+export const ProfileViewNavBarContents: ButtonConfig[] = [
     {
         id: "post",
       children: "Post",
