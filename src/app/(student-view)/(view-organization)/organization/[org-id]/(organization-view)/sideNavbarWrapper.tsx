@@ -19,20 +19,12 @@ export const myButtons: ButtonConfig[] = [
     },
     {
         id: "newsfeed",
-      children: "Newsfeed",
+      children: "Officers",
       variant: "sideNavigation",
-      href:"newsfeed",
+      href:"officers",
       className:
         "sideNavBarButtonText",
       icon: <NewsfeedIcon className="size-10" />,
-    },
-    {
-        id: "upcomingEvents",
-        variant: "sideNavigation",
-        href:"upcoming-events",
-      children: "Upcoming Events",
-      className: "sideNavBarButtonText",
-      icon: <AddIcon className="size-10" />,
     },
     {
       id: "wiki",
@@ -46,7 +38,7 @@ export const myButtons: ButtonConfig[] = [
       id: "manage",
       variant: "sideNavigation",
       href:"manage/officers",
-      children: "Managse",
+      children: "Manage",
       className: "sideNavBarButtonText",
       icon: <LogOutIcon className="size-10" />,
     }

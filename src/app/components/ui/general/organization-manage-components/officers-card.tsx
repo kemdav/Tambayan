@@ -134,13 +134,38 @@ export const CommunityPost: Poster[] = [
 const ContentMagementPage = ( ) => {
     const router = useRouter();
     return (
-        <div className="mt-3">
-            <ContentManagementComponent></ContentManagementComponent>
+         <div className="mt-3">
+            <table className='table-auto'>
+                <thead>
+                    <tr>
+                        <th>Song</th>
+                        <th>Song</th>
+                        <th>Song</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>a</td>
+                        <td>a</td>
+                        <td>a</td>
+                    </tr>
+
+                    <tr>
+                        <td>b</td>
+                        <td>b</td>
+                        <td>b</td>
+                    </tr>
+
+                    <tr>
+                        <td>c</td>
+                         <td>c</td>
+                          <td>c</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     );
 }
-
-
 
 
 
