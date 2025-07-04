@@ -31,7 +31,10 @@ export default function SecondHeader({
         <DropDownRole placeholder="All Schools" options={filters} />
       </div>
 
-      <Button className="text-white w-full sm:w-auto">
+      <Button
+        className="text-white w-full sm:w-auto"
+        onClick={() => console.log("Clicked")}
+      >
         <Download className="w-4 h-4 mr-2" />
         Export Report
       </Button>

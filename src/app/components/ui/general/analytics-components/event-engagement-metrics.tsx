@@ -17,7 +17,10 @@ export default function EventEngagementMetrics({
         <h2 className="text-base font-semibold text-muted-foreground">
           Event Engagement Metrics
         </h2>
-        <button className="text-sm text-green-700 hover:underline cursor-pointer">
+        <button
+          className="text-sm text-green-700 hover:underline cursor-pointer"
+          onClick={() => console.log("Clicked")}
+        >
           View All
         </button>
       </div>
