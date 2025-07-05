@@ -1,7 +1,10 @@
+"use client";
+
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-interface AvatarIconProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
+interface AvatarIconProps
+  extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> {
   src?: string | null;
   alt?: string;
   className?: string;
@@ -76,4 +79,4 @@ export const AvatarIcon: React.FC<AvatarIconProps> = ({
       )}
     </div>
   );
-}; 
+};

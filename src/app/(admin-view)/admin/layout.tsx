@@ -26,18 +26,56 @@ const HamburgerIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-
 const navButtons: ButtonConfig[] = [
-    { id: "dashboard", children: "Dashboard", icon: <img src="/dashboard.svg" alt="Dashboard" className="w-4 h-5" />, href: "/admin/dashboard" },
-    { id: "org-oversight", children: "Organization Oversight", icon: <StudentProfileIcon />, href: "/admin/org-oversight" },
-    { id: "analytics", children: "Campus Analytics", icon: <img src="/analytics.svg" alt="Analytics" className="w-4 h-5" />, href: "/admin/analytics" },
-    { id: "event-oversight", children: "Event Oversight", icon: <SubscribedOrgIcon />, href: "/admin/event-oversight" },
-    { id: "broadcast-tool", children: "Broadcast Tool", icon: <NewsfeedIcon />, href: "/admin/broadcast-tool" },
-    { id: "accreditation", children: "Accreditation", icon: <img src="/accredit.svg" alt="Accreditation" className="w-4 h-5" />, href: "/admin/accreditation" },
-    { id: "settings", children: "Settings", icon: <SettingsIcon />, href: "/admin/settings" },
+  {
+    id: "dashboard",
+    children: "Dashboard",
+    icon: <img src="/dashboard.svg" alt="Dashboard" className="w-4 h-5" />,
+    href: "/admin/dashboard",
+  },
+  {
+    id: "org-oversight",
+    children: "Organization Oversight",
+    icon: <StudentProfileIcon />,
+    href: "/admin/org-oversight",
+  },
+  {
+    id: "analytics",
+    children: "Campus Analytics",
+    icon: <img src="/analytics.svg" alt="Analytics" className="w-4 h-5" />,
+    href: "/admin/analytics",
+  },
+  {
+    id: "event-oversight",
+    children: "Event Oversight",
+    icon: <SubscribedOrgIcon />,
+    href: "/admin/event-oversight",
+  },
+  {
+    id: "broadcast-tool",
+    children: "Broadcast Tool",
+    icon: <NewsfeedIcon />,
+    href: "/admin/broadcast-tool",
+  },
+  {
+    id: "accreditation",
+    children: "Accreditation",
+    icon: <img src="/accredit.svg" alt="Accreditation" className="w-4 h-5" />,
+    href: "/admin/accreditation",
+  },
+  {
+    id: "settings",
+    children: "Settings",
+    icon: <SettingsIcon />,
+    href: "/admin/settings",
+  },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [selected, setSelected] = useState("dashboard");
   const [isNavOpen, setIsNavOpen] = useState(false);
 
@@ -48,9 +86,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="relative min-h-screen md:flex">
-
       <div className="p-4 md:hidden">
-
         <div className="flex justify-between items-center bg-tint-forest-fern text-white p-4 rounded-[20px] shadow-lg">
           <div className="font-bold text-xl">Admin Panel</div>
           <button onClick={() => setIsNavOpen(true)} className="cursor-pointer">
@@ -58,7 +94,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
         </div>
       </div>
-      
+
       {isNavOpen && (
         <div
           className="fixed inset-0 bg-black opacity-50 z-20 md:hidden"
@@ -72,19 +108,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           transform transition-transform duration-300 ease-in-out
           ${isNavOpen ? "translate-x-0" : "-translate-x-full"}
           
-          md:relative md:translate-x-0 md:z-auto
+          md:relative md:translate-x-0 md:z-auto md:h-auto
         `}
       >
         <SideNavBar
           myButtons={navButtons}
           selectedButtonId={selected}
           onButtonSelect={handleSelect}
+          isOpen={isNavOpen}
+          onToggle={() => setIsNavOpen(!isNavOpen)}
         />
       </div>
 
-      <main className="flex-1 bg-neutral-mint-white min-h-screen p-4">
-        {children}
-      </main>
+      <main className="flex-1 bg-neutral-mint-white p-4">{children}</main>
     </div>
   );
 }

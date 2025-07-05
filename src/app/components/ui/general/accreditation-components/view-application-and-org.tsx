@@ -32,11 +32,95 @@ export const ViewApplicationAndOrg: React.FC<ViewApplicationAndOrgProps> = ({
   onTabChange,
   orgStatusCards,
 }) => {
+  // Sample data for each tab - you can replace this with actual props
+  const sampleOrgStatusCards: OrgStatusCardData[] = [
+    // Pending Review tab data
+    {
+      organization: "Computer Science Society",
+      submitted: "2024-01-15",
+      school: "School of Engineering",
+      status: "Pending",
+      onActionClick: () => console.log("Review Computer Science Society"),
+      actionLabel: "Review",
+    },
+    {
+      organization: "Art and Design Collective",
+      submitted: "2024-01-11",
+      school: "School of Arts",
+      status: "Pending",
+      onActionClick: () => console.log("Review Art Collective"),
+      actionLabel: "Review",
+    },
+    {
+      organization: "Literary Society",
+      submitted: "2024-01-08",
+      school: "School of Humanities",
+      status: "Pending",
+      onActionClick: () => console.log("Review Literary Society"),
+      actionLabel: "Review",
+    },
+    // Approved tab data
+    {
+      organization: "Mathematics Club",
+      submitted: "2024-01-14",
+      school: "School of Science",
+      status: "Approved",
+      onActionClick: () => console.log("View Mathematics Club"),
+      actionLabel: "View",
+    },
+    {
+      organization: "International Students Union",
+      submitted: "2024-01-10",
+      school: "School of International Relations",
+      status: "Approved",
+      onActionClick: () => console.log("View International Union"),
+      actionLabel: "View",
+    },
+    // Needs Revision tab data
+    {
+      organization: "Environmental Awareness Group",
+      submitted: "2024-01-13",
+      school: "School of Environmental Studies",
+      status: "Revision",
+      onActionClick: () => console.log("Review Environmental Group"),
+      actionLabel: "Review",
+    },
+    {
+      organization: "Sports and Recreation Club",
+      submitted: "2024-01-09",
+      school: "School of Physical Education",
+      status: "Revision",
+      onActionClick: () => console.log("Review Sports Club"),
+      actionLabel: "Review",
+    },
+    // Rejected tab data
+    {
+      organization: "Business Students Association",
+      submitted: "2024-01-12",
+      school: "School of Business",
+      status: "Rejected",
+      onActionClick: () => console.log("View Business Association"),
+      actionLabel: "View",
+    },
+    {
+      organization: "Photography Club",
+      submitted: "2024-01-07",
+      school: "School of Media Arts",
+      status: "Rejected",
+      onActionClick: () => console.log("View Photography Club"),
+      actionLabel: "View",
+    },
+  ];
+
+  // Use sample data if no orgStatusCards provided, otherwise use the passed props
+  const cardsToUse =
+    orgStatusCards.length > 0 ? orgStatusCards : sampleOrgStatusCards;
+
   // Determine which status to show based on tab
   const statusToShow = tabToStatus[activeTab];
   const filteredCards = statusToShow
-    ? orgStatusCards.filter((card) => card.status === statusToShow)
-    : orgStatusCards;
+    ? cardsToUse.filter((card) => card.status === statusToShow)
+    : cardsToUse;
 
   return (
     <div
