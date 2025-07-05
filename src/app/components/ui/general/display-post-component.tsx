@@ -31,6 +31,7 @@ interface DisplayPostComponentProps {
   eventLocation?: string;
   eventDate?: string;
   registrationPeriod?: string;
+  onAvatarClicked?:()=>void,
 }
 
 const EllipsisIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -66,6 +67,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   eventLocation,
   eventDate,
   registrationPeriod,
+  onAvatarClicked,
 }) => {
   const [showComment, setShowComment] = React.useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -111,7 +113,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
 
   return (
     <>
-      <div className="border rounded-2xl p-4 bg-white shadow-sm max-w-2xl w-full mx-auto relative">
+      <div className="border rounded-2xl p-4 bg-white shadow-sm max-w-4xl w-full mx-auto relative">
         <div className="absolute top-4 right-4 z-10">
           <Popover>
             <PopoverTrigger asChild>
@@ -135,7 +137,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
           </Popover>
         </div>
         <div className="flex items-center gap-3 mb-2">
-          <AvatarIcon src={avatarSrc} alt={posterName} className="h-8 w-8 text-base" />
+          <AvatarIcon src={avatarSrc} alt={posterName} className="h-8 w-8 text-base" isClickable={true} onAvatarClicked={onAvatarClicked}/>
           <div className="flex flex-col">
             {!isDetailed && displayRecipient && (
               <span className="font-semibold text-sm text-neutral-muted-olive flex items-center gap-2">

@@ -18,6 +18,7 @@ interface Props {
 export const OfficalPosts: Poster[] = [
     {
         postID:"1942",
+         posterID:"123456787",
         posterName:"ICPEP",
         daysSincePosted:3,
         content:"This is my fifth post",
@@ -26,6 +27,7 @@ export const OfficalPosts: Poster[] = [
     },
     {
         postID:"2343",
+         posterID:"123456787",
         posterName:"ICPEP",
         daysSincePosted:4,
         content:"This is my fourth post",
@@ -34,6 +36,7 @@ export const OfficalPosts: Poster[] = [
     },
     {
         postID:"5742",
+         posterID:"123456787",
         posterName:"ICPEP",
         daysSincePosted:6,
         content:"This is my third post",
@@ -42,6 +45,7 @@ export const OfficalPosts: Poster[] = [
     },
     {
         postID:"2341",
+         posterID:"123456787",
         posterName:"ICPEP",
         daysSincePosted:8,
         content:"This is my second post",
@@ -50,6 +54,7 @@ export const OfficalPosts: Poster[] = [
     },
     {
         postID:"572142",
+         posterID:"123456787",
         posterName:"ICPEP",
         daysSincePosted:10,
         content:"This is my first post",
@@ -69,7 +74,8 @@ const OfficialPostPage = () => {
                         daysSincePosted={OfficalPosts.daysSincePosted}
                         content={OfficalPosts.content}
                         likes={OfficalPosts.likes}
-                        comments={OfficalPosts.comments}/>
+                        comments={OfficalPosts.comments}
+                        onAvatarClicked={()=>console.log("Test")}/>
                     ))}
                 </ul>
             )}
@@ -83,6 +89,7 @@ export const CommunityPost: Poster[] = [
         postID:"1942",
         posterName:"Excel Duran",
         daysSincePosted:3,
+         posterID:"123456787",
         content:"This is my fifth post",
         likes:3,
         comments:3,
@@ -91,6 +98,7 @@ export const CommunityPost: Poster[] = [
         postID:"2343",
         posterName:"Kem David",
         daysSincePosted:4,
+         posterID:"123456787",
         content:"This is my fourth post",
         likes:3,
         comments:3,
@@ -99,6 +107,7 @@ export const CommunityPost: Poster[] = [
         postID:"5742",
         posterName:"Gihun",
         daysSincePosted:6,
+         posterID:"123456787",
         content:"This is my third post",
         likes:3,
         comments:3,
@@ -106,6 +115,7 @@ export const CommunityPost: Poster[] = [
     {
         postID:"2341",
         posterName:"Steve",
+         posterID:"123456787",
         daysSincePosted:8,
         content:"This is my second post",
         likes:3,
@@ -114,6 +124,7 @@ export const CommunityPost: Poster[] = [
     {
         postID:"572142",
         posterName:"Monkey D. Luffy",
+         posterID:"123456787",
         daysSincePosted:10,
         content:"First Post",
         likes:3,

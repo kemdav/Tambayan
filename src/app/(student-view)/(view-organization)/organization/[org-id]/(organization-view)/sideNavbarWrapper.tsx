@@ -1,5 +1,5 @@
 "use client"
-import { AddIcon, LogOutIcon, NavigationButtonIcon, NewsfeedIcon, StudentProfileIcon, SubscribedOrgIcon } from "@/app/components/icons";
+import { AddIcon, LogOutIcon, NavigationButtonIcon, NewsfeedIcon, StudentProfileIcon, SubscribedOrgIcon, WikiIcon } from "@/app/components/icons";
 import { Button } from "@/app/components/ui/general/button";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
@@ -19,26 +19,26 @@ export const myButtons: ButtonConfig[] = [
     },
     {
         id: "newsfeed",
-      children: "Newsfeed",
+      children: "Officers",
       variant: "sideNavigation",
-      href:"newsfeed",
+      href:"officers",
       className:
         "sideNavBarButtonText",
       icon: <NewsfeedIcon className="size-10" />,
     },
     {
-        id: "upcomingEvents",
-        variant: "sideNavigation",
-        href:"upcoming-events",
-      children: "Upcoming Events",
-      className: "sideNavBarButtonText",
-      icon: <AddIcon className="size-10" />,
-    },
-    {
-      id: "logout",
+      id: "wiki",
       variant: "sideNavigation",
       href:"wiki",
       children: "Wiki",
+      className: "sideNavBarButtonText",
+      icon: <WikiIcon className="size-10" />,
+    },
+    {
+      id: "manage",
+      variant: "sideNavigation",
+      href:"manage/officers",
+      children: "Manage",
       className: "sideNavBarButtonText",
       icon: <LogOutIcon className="size-10" />,
     }
@@ -58,7 +58,7 @@ export const myButtons: ButtonConfig[] = [
   export function StudentVerticalNavigation({children}: Props){
     const params = useParams();
     return (
-      <div className="relative flex h-dvh">
+      <div className="relative flex flex-grow h-dvh">
         <div className="z-20 fixed">
           <SideBar></SideBar>
         </div>
