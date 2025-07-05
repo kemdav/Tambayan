@@ -18,6 +18,7 @@ interface Props extends studentProps {
     selectedButtonId: string;
     posts: Poster[];
     onButtonSelect: (id: string) => void;
+    currentUserID: string;
 }
 
 interface studentProps {
@@ -68,8 +69,9 @@ const options = [
     { value: "mostLikedMonth", label: "Most Liked Month" },
     { value: "mostLikedWeek", label: "Most Liked Week" }
 ];
-const PostPage = ({ posts }: { posts: Poster[] }) => {
-     console.log("PostPage received posts:", posts);
+const PostPage = ({ posts, currentUserID }: { posts: Poster[], currentUserID: string }) => {
+    console.log("PostPage received posts:", posts);
+    console.log("PostPage received currentUserID:", currentUserID);
     return (
         <div className="mt-3">
             <div className="mb-3">
@@ -80,12 +82,18 @@ const PostPage = ({ posts }: { posts: Poster[] }) => {
                     {posts.map((post) => ( // Use 'post' as the iteration variable
                         <DisplayPostComponent
                             key={post.postID}
+                            postID={post.postID}
                             posterName={post.posterName}
+                            avatarSrc={post.posterPictureUrl}
+                            title={post.title}
+                            posterUserID={post.posterUserID}
                             daysSincePosted={post.daysSincePosted}
                             content={post.content}
                             likes={post.likes}
                             comments={post.comments}
-                            recipient={post.recipient} // FIX: Use dynamic recipient
+                            recipient={post.recipient} 
+                            currentUserID={currentUserID}
+                            posterID="might_remove"
                         />
                     ))}
                 </ul>
@@ -152,14 +160,16 @@ const CommentPage = () => {
 }
 
 
-export default function StudentProfileCard({ className, myButtons, selectedButtonId, posts, onButtonSelect, studentId, studentCourse, studentEmail, studentYear, studentJoinDate, studentEventsJoined, studentTotalOrg }: Props) {
+export default function StudentProfileCard({ className, myButtons, currentUserID, selectedButtonId, posts, onButtonSelect, studentId, studentCourse, studentEmail, studentYear, studentJoinDate, studentEventsJoined, studentTotalOrg }: Props) {
     const combinedClassName = `flex flex-col ${className || ''}`;
     console.log("StudentProfileCard received posts:", posts);
+    
+    console.log("StudentProfileCard received currentUserID:", currentUserID);
     return (
         <div className={combinedClassName}>
             <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect}></HorizontalNavBar>
             {selectedButtonId === "about" && <AboutPage studentId={studentId} studentCourse={studentCourse} studentEmail={studentEmail} studentYear={studentYear} studentJoinDate={studentJoinDate} studentEventsJoined={studentEventsJoined} studentTotalOrg={studentTotalOrg} />}
-            {selectedButtonId === "post" && <PostPage posts={posts}></PostPage>}
+            {selectedButtonId === "post" && <PostPage posts={posts} currentUserID={currentUserID}></PostPage>}
         </div>
     );
 }

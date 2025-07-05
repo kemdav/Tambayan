@@ -52,6 +52,7 @@ interface CreatePostComponentProps {
   postButtonText?: string;
   isEditMode?: boolean;
   isUserPosting?:boolean;
+  isSubmitting?: boolean;
 }
 
 export function CreatePostComponent({
@@ -70,6 +71,7 @@ export function CreatePostComponent({
   onTagInputChange,
   onAddTag,
   orgOptions = [],
+  isSubmitting = false,
   onRemoveTag,
   photoFile = null,
   onPhotoChange,
@@ -224,7 +226,7 @@ export function CreatePostComponent({
         </>
       )}
       <div className="flex justify-end mt-2">
-        <Button onClick={onPost}>{postButtonText}</Button>
+        <Button onClick={onPost} disabled={isSubmitting}>{isSubmitting ? "Posting..." : postButtonText}</Button>
       </div>
     </div>
   );

@@ -35,12 +35,14 @@ export default async function ProfilePage() {
 
   const initialPosts: Poster[] = await getPostsByStudent(initialProfile.studentid);
   console.log("ProfilePage (Server): Value of initialPosts after fetching:", initialPosts);
+  console.log("ProfilePage (Server): user.id (currentUserID source) =", user.id);
 
   // 3. Render the CLIENT component and pass the fetched data as a prop
   return (
     <ProfileView
       initialProfile={initialProfile}
       initialPosts={initialPosts}
+      currentUserID={user.id}
       // initialComments={initialComments} // Pass comments if fetched
     />
   );

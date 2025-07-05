@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import { AvatarIcon } from "./avatar-icon-component";
 import { Button } from "./button";
@@ -11,18 +12,23 @@ import { Input } from "./input/input";
 import { FormattableInput } from "./input/FormattableInput";
 import { CreatePostComponent } from "./create-post-component";
 import { DateTimePicker } from "./date-picker/date-picker-component";
+import { deletePost, updatePost } from "@/lib/actions/post";
 
 interface DisplayPostComponentProps {
   posterName: string;
+  postID: string; // <-- ADD THIS
+  currentUserID?: string;
   event?: string;
+  posterUserID?: string | null;
   avatarSrc?: string | null;
   daysSincePosted: number;
-  title?: string;
+  title?: string | null;
   content: string;
   imageSrc?: string;
   likes: number;
   comments: number;
   tags?: string[];
+  posterID: string;
   onLike?: () => void;
   onComment?: () => void;
   orgLabel?: string;
@@ -31,7 +37,7 @@ interface DisplayPostComponentProps {
   eventLocation?: string;
   eventDate?: string;
   registrationPeriod?: string;
-  onAvatarClicked?:()=>void,
+  onAvatarClicked?: () => void,
 }
 
 const EllipsisIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -58,10 +64,13 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   imageSrc: initialImageSrc,
   likes,
   comments,
+  postID,
+  currentUserID,
   tags: initialTags = [],
   onLike,
   onComment,
   orgLabel: initialOrgLabel,
+  posterUserID,
   recipient,
   isDetailed = false,
   eventLocation,
@@ -69,10 +78,15 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   registrationPeriod,
   onAvatarClicked,
 }) => {
+
+
+
   const [showComment, setShowComment] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const canEditOrDelete = currentUserID === posterUserID;
   const [editTitle, setEditTitle] = useState(initialTitle || "");
   const [editContent, setEditContent] = useState(initialContent);
   const [editOrg, setEditOrg] = useState(orgOptions.find(o => o.label === initialOrgLabel)?.value || null);
@@ -99,6 +113,14 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   const [displayEventLocation, setDisplayEventLocation] = useState(eventLocation || "");
   const [editImagePreview, setEditImagePreview] = useState<string | undefined>(initialImageSrc);
 
+
+
+  console.log(`--- Post ID: ${postID} ---`);
+  console.log(`currentUserID:`, currentUserID, `(${typeof currentUserID})`);
+  console.log(`posterUserID:`, posterUserID, `(${typeof posterUserID})`);
+  console.log(`Are they equal?`, currentUserID === posterUserID);
+  console.log(`canEditOrDelete:`, canEditOrDelete);
+
   React.useEffect(() => {
     if (editPhoto) {
       const url = URL.createObjectURL(editPhoto);
@@ -109,35 +131,74 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
     }
   }, [editPhoto, initialImageSrc]);
 
+  const handleDelete = async () => {
+    setIsSubmitting(true);
+    const result = await deletePost(Number(postID));
+    setIsSubmitting(false);
+
+    if (result.error) {
+      alert(`Error: ${result.error}`);
+      setShowDeleteConfirm(false); // Close modal even on error
+    } else {
+      // On success, RLS on the server will revalidate the path.
+      // The post will disappear from the list automatically.
+      // We don't even need `setHidden(true)` anymore.
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    setIsSubmitting(true);
+
+    // Create FormData to send to the server action
+    const formData = new FormData();
+    formData.append('postId', postID);
+    formData.append('title', editTitle);
+    formData.append('content', editContent);
+    // Note: We are not handling image updates in this pass for simplicity.
+
+    const result = await updatePost(formData);
+    setIsSubmitting(false);
+
+    if (result.error) {
+      alert(`Error: ${result.error}`);
+    } else {
+      // On success, close the modal. The page will auto-refresh.
+      setShowEdit(false);
+    }
+  };
+
+
   if (hidden) return null;
 
   return (
     <>
       <div className="border rounded-2xl p-4 bg-white shadow-sm max-w-4xl w-full mx-auto relative">
         <div className="absolute top-4 right-4 z-10">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Post options">
-                <EllipsisIcon className="w-6 h-6" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48 p-0">
-              <div className="flex flex-col divide-y">
-                <button className="px-4 py-2 text-left hover:bg-secondary-pale-sage" onClick={() => setShowEdit(true)}>
-                  Edit Post
-                </button>
-                <button className="px-4 py-2 text-left hover:bg-secondary-pale-sage" onClick={() => setHidden(true)}>
-                  Hide Post
-                </button>
-                <button className="px-4 py-2 text-left text-red-600 hover:bg-secondary-pale-sage" onClick={() => setShowDeleteConfirm(true)}>
-                  Delete Post
-                </button>
-              </div>
-            </PopoverContent>
-          </Popover>
+          {canEditOrDelete && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Post options">
+                  <EllipsisIcon className="w-6 h-6" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-0">
+                <div className="flex flex-col divide-y">
+                  <button className="px-4 py-2 text-left hover:bg-secondary-pale-sage" onClick={() => setShowEdit(true)}>
+                    Edit Post
+                  </button>
+                  <button className="px-4 py-2 text-left hover:bg-secondary-pale-sage" onClick={() => setHidden(true)}>
+                    Hide Post
+                  </button>
+                  <button className="px-4 py-2 text-left text-red-600 hover:bg-secondary-pale-sage" onClick={() => setShowDeleteConfirm(true)}>
+                    Delete Post
+                  </button>
+                </div>
+              </PopoverContent>
+            </Popover>)}
         </div>
         <div className="flex items-center gap-3 mb-2">
-          <AvatarIcon src={avatarSrc} alt={posterName} className="h-8 w-8 text-base" isClickable={true} onAvatarClicked={onAvatarClicked}/>
+          <AvatarIcon src={avatarSrc} alt={posterName} className="h-8 w-8 text-base" isClickable={true} onAvatarClicked={onAvatarClicked} />
           <div className="flex flex-col">
             {!isDetailed && displayRecipient && (
               <span className="font-semibold text-sm text-neutral-muted-olive flex items-center gap-2">
@@ -252,28 +313,8 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
               onRegistrationEndChange={setEditRegistrationEnd}
               postButtonText="Save Changes"
               isEditMode={true}
-              onPost={() => {
-                setDisplayTitle(editTitle);
-                setDisplayContent(editContent);
-                setDisplayTags(editTags);
-                setDisplayOrg(orgOptions.find(o => o.value === editOrg)?.label || "");
-                setDisplayEvent(editPostType === "event" ? editTitle : "");
-                setDisplayImage(editPhoto ? editImagePreview : initialImageSrc);
-                setDisplayRegistrationPeriod(
-                  editPostType === "event" && editRegistrationStart && editRegistrationEnd
-                    ? `${editRegistrationStart.toLocaleString()} - ${editRegistrationEnd.toLocaleString()}`
-                    : undefined
-                );
-                if (editPostType === "default") {
-                  setDisplayOrg("");
-                  setDisplayEvent("");
-                  setDisplayRecipient(orgOptions.find(o => o.value === editOrg)?.label || undefined);
-                }
-                if (editPostType === "event") {
-                  setDisplayEventLocation(editEventLocation);
-                }
-                setShowEdit(false);
-              }}
+              onPost={handleSaveChanges}
+              isSubmitting={isSubmitting}
             />
             <div className="mt-4">
               <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Edit Image</label>
@@ -306,8 +347,10 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
             <h2 className="text-lg font-bold mb-4">Delete Post?</h2>
             <p className="mb-4">Are you sure you want to delete this post? This action cannot be undone.</p>
             <div className="flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
-              <Button variant="destructive" onClick={() => { setShowDeleteConfirm(false); setHidden(true); }}>Delete</Button>
+              <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)} disabled={isSubmitting}>Cancel</Button>
+              <Button variant="destructive" onClick={handleDelete} disabled={isSubmitting}>
+                {isSubmitting ? "Deleting..." : "Delete"}
+              </Button>
             </div>
           </div>
         </div>

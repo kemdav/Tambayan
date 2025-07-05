@@ -7,7 +7,8 @@ import SideNavBar from "@/app/components/ui/general/side-navigation-bar-componen
 import SearchBar from "@/app/components/ui/student-view-ui/search-bar";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { redirect } from "next/navigation";
+import { createPost } from "@/lib/actions/post";
+import { redirect, useRouter } from "next/navigation";
 import { ShowcaseCardProps } from "@/app/components/ui/general/showcase-card-component";
 
 interface Props {
@@ -76,6 +77,8 @@ export default function StudentVerticalNavigation({ children }: Props) {
   const [isCreatePostOpen, setCreatePostOpen] = useState(false);
   const [selectedNavId, setSelectedNavId] = useState<string>("profile");
   const [orgOptions, setOrgOptions] = useState<OrgOption[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const [postType, setPostType] = useState("default");
   const [org, setOrg] = useState<string | null>(null);
@@ -129,9 +132,52 @@ export default function StudentVerticalNavigation({ children }: Props) {
   const handlePhotoChange = (file: File | null) => {
     setPhotoFile(file);
   };
-   const handlePost = () => {
-    // ... your post handling logic
+  const handlePost = async () => {
+    // Basic validation on the client-side
+    if (!org) {
+      alert("Please select an organization.");
+      return;
+    }
+    if (!content.trim()) {
+      alert("Post content cannot be empty.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const formData = new FormData();
+    formData.append('orgId', org);
+    formData.append('title', title);
+    formData.append('content', content);
+    if (photoFile) {
+      formData.append('photoFile', photoFile);
+    }
+
+    // 2. Call the server action
+    const result = await createPost(formData);
+
+    setIsSubmitting(false); // Re-enable the button
+
+    // 3. Handle the result
+    if (result.error) {
+      alert(`Error: ${result.error}`); // Show an error message
+    } else {
+      // Success!
+      alert(result.success);
+      closeAndResetModal(); // Call a helper function to clean up
+      router.refresh(); // THIS IS THE MAGIC! It refetches server data and updates the UI.
+    }
   };
+  const closeAndResetModal = () => {
+    setCreatePostOpen(false);
+    setPostType("default");
+    setOrg(null);
+    setTitle("");
+    setContent("");
+    setPhotoFile(null);
+    // Reset any other form fields here...
+  };
+
+
 
   return (
     <>
@@ -151,6 +197,7 @@ export default function StudentVerticalNavigation({ children }: Props) {
               orgOptions={orgOptions}
               onTitleChange={setTitle}
               content={content}
+              isSubmitting={isSubmitting}
               onContentChange={setContent}
               onPost={handlePost}
               eventLocation={eventLocation}
@@ -165,6 +212,7 @@ export default function StudentVerticalNavigation({ children }: Props) {
               tagInput={tagInput}
               onTagInputChange={setTagInput}
               onAddTag={handleAddTag}
+              postButtonText={isSubmitting ? "Posting..." : "Post"}
               onRemoveTag={handleRemoveTag}
               photoFile={photoFile}
               onPhotoChange={handlePhotoChange}

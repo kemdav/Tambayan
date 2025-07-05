@@ -1,7 +1,11 @@
 export interface Poster {
-    postID:string;
+    recipient: string | undefined;
+    postID: string;
     posterID: string;
     posterName: string;
+    posterUserID?: string | null;
+    posterPictureUrl?: string | null;
+    title?: string | null;
     daysSincePosted: number;
     content: string;
     likes: number;
@@ -9,9 +13,9 @@ export interface Poster {
 }
 
 export interface Commenter {
-    commentID:string;
-    postTitle:string;
-    organizationPosted:string;
+    commentID: string;
+    postTitle: string;
+    organizationPosted: string;
     commenterName: string;
     daysSinceCommented: number;
     content: string;
@@ -45,22 +49,22 @@ export interface Event {
 }
 
 export interface Post {
-  id: string; // Always good to have a unique ID
-  posterName: string;
-  avatarSrc?: string | null;
-  daysSincePosted: number;
-  title?: string;
-  content: string;
-  imageSrc?: string;
-  likes: number;
-  comments: number;
-  tags?: string[];
-  orgLabel?: string;
-  recipient?: string;
-  // Event-specific fields
-  isEvent: boolean;
-  eventLocation?: string;
-  eventDate?: string;
-  registrationStart?: Date;
-  registrationEnd?: Date;
+    id: string; // Always good to have a unique ID
+    posterName: string;
+    avatarSrc?: string | null;
+    daysSincePosted: number;
+    title?: string;
+    content: string;
+    imageSrc?: string;
+    likes: number;
+    comments: number;
+    tags?: string[];
+    orgLabel?: string;
+    recipient?: string;
+    // Event-specific fields
+    isEvent: boolean;
+    eventLocation?: string;
+    eventDate?: string;
+    registrationStart?: Date;
+    registrationEnd?: Date;
 }
