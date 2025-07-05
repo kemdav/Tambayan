@@ -46,7 +46,7 @@ interface DropDownProps {
 }
 
 export default function DropDownRole({
-  options,
+  options = [],
   placeholder = "Select an option...",
   width = "w-[145px]",
   height = "h-10",
@@ -66,6 +66,11 @@ export default function DropDownRole({
   dropdownActiveBgColor = "active:bg-action-moss-green",
   onSelect,
 }: DropDownProps) {
+  if (!Array.isArray(options)) {
+    console.warn('DropDownRole: options prop is not an array or is undefined.');
+    options = [];
+  }
+
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
 

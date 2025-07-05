@@ -62,7 +62,7 @@ export default function SubscribedOrgTestPage() {
   };
   return (
     <div className="w-full grid place-items-center items-start">
-      <div className="h-auto w-full max-w-3xl shadow-lg/100 p-10">
+      <div className="mainContentCard">
         <SubscribedOrgComponent orgs={sampleOrgs} onButtonClick={handleNavigate} />
       </div>
     </div>

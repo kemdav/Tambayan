@@ -1,4 +1,4 @@
-
+"use client"
 import HorizontalNavBar from "../general/horizontal-navigation-bar-component";
 import { ButtonConfig } from "../general/button-type";
 import { Button } from "../general/button";
@@ -7,6 +7,7 @@ import type { Poster, Commenter, Event } from '@/lib/types/types';
 import { CommentComponent } from "../general/comment-component";
 import CommentToOrgCard from "../general/comment-toOrg-card";
 import { UpcomingEventComponent } from "../general/upcoming-event-component";
+import { useRouter } from "next/navigation";
 
 interface Props {
     className?: string;
@@ -19,6 +20,7 @@ export const OfficalPosts: Poster[] = [
     {
         postID:"1942",
         posterName:"ICPEP",
+         posterID:"123456787",
         daysSincePosted:3,
         content:"This is my fifth post",
         likes:3,
@@ -27,6 +29,7 @@ export const OfficalPosts: Poster[] = [
     {
         postID:"2343",
         posterName:"CE",
+         posterID:"123456787",
         daysSincePosted:4,
         content:"This is my fourth post",
         likes:3,
@@ -34,6 +37,7 @@ export const OfficalPosts: Poster[] = [
     },
     {
         postID:"5742",
+         posterID:"123456787",
         posterName:"DOST",
         daysSincePosted:6,
         content:"This is my third post",
@@ -42,6 +46,7 @@ export const OfficalPosts: Poster[] = [
     },
     {
         postID:"2341",
+         posterID:"123456787",
         posterName:"SSG",
         daysSincePosted:8,
         content:"This is my second post",
@@ -50,6 +55,7 @@ export const OfficalPosts: Poster[] = [
     },
     {
         postID:"572142",
+         posterID:"123456787",
         posterName:"Honor Society",
         daysSincePosted:10,
         content:"This is my first post",
@@ -81,6 +87,7 @@ const OfficialPostPage = () => {
 export const CommunityPost: Poster[] = [
     {
         postID:"1942",
+        posterID:"123456787",
         posterName:"Excel Duran",
         daysSincePosted:3,
         content:"This is my fifth post",
@@ -89,6 +96,7 @@ export const CommunityPost: Poster[] = [
     },
     {
         postID:"2343",
+         posterID:"123456787",
         posterName:"Kem David",
         daysSincePosted:4,
         content:"This is my fourth post",
@@ -97,6 +105,7 @@ export const CommunityPost: Poster[] = [
     },
     {
         postID:"5742",
+         posterID:"123456787",
         posterName:"Gihun",
         daysSincePosted:6,
         content:"This is my third post",
@@ -105,6 +114,7 @@ export const CommunityPost: Poster[] = [
     },
     {
         postID:"2341",
+         posterID:"123456787",
         posterName:"Steve",
         daysSincePosted:8,
         content:"This is my second post",
@@ -113,6 +123,7 @@ export const CommunityPost: Poster[] = [
     },
     {
         postID:"572142",
+         posterID:"123456787",
         posterName:"Monkey D. Luffy",
         daysSincePosted:10,
         content:"This is my first post",
@@ -122,7 +133,8 @@ export const CommunityPost: Poster[] = [
   ];
 
 
-const CommunityPostPage = () => {
+const CommunityPostPage = ( ) => {
+    const router = useRouter();
     return (
         <div className="mt-3">
             {CommunityPost.length === 0 ? (<p>No users found</p>) : (
@@ -132,7 +144,8 @@ const CommunityPostPage = () => {
                         daysSincePosted={CommunityPost.daysSincePosted}
                         content={CommunityPost.content}
                         likes={CommunityPost.likes}
-                        comments={CommunityPost.comments}/>
+                        comments={CommunityPost.comments}
+                        onAvatarClicked={()=>router.push(`/visit/${CommunityPost.posterID}`)}/>
                     ))}
                 </ul>
             )}
@@ -213,6 +226,7 @@ const UpcomingEventsPage = () => {
 
 export default function StudentNewsfeedCard({ className, myButtons, selectedButtonId, onButtonSelect}: Props) {
     const combinedClassName = `flex flex-col ${className || ''}`;
+    const router = useRouter();
 
     return (
         <div className={combinedClassName}>
