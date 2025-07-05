@@ -11,9 +11,9 @@ interface ButtonProps {
   textColor?: string;
 }
 
-interface ShowcaseCardProps {
+export interface ShowcaseCardProps {
   title: string;
-  orgID: string
+  orgID: string;
   subtitle: string;
   bgColor?: string;
   tagText: string;
