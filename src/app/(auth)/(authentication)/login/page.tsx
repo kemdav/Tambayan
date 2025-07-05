@@ -3,7 +3,7 @@
 import AuthLoginCard from "@/app/components/ui/auth-page-ui/auth-login-card";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { login } from '../action'; // Make sure this import is correct
+import { login } from "../action"; // Make sure this import is correct
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -21,9 +21,9 @@ export default function LoginPage() {
     setError(null);
 
     const formData = new FormData();
-    formData.append('email', email);
-    formData.append('password', password);
-    
+    formData.append("email", email);
+    formData.append("password", password);
+
     // This function call sends the data to your server action.
     await login(formData);
 
@@ -38,9 +38,9 @@ export default function LoginPage() {
         rememberMe={rememberMe}
         loading={loading}
         error={error}
-        onEmailChange={e => setEmail(e.target.value)}
-        onPasswordChange={e => setPassword(e.target.value)}
-        onRememberMeChange={e => setRememberMe(e.target.checked)}
+        onEmailChange={(e) => setEmail(e.target.value)}
+        onPasswordChange={(e) => setPassword(e.target.value)}
+        onRememberMeChange={(e) => setRememberMe(e.target.checked)}
         // Here we pass our corrected handleLogin function
         onSubmit={handleLogin}
         onForgotPassword={() => router.push("/forgot-password")}
