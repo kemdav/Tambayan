@@ -69,7 +69,7 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 w-full max-w-6xl mx-auto">
+    <div className="bg-white rounded-2xl shadow-md p-6 w-full max-w-7xl h-full min-h-screen">
       <div className="mb-4">
         <span className="font-bold text-xl">Join an Organization</span>
       </div>
