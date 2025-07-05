@@ -75,7 +75,7 @@ input[type="password"]::-webkit-password-reveal-button {
 }
 
 .card {
-  @apply lg:bg-neutral-pure-white lg:ring-1 select-none p-10 rounded-4xl;
+  @apply lg:bg-neutral-pure-white lg:ring-1 select-none pr-10 pl-10 pt-5 rounded-4xl;
 }
 .responsiveCardHeading {
   @apply text-shade-charcoal-green lg:text-action-forest-green text-3xl lg:text-4xl font-bold;
@@ -95,8 +95,8 @@ input[type="password"]::-webkit-password-reveal-button {
 .horizontalNavBarButtonIcons {
   @apply size-10;
 }
-.mainContentCard{
-  @apply  h-auto min-h-dvh w-full max-w-4xl shadow-lg/100 p-4
+.mainContentCard {
+  @apply h-auto min-h-dvh w-full max-w-4xl shadow-lg/100 p-4;
 }
 
 .custom-checkbox {
@@ -105,20 +105,20 @@ input[type="password"]::-webkit-password-reveal-button {
   height: 16px;
   appearance: none;
   background-color: #fff;
-  border: 2px solid var(--color-action-success-green);
+  border: 2px solid var(--color-action-forest-green);
   border-radius: 4px;
   cursor: pointer;
   vertical-align: middle;
   margin-top: 2px;
 }
 .custom-checkbox:checked {
-  background-color: var(--color-action-success-green);
-  border-color: var(--color-action-success-green);
+  background-color: var(--color-action-forest-green);
+  border-color: var(--color-action-forest-green);
 }
 .custom-checkbox:checked::after {
   content: "";
   position: absolute;
-  left: 2px;
+  left: 3.5px;
   top: 0px;
   width: 6px;
   height: 10px;

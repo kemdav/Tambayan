@@ -23,7 +23,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
             className="flex items-center justify-center"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
-            <Icon className="h-7 w-7 text-gray-500" />
+            <Icon className="h-7 w-7 text-[#4E625A] cursor-pointer animation-button" />
           </button>
         }
         {...props}
