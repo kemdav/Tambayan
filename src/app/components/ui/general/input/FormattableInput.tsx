@@ -94,8 +94,8 @@ export const FormattableInput = React.forwardRef<
   // For controlled value
   React.useEffect(() => {
     if (isFormattable && value !== undefined && editableRef.current) {
-      if (editableRef.current.innerText !== value) {
-        editableRef.current.innerText = value;
+      if (editableRef.current.innerHTML !== value) {
+        editableRef.current.innerHTML = value;
       }
     }
   }, [value, isFormattable]);
@@ -104,7 +104,7 @@ export const FormattableInput = React.forwardRef<
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     if (onChange) {
-      onChange(e.currentTarget.innerText);
+      onChange(e.currentTarget.innerHTML);
     }
     // Auto-grow for multiline (unless fixedScroll)
     if (multiline && !fixedScroll && editableRef.current) {

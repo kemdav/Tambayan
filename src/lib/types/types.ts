@@ -43,3 +43,24 @@ export interface Event {
     status: string;
     registered: boolean;
 }
+
+export interface Post {
+  id: string; // Always good to have a unique ID
+  posterName: string;
+  avatarSrc?: string | null;
+  daysSincePosted: number;
+  title?: string;
+  content: string;
+  imageSrc?: string;
+  likes: number;
+  comments: number;
+  tags?: string[];
+  orgLabel?: string;
+  recipient?: string;
+  // Event-specific fields
+  isEvent: boolean;
+  eventLocation?: string;
+  eventDate?: string;
+  registrationStart?: Date;
+  registrationEnd?: Date;
+}
