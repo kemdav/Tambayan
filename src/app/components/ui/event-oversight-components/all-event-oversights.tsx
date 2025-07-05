@@ -1,3 +1,5 @@
+"use client";
+
 import EventOversight from "@/app/components/ui/event-oversight-components/event-oversight-header";
 import EventFilter from "@/app/components/ui/event-oversight-components/event-filter";
 import EventTable from "./event-table";
@@ -43,15 +45,17 @@ export default function AllEventOversights({
   onClickButton,
 }: Props) {
   return (
-    <div className="flex flex-col items-center justify-center px-4 py-4">
-      <EventOversight name={nameOversight} />
-      <EventFilter
-        name={nameFilter}
-        placeholder={placeholder}
-        options={options}
-        onClickButton={onClickButton}
-      />
-      <EventTable tableData={tableData} statuses={statuses} />
+    <div className="flex flex-col items-center justify-center px-4 py-4 w-full">
+      <div className="w-full max-w-[1066px] flex flex-col gap-4">
+        <EventOversight name={nameOversight} />
+        <EventFilter
+          name={nameFilter}
+          placeholder={placeholder}
+          options={options}
+          onClickButton={onClickButton}
+        />
+        <EventTable tableData={tableData} statuses={statuses} />
+      </div>
     </div>
   );
 }

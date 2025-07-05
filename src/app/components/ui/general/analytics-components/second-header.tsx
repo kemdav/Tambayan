@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "../button";
 import { Download } from "lucide-react";
 import DropDownRole from "../dropdown/dropdown-role";

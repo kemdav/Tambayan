@@ -25,7 +25,7 @@ interface Props {
 
 export default function EventTable({ tableData = [], statuses = [] }: Props) {
   return (
-    <div className="overflow-x-auto rounded-[10px] border border-green-900 w-full mt-4">
+    <div className="overflow-x-auto rounded-[10px] border border-green-900 w-full mt-4 max-w-[1066px]">
       <table className="min-w-[600px] w-full border-collapse text-left text-sm sm:text-base">
         <thead className="bg-gray-100">
           <tr>

@@ -1,6 +1,4 @@
-import DropDownRole from "../general/dropdown/dropdown-role";
-import { Button } from "@/app/components/ui/general/button";
-import { Plus } from "lucide-react";
+"use client";
 
 interface Props {
   name?: string;

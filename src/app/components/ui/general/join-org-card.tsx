@@ -4,77 +4,99 @@ import React, { useState, useMemo } from "react";
 import OrgRecruitCard from "./org-recruit-card";
 import { Input } from "./input/input";
 import { SearchIcon } from "@/app/components/icons/SearchIcon";
+import { createClient } from "@/lib/supabase/client";
+import type { OrgRecruitCardProps } from "./org-recruit-card";
 
-import type { ComponentProps } from "react";
-
-export const JOIN_ORG_CARD_BG = "#f8f5ef";
-
+// 1. SIMPLIFY PROPS: The component only needs the initial data.
 interface JoinOrgCardProps {
-  orgs: Array<ComponentProps<typeof OrgRecruitCard>>;
-  onViewClick?: (orgID: string) => void;
-  onJoinClick?: (orgID: string) => void;
+  initialOrgs: OrgRecruitCardProps[];
 }
 
-const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ orgs, onViewClick, onJoinClick }) => {
+const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
+  // 2. STATE MANAGEMENT: Set up state based on the initial prop. This is our single source of truth.
+  const [organizations, setOrganizations] = useState(initialOrgs);
+  const [isLoading, setIsLoading] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const supabase = useMemo(() => createClient(), []);
 
+  // 3. FIX THE FILTERING LOGIC: This now depends on the `organizations` state.
+  //    When `setOrganizations` is called, this will re-run with the new data.
   const filteredOrgs = useMemo(() => {
-    if (!search.trim()) return orgs;
-    return orgs.filter(org =>
+    if (!search.trim()) {
+      return organizations; // Use the state variable
+    }
+    return organizations.filter(org => // Use the state variable
       org.title.toLowerCase().includes(search.toLowerCase()) ||
       org.subtitle.toLowerCase().includes(search.toLowerCase())
     );
-  }, [search, orgs]);
+  }, [search, organizations]); // Dependency array is now correct
 
-  // Default click handlers
-  const handleViewClick = (orgID: string) => {
-    if (onViewClick) {
-      onViewClick(orgID);
-    } else {
-      console.log("View clicked", orgID);
-    }
-  };
+  // 4. THE ACTION HANDLER: This logic was already correct.
+  const handleJoinClick = async (orgID: string) => {
+    setIsLoading(orgID);
+    try {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        throw new Error("User not authenticated");
+      }
 
-  const handleJoinClick = (orgID: string) => {
-    if (onJoinClick) {
-      onJoinClick(orgID);
-    } else {
-      console.log("Join clicked", orgID);
+      const { data: studentProfile, error: profileError } = await supabase
+        .from('student')
+        .select('studentid')
+        .eq('user_id', user.id)
+        .single();
+      if (profileError || !studentProfile) throw new Error("Could not find student profile.");
+      
+      const { error: insertError } = await supabase
+        .from('orgmember')
+        .insert({ orgid: orgID, studentid: studentProfile.studentid, position: 'Member' });
+      if (insertError) throw insertError;
+      
+      // This correctly updates the state, which will now trigger a re-render
+      setOrganizations(currentOrgs =>
+        currentOrgs.map(org =>
+          org.orgID === orgID
+            ? { ...org, joinLabel: "Joined", joinDisabled: true }
+            : org
+        )
+      );
+      console.log(`Successfully joined organization ${orgID}`);
+    } catch (error) {
+      console.error("Error joining organization:", error);
+    } finally {
+      setIsLoading(null);
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 w-full max-w-6xl mx-auto">
+    <div className="bg-white rounded-2xl shadow-md p-6 w-full max-w-7xl h-full min-h-screen">
       <div className="mb-4">
-        <span className="font-bold text-xl">Organization Oversight</span>
+        <span className="font-bold text-xl">Join an Organization</span>
       </div>
       <div className="w-full">
         <Input
           leftIcon={<SearchIcon width={20} height={20} />}
           placeholder="Search Organizations.."
-          aria-label="Search organizations"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full"
         />
       </div>
       <div className="flex flex-wrap gap-6 justify-center md:justify-start mt-6">
-        {filteredOrgs.length === 0 ? (
-          <div className="text-gray-500 text-center w-full">No organizations found.</div>
-        ) : (
-          filteredOrgs.map((orgProps) => (
-            <div key={orgProps.orgID} className="flex-shrink-0">
-              <OrgRecruitCard
-                {...orgProps}
-                onView={() => handleViewClick(orgProps.orgID)}
-                onJoin={() => handleJoinClick(orgProps.orgID)}
-              />
-            </div>
-          ))
-        )}
+        {/* This now maps over the correctly filtered list */}
+        {filteredOrgs.map((orgProps) => (
+          <div key={orgProps.orgID} className="flex-shrink-0">
+            <OrgRecruitCard
+              {...orgProps}
+              onView={() => console.log("View clicked", orgProps.orgID)}
+              onJoin={() => handleJoinClick(orgProps.orgID)}
+              joinDisabled={orgProps.joinDisabled || isLoading === orgProps.orgID}
+              joinLabel={isLoading === orgProps.orgID ? "Joining..." : orgProps.joinLabel}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default JoinOrgCard; 
+export default JoinOrgCard;
