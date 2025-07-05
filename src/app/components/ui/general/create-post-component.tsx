@@ -29,7 +29,7 @@ interface CreatePostComponentProps {
   onTitleChange: (title: string) => void;
   content: string;
   onContentChange: (content: string) => void;
-  orgOptions: OrgOption[];
+  orgOptions?: OrgOption[];
   onPost: () => void;
   // Default post fields
   tags?: string[];
@@ -69,7 +69,7 @@ export function CreatePostComponent({
   tagInput = "",
   onTagInputChange,
   onAddTag,
-  orgOptions,
+  orgOptions = [],
   onRemoveTag,
   photoFile = null,
   onPhotoChange,

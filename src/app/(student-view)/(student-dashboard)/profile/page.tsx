@@ -1,13 +1,15 @@
-// app/your-route/page.tsx   <- This is the new Server Component
+//profile page.tsx
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server"; // Your server client creator
 import { redirect } from "next/navigation";
-import { type StudentProfile } from "@/lib/types/database";
-import ProfileView from "@/app/components/ui/student-view-ui/ProfileView"; // We will create this next
+import { type StudentProfile } from "@/lib/types/database"; // Assuming StudentProfile is Tables<'student'>
+import { getPostsByStudent } from "@/lib/actions/post";     // Import your server action for posts
+import type { Poster } from "@/lib/types/types";           // Ensure Poster type is imported
+import ProfileView from "@/app/components/ui/student-view-ui/ProfileView"; 
 
 export default async function ProfilePage() {
-  // 1. Use the SERVER client to fetch data securely
-  const supabase = createClient();
+
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -17,21 +19,29 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  // console.log("Attempting to fetch profile for user ID:", user.id);
-  // 2. Fetch the student's profile data
-  const { data: profile, error } = await (await supabase)
+  const { data: initialProfile, error: profileError } = await supabase
     .from("student")
     .select<string, StudentProfile>("*") // Use your type for safety
-    .eq("user_id", user.id)
-    .single();
+    .eq("user_id", user.id) // Filter by the authenticated user's ID
+    .single(); 
 
    //console.log("Profile query result:", { profile, error });
 
-  if (error || !profile) {
-    // Handle case where profile doesn't exist
-    redirect("/create-profile");
+  if (profileError || !initialProfile) {
+    console.error("Error fetching profile:", profileError?.message);
+    // If no profile found for the user, redirect them to a profile creation page
+    redirect("/register");
   }
 
+  const initialPosts: Poster[] = await getPostsByStudent(initialProfile.studentid);
+  console.log("ProfilePage (Server): Value of initialPosts after fetching:", initialPosts);
+
   // 3. Render the CLIENT component and pass the fetched data as a prop
-  return <ProfileView initialProfile={profile} />;
+  return (
+    <ProfileView
+      initialProfile={initialProfile}
+      initialPosts={initialPosts}
+      // initialComments={initialComments} // Pass comments if fetched
+    />
+  );
 }

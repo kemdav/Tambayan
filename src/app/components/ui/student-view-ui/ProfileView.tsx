@@ -8,13 +8,16 @@ import { useEffect, useState } from "react";
 import { ProfileViewNavBarContents } from "../../navBars/navBarContents";
 import { type StudentProfile } from "@/lib/types/database";
 import { createClient } from "@/lib/supabase/client";
+import { type Poster } from "@/lib/types/types";
 
 // Define the props that this component will receive
 interface ProfileViewProps {
   initialProfile: StudentProfile;
+  initialPosts: Poster[];
 }
 
-export default function ProfileView({ initialProfile }: ProfileViewProps) {
+export default function ProfileView({ initialProfile, initialPosts }: ProfileViewProps) {
+  console.log("ProfileView received initialPosts:", initialPosts);
   // All your hooks and state management live here!
   const [profile, setProfile] = useState<StudentProfile>(initialProfile);
   const [selectedNavId, setSelectedNavId] = useState<string>("post");
@@ -57,6 +60,7 @@ export default function ProfileView({ initialProfile }: ProfileViewProps) {
             studentJoinDate="September 17, 2004" // You can pass this down too
             studentEventsJoined="6"
             studentTotalOrg="3"
+            posts={initialPosts}
           ></StudentProfileCard>
         </div>
       </main>
