@@ -5,11 +5,19 @@ import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import { CreatePostComponent } from "@/app/components/ui/general/create-post-component";
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
 import SearchBar from "@/app/components/ui/student-view-ui/search-bar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { redirect } from "next/navigation";
+import { ShowcaseCardProps } from "@/app/components/ui/general/showcase-card-component";
 
 interface Props {
   children: React.ReactNode;
 }
+
+type OrgOption = {
+  value: string;
+  label: string;
+};
 
 export const myButtons: ButtonConfig[] = [
   {
@@ -64,14 +72,66 @@ const SideBar = () => {
   </div>);
 }
 
-function CreatePost() {
-  <CreatePostComponent></CreatePostComponent>
-}
-
 export default function StudentVerticalNavigation({ children }: Props) {
-
   const [isCreatePostOpen, setCreatePostOpen] = useState(false);
   const [selectedNavId, setSelectedNavId] = useState<string>("profile");
+  const [orgOptions, setOrgOptions] = useState<OrgOption[]>([])
+
+  const [postType, setPostType] = useState("default");
+  const [org, setOrg] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [eventLocation, setEventLocation] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [registrationStart, setRegistrationStart] = useState<Date | undefined>();
+  const [registrationEnd, setRegistrationEnd] = useState<Date | undefined>();
+  const [submitted, setSubmitted] = useState<any>(null);
+
+  // Tag and photo state
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  useEffect(() => {
+    const fetchOrgOptions = async () => {
+      const supabase = createClient();
+
+      // --- THIS IS THE NEW, SIMPLIFIED LOGIC ---
+      // Make a single call to our new RPC function.
+      const { data, error } = await supabase.rpc('get_user_org_options');
+
+      if (error) {
+        console.error("Error fetching organization options:", error);
+        return;
+      }
+
+      // The `data` is already in the perfect [{ value, label }] format.
+      // No .map() or .filter() needed!
+      if (data) {
+        setOrgOptions(data);
+      }
+    };
+
+    fetchOrgOptions();
+  }, []);
+  // Tag handlers
+  const handleAddTag = () => {
+    const trimmed = tagInput.trim();
+    if (trimmed && !tags.includes(trimmed)) {
+      setTags([...tags, trimmed]);
+    }
+    setTagInput("");
+  };
+  const handleRemoveTag = (tag: string) => {
+    setTags(tags.filter(t => t !== tag));
+  };
+
+  // Photo handler
+  const handlePhotoChange = (file: File | null) => {
+    setPhotoFile(file);
+  };
+   const handlePost = () => {
+    // ... your post handling logic
+  };
 
   return (
     <>
@@ -81,7 +141,34 @@ export default function StudentVerticalNavigation({ children }: Props) {
           onClick={() => setCreatePostOpen(false)}
         >
           <div onClick={(e) => e.stopPropagation()}>
-            <CreatePostComponent/>
+            <CreatePostComponent
+              className="max-w-2xl min-w-1xl md:w-2xl"
+              postType={postType}
+              onPostTypeChange={setPostType}
+              org={org}
+              onOrgChange={setOrg}
+              title={title}
+              orgOptions={orgOptions}
+              onTitleChange={setTitle}
+              content={content}
+              onContentChange={setContent}
+              onPost={handlePost}
+              eventLocation={eventLocation}
+              onEventLocationChange={setEventLocation}
+              eventDate={eventDate}
+              onEventDateChange={setEventDate}
+              registrationStart={registrationStart}
+              onRegistrationStartChange={setRegistrationStart}
+              registrationEnd={registrationEnd}
+              onRegistrationEndChange={setRegistrationEnd}
+              tags={tags}
+              tagInput={tagInput}
+              onTagInputChange={setTagInput}
+              onAddTag={handleAddTag}
+              onRemoveTag={handleRemoveTag}
+              photoFile={photoFile}
+              onPhotoChange={handlePhotoChange}
+            />
           </div>
         </div>
       )}

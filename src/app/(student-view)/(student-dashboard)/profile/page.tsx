@@ -17,7 +17,7 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-   console.log("Attempting to fetch profile for user ID:", user.id);
+  // console.log("Attempting to fetch profile for user ID:", user.id);
   // 2. Fetch the student's profile data
   const { data: profile, error } = await (await supabase)
     .from("student")
@@ -25,7 +25,7 @@ export default async function ProfilePage() {
     .eq("user_id", user.id)
     .single();
 
-   console.log("Profile query result:", { profile, error });
+   //console.log("Profile query result:", { profile, error });
 
   if (error || !profile) {
     // Handle case where profile doesn't exist
