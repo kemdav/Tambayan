@@ -9,6 +9,8 @@ import CommentToOrgCard from "../general/comment-toOrg-card";
 import { useState } from "react";
 import { UpcomingEventComponent } from "../general/upcoming-event-component";
 import UpcomingorgEventComponent from "../general/upcomingorg-event-component";
+import DropDownRole from "../general/dropdown/dropdown-role";
+import { DropdownStatus } from "../general/dropdown/dropdown-status";
 
 interface Props extends studentProps {
     className?: string;
@@ -62,6 +64,7 @@ export const Posts: Poster[] = [
         postID: "1942",
         posterName: "Excel Duran",
         daysSincePosted: 3,
+         posterID:"123456787",
         content: "This is my fifth post",
         likes: 3,
         comments: 3,
@@ -70,6 +73,7 @@ export const Posts: Poster[] = [
         postID: "2343",
         posterName: "Excel Duran",
         daysSincePosted: 4,
+         posterID:"123456787",
         content: "This is my fourth post",
         likes: 3,
         comments: 3,
@@ -78,6 +82,7 @@ export const Posts: Poster[] = [
         postID: "5742",
         posterName: "Excel Duran",
         daysSincePosted: 6,
+         posterID:"123456787",
         content: "This is my third post",
         likes: 3,
         comments: 3,
@@ -86,6 +91,7 @@ export const Posts: Poster[] = [
         postID: "2341",
         posterName: "Excel Duran",
         daysSincePosted: 8,
+         posterID:"123456787",
         content: "This is my second post",
         likes: 3,
         comments: 3,
@@ -94,16 +100,26 @@ export const Posts: Poster[] = [
         postID: "572142",
         posterName: "Excel Duran",
         daysSincePosted: 10,
+         posterID:"123456787",
         content: "This is my first post",
         likes: 3,
         comments: 3,
     }
 ];
 
-
+const options = [
+  { value: "recent", label: "Most Recent" },
+  { value: "oldest", label: "Oldest" },
+  { value: "mostLikedAllTime", label: "Most Liked All Time" },
+  { value: "mostLikedMonth", label: "Most Liked Month" },
+  { value: "mostLikedWeek", label: "Most Liked Week" }
+];
 const PostPage = () => {
     return (
         <div className="mt-3">
+            <div className="mb-3">
+                <DropDownRole options={options} placeholder="Filtering" width="w-xs"></DropDownRole>
+            </div>
             {Posts.length === 0 ? (<p>No users found</p>) : (
                 <ul className="space-y-4">
                     {Posts.map((Posts) => (
@@ -111,7 +127,8 @@ const PostPage = () => {
                             daysSincePosted={Posts.daysSincePosted}
                             content={Posts.content}
                             likes={Posts.likes}
-                            comments={Posts.comments} />
+                            comments={Posts.comments}
+                            recipient="ICPEP" />
                     ))}
                 </ul>
             )}

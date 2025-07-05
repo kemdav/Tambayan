@@ -1,40 +1,70 @@
+//auth-registration-card.tsx
 "use client";
 
 import { Button } from "@/app/components/ui/general/button";
 import { PasswordInput } from "@/app/components/ui/general/input/password-input";
 import { Input } from "@/app/components/ui/general/input/input";
 import {
-  UserPofileLoginIcon,
   EmailIcon,
-  CourseIcon,
-  UniversityIcon,
 } from "../../icons";
 import DropdownRole from "@/app/components/ui/general/dropdown/dropdown-role";
-import { useRouter } from "next/navigation";
+import React from "react";
 
-export default function AuthRegCard() {
-  const router = useRouter();
+interface Option {
+  value: string;
+  label: string;
+}
 
-  // Might consider moving this to another file later on
-  const YrOptions = [
-    { value: "year_1", label: "1" },
-    { value: "year_2", label: "2" },
-    { value: "year_3", label: "3" },
-    { value: "year_4", label: "4" },
-    { value: "year_5", label: "5" }
-  ];
+interface AuthRegCardProps {
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  loading: boolean;
+  error: string | null;
+  universityOptions: Option[];
+  courseOptions: Option[];
+  yearOptions: Option[];
+  onFirstNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onLastNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onMiddleNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onConfirmPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onUniversityChange: (value: string) => void;
+  onCourseChange: (value: string) => void;
+  onYearChange: (value: string) => void;
+  // --- MODIFICATION: Changed prop to a standard event handler ---
+  onSubmit: (e: React.FormEvent) => void;
+  onLogin: () => void;
+}
 
-  // Ideally, the value would be u[University ID]
-   const UniversityOptions = [
-    { value: "u1", label: "Cebu Institute of Technology University" },
-    { value: "u2", label: "Cebu Technological University" },
-  ];
-
-   const CourseOptions = [
-    { value: "bscpe", label: "Bachelors of Science in Computer Engineering" },
-    { value: "bsce", label: "Bachelors of Science in Civil Engineering" },
-    { value: "bscs", label: "Bachelors of Science in Computer Science" }
-  ];
+export default function AuthRegCard({
+  firstName,
+  lastName,
+  middleName,
+  email,
+  password,
+  confirmPassword,
+  loading,
+  error,
+  universityOptions,
+  courseOptions,
+  yearOptions,
+  onFirstNameChange,
+  onLastNameChange,
+  onMiddleNameChange,
+  onEmailChange,
+  onPasswordChange,
+  onConfirmPasswordChange,
+  onUniversityChange,
+  onCourseChange,
+  onYearChange,
+  onSubmit,
+  onLogin,
+}: AuthRegCardProps) {
 
   return (
     <div className="card w-100 lg:w-130 h-160 p-5 lg:p-10">
@@ -44,78 +74,93 @@ export default function AuthRegCard() {
           Enter your information to get started.
         </p>
       </div>
+      
+      {/* --- MODIFICATION: Added onSubmit to the form tag --- */}
+      <form onSubmit={onSubmit}>
+        <div className="grid grid-cols-3 grid-row-1 gap-2 lg:grid-cols-4">
+          <div className="col-span-2 lg:col-span-1 lg:order-1">
+            <p className="textAuthResponsive">Last Name</p>
+            <Input className="inputAuthResponsive" value={lastName} onChange={onLastNameChange} required />
+          </div>
 
-      <div className="grid grid-cols-3 grid-row-1 gap-2 lg:grid-cols-4">
-        <div className="col-span-2 lg:col-span-1 lg:order-1">
-          <p className="textAuthResponsive">Last Name</p>
-          <Input className="inputAuthResponsive"></Input>
+          <div className="lg:order-3">
+            <p className="textAuthResponsive">Middle Name</p>
+            <Input className="inputAuthResponsive" value={middleName} onChange={onMiddleNameChange} />
+          </div>
+
+          <div className="col-span-3 lg:col-span-2 lg:order-2">
+            <p className="textAuthResponsive">First Name</p>
+            <Input className="inputAuthResponsive" value={firstName} onChange={onFirstNameChange} required />
+          </div>
         </div>
 
-        <div className="lg:order-3">
-          <p className="textAuthResponsive">Middle Name</p>
-          <Input className="inputAuthResponsive"></Input>
+        <div className="flex flex-col lg:mt-3">
+          <div>
+            <p className="textAuthResponsive">Email</p>
+            <Input
+              rightIcon={<EmailIcon className="size-6" />}
+              className="inputAuthResponsive"
+              value={email}
+              onChange={onEmailChange}
+              type="email"
+              required
+            />
+          </div>
+
+          <div>
+            <p className="textAuthResponsive lg:mt-3">University</p>
+            <DropdownRole
+              options={universityOptions}
+              width="w-full"
+              onSelect={onUniversityChange}
+            />
+          </div>
         </div>
 
-        <div className="col-span-3 lg:col-span-2 lg:order-2">
-          <p className="textAuthResponsive">First Name</p>
-          <Input className="inputAuthResponsive"></Input>
-        </div>
-      </div>
+        <div className="flex lg:mt-3 gap-3">
+          <div className="">
+            <p className="textAuthResponsive">Year Level</p>
+            <DropdownRole options={yearOptions} onSelect={onYearChange} />
+          </div>
 
-      <div className="flex flex-col lg:mt-3">
-        <div>
-          <p className="textAuthResponsive">Email</p>
-          <Input
-            rightIcon={<EmailIcon className="size-6" />}
-            className="inputAuthResponsive"
-          ></Input>
+          <div className="grow">
+            <p className="textAuthResponsive">Course</p>
+            <DropdownRole options={courseOptions} width="w-full" onSelect={onCourseChange} />
+          </div>
         </div>
 
-        <div>
-          <p className="textAuthResponsive lg:mt-3">University</p>
-          <DropdownRole options={UniversityOptions} width="w-full"></DropdownRole>
-        </div>
-      </div>
+        <div className="grid grid-row-2 lg:gap-3 lg:mt-3 lg:flex">
+          <div>
+            <p className="textAuthResponsive">Password</p>
+            <PasswordInput className="inputAuthResponsive" value={password} onChange={onPasswordChange} required />
+          </div>
 
-      <div className="flex lg:mt-3 gap-3">
-        <div className="">
-          <p className="textAuthResponsive">Year Level</p>
-          <DropdownRole options={YrOptions}></DropdownRole>
-        </div>
-
-        <div className="grow">
-          <p className="textAuthResponsive">Course</p>
-          <DropdownRole options={CourseOptions} width="w-full"></DropdownRole>
-        </div>
-      </div>
-
-      <div className="grid grid-row-2 lg:gap-3 lg:mt-3 lg:flex">
-        <div>
-          <p className="textAuthResponsive">Password</p>
-          <PasswordInput className="inputAuthResponsive"></PasswordInput>
+          <div>
+            <p className="textAuthResponsive">Confirm Password</p>
+            <PasswordInput className="inputAuthResponsive" value={confirmPassword} onChange={onConfirmPasswordChange} required />
+          </div>
         </div>
 
-        <div>
-          <p className="textAuthResponsive">Confirm Password</p>
-          <PasswordInput className="inputAuthResponsive"></PasswordInput>
-        </div>
-      </div>
-
-      <Button
-        className="text-neutral-linen-white 
-        bg-linear-to-r from-action-seafoam-green to-action-forest-green
-         hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 
-         font-bold text-xl w-full mt-5 lg:mt-10"
-      >
-        Sign Up
-      </Button>
+        {error && (
+          <div className="text-red-500 text-sm text-center mt-2">{error}</div>
+        )}
+        
+        {/* --- MODIFICATION: Removed formAction, it's now a standard submit button --- */}
+        <Button
+          className="text-neutral-linen-white bg-linear-to-r from-action-seafoam-green to-action-forest-green hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 font-bold text-xl w-full mt-5 lg:mt-10"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Signing up..." : "Sign Up"}
+        </Button>
+      </form>
 
       <div className="flex items-center justify-center">
         <p className="textAuthResponsive">Already have an account?</p>
         <Button
           variant="link"
           className="textAuthResponsive"
-          onClick={() => router.push("/login")}
+          onClick={onLogin}
         >
           Log in
         </Button>

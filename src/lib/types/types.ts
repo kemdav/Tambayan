@@ -1,5 +1,6 @@
 export interface Poster {
     postID:string;
+    posterID: string;
     posterName: string;
     daysSincePosted: number;
     content: string;

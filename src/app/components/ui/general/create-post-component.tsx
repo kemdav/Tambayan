@@ -73,7 +73,7 @@ export function CreatePostComponent() {
 
   return (
     <>
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 flex flex-col gap-4 shadow-sm w-full max-w-3xl mx-auto mb-4">
+      <div className="rounded-2xl border border-gray-200 bg-white p-10 flex flex-col gap-4 shadow-sm w-full max-w-3xl mx-auto mb-4">
         <Input
           type="text"
           placeholder="Post Title"

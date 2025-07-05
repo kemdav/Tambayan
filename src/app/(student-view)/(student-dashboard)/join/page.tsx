@@ -57,7 +57,7 @@ export default function JoinOrgCardTestPage() {
 
   return (
     <div className="w-full grid place-items-center items-start">
-      <div className="h-auto w-full max-w-3xl shadow-lg/100 p-4">
+      <div className="mainContentCard">
         <JoinOrgCard orgs={sampleOrgs}  onViewClick={handleView} onJoinClick={handleJoin}/>
       </div>
     </div>
