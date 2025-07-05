@@ -40,7 +40,7 @@ export default function AuthLoginCard({
         <h1 className="responsiveCardHeading text-center mb-2">
           Log In to Your Account
         </h1>
-        <p className="textAuthResponsive text-xs text-center">
+        <p className="textAuthResponsive text-s text-center">
           Please sign in to proceed
         </p>
       </div>
@@ -81,7 +81,7 @@ export default function AuthLoginCard({
           />
           <Button
             variant="link"
-            className="textAuthResponsive text-xs p-0"
+            className="textAuthResponsive text-sm p-0"
             type="button"
             onClick={onForgotPassword}
           >
