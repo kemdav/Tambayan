@@ -81,6 +81,7 @@ export default function AdminLayout({
 
   const handleSelect = (id: string) => {
     setSelected(id);
+    // Only close navigation on mobile
     setIsNavOpen(false);
   };
 

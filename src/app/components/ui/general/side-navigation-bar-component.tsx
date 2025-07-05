@@ -35,8 +35,22 @@ export default function SideNavBar({
   const [isNavOpen, setIsNavOpen] = useState(false);
 
   // Use external control for mobile, internal state for desktop
-  const isExpanded = isOpen !== undefined ? isOpen : isNavOpen;
-  const handleToggle = onToggle || (() => setIsNavOpen(!isNavOpen));
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  const isExpanded = isMobile && isOpen !== undefined ? isOpen : isNavOpen;
+  const handleToggle =
+    isMobile && onToggle ? onToggle : () => setIsNavOpen(!isNavOpen);
 
   const navButtons = myButtons.map((btn) => ({
     ...btn,
