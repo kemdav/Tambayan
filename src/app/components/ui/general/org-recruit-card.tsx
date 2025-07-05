@@ -5,7 +5,7 @@ import { AvatarIcon } from "./avatar-icon-component";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
-interface OrgRecruitCardProps {
+export interface OrgRecruitCardProps {
   title: string;
   orgID: string;
   subtitle: string;

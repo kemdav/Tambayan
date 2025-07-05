@@ -1,70 +1,93 @@
-"use client";
-import React from "react";
-import SubscribedOrgComponent, { SUBSCRIBED_ORG_CARD_BG } from "@/app/components/ui/general/subscribed-org-component";
-import { useRouter } from "next/navigation";
+// app/subscribed/page.tsx
 
-const sampleOrgs = [
-  {
-    title: "ICPEP",
-    subtitle: "College of Engineering",
-    orgID: "1",
-    bgColor: "bg-green-200",
-    tagText: "Active",
-    tagBgColor: "bg-green-100",
-    tagTextColor: "text-green-800",
-    memberCount: 245,
-    eventCount: 12,
-    buttons: [
-      { label: "View", bgColor: "bg-green-300", textColor: "text-white" },
-    ],
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-  {
-    title: "Debate Organization",
-    subtitle: "College of Arts",
-    bgColor: "bg-green-300",
-    orgID: "12",
-    tagText: "Active",
-    tagBgColor: "bg-green-100",
-    tagTextColor: "text-green-800",
-    memberCount: 187,
-    eventCount: 8,
-    buttons: [
-      { label: "View", bgColor: "bg-green-300", textColor: "text-white" },
-    ],
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-  {
-    title: "Music Organization",
-    subtitle: "College of Arts",
-    orgID: "14",
-    bgColor: "bg-green-200",
-    tagText: "Inactive",
-    tagBgColor: "bg-red-100",
-    tagTextColor: "text-red-800",
-    memberCount: 56,
-    eventCount: 0,
-    buttons: [
-      { label: "View", bgColor: "bg-green-300", textColor: "text-white" },
-    ],
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-];
+import { createClient } from '@/lib/supabase/server';
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import SubscribedOrgComponent from "@/app/components/ui/general/subscribed-org-component";
+import { ShowcaseCardProps } from "@/app/components/ui/general/showcase-card-component";
 
-export default function SubscribedOrgTestPage() {
-  const router = useRouter();
-   const handleNavigate = (orgID: string) => {
-    console.log(`Parent component is navigating to organization: ${orgID}`);
-    router.push(`/organization/${orgID}/newsfeed`);
-  };
+// These type definitions are correct.
+type OrganizationData = {
+  orgid: string;
+  orgname: string;
+  status: string;
+  picture: string | null;
+  cover_photo_path: string | null;
+  orgmember: { count: number }[];
+  events: { count: number }[];
+};
+
+type SubscribedOrgData = {
+  organizations: OrganizationData;
+};
+
+export default async function SubscribedOrgsPage() {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) { redirect("/login"); }
+
+  const { data: studentProfile, error: profileError } = await supabase
+    .from("student").select("studentid").eq("user_id", user.id).single();
+
+  if (profileError || !studentProfile) {
+    return <div>Error: Student profile not found.</div>;
+  }
+  
+  const { data: subscribedOrgsData, error: orgsError } = await supabase
+    .from("orgmember")
+    .select(`
+      organizations!inner (
+        orgid, orgname, status, picture, cover_photo_path,
+        orgmember(count), events(count)
+      )
+    `)
+    .eq("studentid", studentProfile.studentid)
+    // Add this line to apply your manual types to the query result
+    .returns<SubscribedOrgData[]>(); 
+    
+  
+  if (orgsError) {
+    console.error("Error fetching subscribed orgs:", orgsError);
+    return <div>Error fetching organization data.</div>;
+  }
+
+  // --- THE CORRECTED TRANSFORMATION LOGIC ---
+  
+  const transformedOrgs: ShowcaseCardProps[] = [];
+
+  for (const item of subscribedOrgsData || []) {
+    if (!item || !item.organizations) {
+      continue;
+    }
+
+    const org = item.organizations;
+
+    const newOrgCard: ShowcaseCardProps = {
+      orgID: org.orgid,
+      title: org.orgname,
+      subtitle: "Subscribed Organization",
+      memberCount: org.orgmember[0]?.count ?? 0,
+      eventCount: org.events[0]?.count ?? 0,
+      avatarUrl: org.picture ? supabase.storage.from("organization-assets").getPublicUrl(org.picture).data.publicUrl : undefined,
+      coverPhotoUrl: org.cover_photo_path ? supabase.storage.from("organization-assets").getPublicUrl(org.cover_photo_path).data.publicUrl : undefined,
+      tagText: org.status,
+      tagBgColor: org.status === 'active' ? 'bg-green-100' : 'bg-red-100',
+      tagTextColor: org.status === 'active' ? 'text-green-800' : 'text-red-800',
+      buttons: [
+        { label: "View", bgColor: "bg-blue-500", textColor: "text-white" },
+        { label: "Leave", bgColor: "bg-red-500", textColor: "text-white" },
+      ],
+    };
+
+    transformedOrgs.push(newOrgCard);
+  }
+
   return (
     <div className="w-full grid place-items-center items-start">
       <div className="mainContentCard">
-        <SubscribedOrgComponent orgs={sampleOrgs} onButtonClick={handleNavigate} />
+        <SubscribedOrgComponent initialOrgs={transformedOrgs} />
       </div>
     </div>
   );
-} 
+}
