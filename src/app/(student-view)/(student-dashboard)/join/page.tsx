@@ -28,15 +28,16 @@ interface EventCountData {
 export default async function JoinOrganizationPage() {
   const supabase = await createClient();
 
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
     redirect("/login");
   }
+
 
   const { data: studentProfile, error: profileError } = await supabase
     .from("student")
     .select("studentid, universityid")
-    .eq("user_id", session.user.id)
+    .eq("user_id", user.id)
     .single();
 
   if (profileError || !studentProfile) {
@@ -117,7 +118,7 @@ export default async function JoinOrganizationPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <JoinOrgCard orgs={transformedOrgs} />
+      <JoinOrgCard initialOrgs={transformedOrgs} />
     </div>
   );
 }
