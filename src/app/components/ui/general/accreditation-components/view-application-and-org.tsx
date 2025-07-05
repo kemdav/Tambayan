@@ -128,11 +128,9 @@ export const ViewApplicationAndOrg: React.FC<ViewApplicationAndOrgProps> = ({
         background: "#f6f7ef",
         borderRadius: 12,
         padding: 0,
-        width: 560,
+        width: "100%",
         boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
-        marginLeft: "auto",
-        marginRight: "auto",
-        marginTop: 24,
+        marginTop: 0,
         overflow: "hidden",
       }}
     >
