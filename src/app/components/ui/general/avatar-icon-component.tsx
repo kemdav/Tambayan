@@ -1,11 +1,16 @@
+"use client";
+
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-interface AvatarIconProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
+interface AvatarIconProps
+  extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> {
   src?: string | null;
   alt?: string;
   className?: string;
   onImageChange?: (file: File) => void;
+  onAvatarClicked?: () => void;
+  isClickable?:boolean,
   isEditable?: boolean;
 }
 
@@ -15,6 +20,8 @@ export const AvatarIcon: React.FC<AvatarIconProps> = ({
   className,
   onImageChange,
   isEditable = false,
+  isClickable=false,
+  onAvatarClicked,
   ...props
 }) => {
   const [imageSrc, setImageSrc] = React.useState(initialSrc);
@@ -23,6 +30,9 @@ export const AvatarIcon: React.FC<AvatarIconProps> = ({
   const handleImageClick = () => {
     if (isEditable && fileInputRef.current) {
       fileInputRef.current.click();
+    }
+    if (!isEditable && isClickable && onAvatarClicked){
+        onAvatarClicked();
     }
   };
 
@@ -76,4 +86,4 @@ export const AvatarIcon: React.FC<AvatarIconProps> = ({
       )}
     </div>
   );
-}; 
+};

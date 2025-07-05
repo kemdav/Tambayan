@@ -16,12 +16,12 @@ const buttonVariants = cva(
         navigation:
           "bg-action-forest-green text-neutral-linen-white shadow-xs hover:bg-action-forest-green/60",
         sideNavigation:
-          "sideNavBarButton justify-start text-lg h-12 bg-tint-forest-fern hover:bg-primary-forest-green text-neutral-pure-white shadow-none",
+          "sideNavBarButton justify-start text-lg h-12 bg-tint-forest-fern hover:bg-action-success-green/25 text-neutral-pure-white shadow-none rounded-[40px] w-full",
         horizontalNavigation:
           "bg-background justify-center text-lg h-12 text-tint-forest-fern transition-all duration-500 ease-in-out",
         link: "text-info underline-offset-4 underline rounded-md",
         outline:
-        "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         ghost: "bg-transparent hover:bg-muted/40 text-inherit shadow-none",
       },
       size: {
@@ -30,22 +30,22 @@ const buttonVariants = cva(
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9",
       },
-      isSelected : {
+      isSelected: {
         true: "",
         false: "",
       },
     },
     compoundVariants: [
-        {
-          variant: "sideNavigation",
-          isSelected: true,
-          className: "bg-primary-forest-green",
-        },
-        {
-          variant: "horizontalNavigation",
-          isSelected: true,
-          className: "border-b-4",
-        },
+      {
+        variant: "sideNavigation",
+        isSelected: true,
+        className: "bg-primary-forest-green",
+      },
+      {
+        variant: "horizontalNavigation",
+        isSelected: true,
+        className: "border-b-4",
+      },
     ],
     defaultVariants: {
       variant: "default",
@@ -55,11 +55,11 @@ const buttonVariants = cva(
   }
 );
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
-
 
 function Button({
   className,
@@ -74,7 +74,10 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className, isSelected }))}
+      className={cn(
+        buttonVariants({ variant, size, className, isSelected }),
+        "animation-button"
+      )}
       {...props}
     />
   );

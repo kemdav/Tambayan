@@ -8,6 +8,8 @@ interface WikiPageComponentProps {
   icon?: React.ReactNode;
   description?: string;
   onBack?: () => void;
+  canEdit?: boolean;
+  onEdit?: () => void;
 }
 
 const DEFAULT_DESCRIPTION = "No information provided.";
@@ -17,6 +19,8 @@ export default function WikiViewComponent({
   icon,
   description,
   onBack,
+  canEdit = false,
+  onEdit,
 }: WikiPageComponentProps) {
   return (
     <div className="flex justify-center px-4 py-6 sm:py-10 bg-gray-100 min-h-screen">
@@ -26,12 +30,22 @@ export default function WikiViewComponent({
             {icon && <span className="flex items-center">{icon}</span>}
             <span>{title}</span>
           </div>
-          <button
-            onClick={onBack}
-            className="text-sm px-3 py-1 border rounded bg-white hover:bg-gray-100"
-          >
-            Back
-          </button>
+          <div className="flex items-center gap-2">
+            {canEdit && (
+              <button
+                onClick={onEdit}
+                className="text-sm px-3 py-1 border rounded bg-green-600 text-white hover:bg-green-700"
+              >
+                Edit
+              </button>
+            )}
+            <button
+              onClick={onBack}
+              className="text-sm px-3 py-1 border rounded bg-white hover:bg-gray-100"
+            >
+              Back
+            </button>
+          </div>
         </div>
 
         <div

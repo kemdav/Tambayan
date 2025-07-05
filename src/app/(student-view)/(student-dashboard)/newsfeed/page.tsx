@@ -11,7 +11,7 @@ export default function TagComponentTestPage() {
 
   return (
     <main className="w-full grid place-items-center items-start mt-10 md:mt-0">
-        <div className="h-auto w-full max-w-3xl shadow-lg/100 p-4">
+        <div className="mainContentCard">
             <StudentNewsfeedCard className="h-1/2" 
             myButtons={myButtons} 
             selectedButtonId={selectedNavId}

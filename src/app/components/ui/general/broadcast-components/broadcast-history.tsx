@@ -34,7 +34,7 @@ export function BroadcastHistory({ broadcasts, filter, onFilterChange, onBroadca
           <option value="schools">Schools</option>
         </select>
       </div>
-      <div className="flex flex-col gap-2 max-h-96 overflow-y-auto">
+      <div className="flex flex-col gap-1 overflow-y-auto max-h-[32rem]">
         {broadcasts.length === 0 && <div className="text-gray-400 text-sm">No broadcasts found.</div>}
         {broadcasts.map(b => (
           <button
