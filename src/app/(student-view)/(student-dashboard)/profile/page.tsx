@@ -6,14 +6,14 @@ import { type StudentProfile } from "@/lib/types/database"; // Assuming StudentP
 import { getPostsByStudent } from "@/lib/actions/post";     // Import your server action for posts
 import type { Poster } from "@/lib/types/types";           // Ensure Poster type is imported
 import ProfileView from "@/app/components/ui/student-view-ui/ProfileView"; 
+import { getCommentsByStudent } from "@/lib/actions/comment"; 
+import { StudentComment } from "@/lib/actions/comment";
 
 export default async function ProfilePage() {
 
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await (await supabase).auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect("/login");
@@ -33,9 +33,14 @@ export default async function ProfilePage() {
     redirect("/register");
   }
 
-  const initialPosts: Poster[] = await getPostsByStudent(initialProfile.studentid);
+  const [initialPosts, initialComments] = await Promise.all([
+    getPostsByStudent(initialProfile.studentid),
+    getCommentsByStudent(initialProfile.studentid)
+  ]);
   console.log("ProfilePage (Server): Value of initialPosts after fetching:", initialPosts);
   console.log("ProfilePage (Server): user.id (currentUserID source) =", user.id);
+console.log("ProfilePage (Server): initialComments =", initialComments);
+  
 
   // 3. Render the CLIENT component and pass the fetched data as a prop
   return (
@@ -43,7 +48,7 @@ export default async function ProfilePage() {
       initialProfile={initialProfile}
       initialPosts={initialPosts}
       currentUserID={user.id}
-      // initialComments={initialComments} // Pass comments if fetched
+      initialComments={initialComments} // Pass comments if fetched
     />
   );
 }

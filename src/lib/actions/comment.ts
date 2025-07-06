@@ -2,6 +2,39 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { Tables } from "@/lib/database.types";
+
+export type StudentComment = Tables<'comments'> & {
+    post: Pick<Tables<'post'>, 'postid' | 'subject'> | null;
+};
+export async function getCommentsByStudent(studentId: number): Promise<StudentComment[]> {
+    console.log(`[getCommentsByStudent] Fetching comments for studentId: ${studentId}`);
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from('comments')
+        .select(`
+            *,
+            post:postid (
+                postid,
+                subject
+            )
+        `)
+        .eq('studentid', studentId)
+        .order('posted', { ascending: false });
+
+    if (error) {
+        console.error("Error fetching student comments:", error.message);
+        return [];
+    }
+
+    if (!data) {
+        return [];
+    }
+
+    console.log(`[getCommentsByStudent] Found ${data.length} comments.`);
+    return data as StudentComment[];
+}
 
 export async function addComment(postId: number, commentText: string) {
     const supabase = await createClient();
@@ -29,6 +62,7 @@ export async function addComment(postId: number, commentText: string) {
         postid: postId,
         studentid: student.studentid, // Or user_id if you use my suggested schema
         comment_text: commentText, // Assuming your column is named 'comment'
+        posted: new Date().toISOString(),
     });
 
     if (error) {
