@@ -7,8 +7,96 @@ import type { Poster } from "@/lib/types/types";
 import { revalidatePath } from "next/cache";
 import { v4 as uuidv4 } from 'uuid';
 import type { TablesUpdate } from "@/lib/database.types";
+import { Tables } from "@/lib/database.types";
 
 import { differenceInDays } from 'date-fns';
+
+type OrgPostQueryResult = Tables<'post'> & {
+    student: Pick<Tables<'student'>, 'fname' | 'lname' | 'picture' | 'user_id' | 'studentid'> | null; // <-- ADD 'studentid' HERE
+    organizations: Pick<Tables<'organizations'>, 'orgname'> | null;
+};
+
+export async function getOrgPosts(orgId: string, isOfficial: boolean): Promise<Poster[]> {
+    console.log(`[getOrgPosts] START: Called for orgId: ${orgId}, isOfficial: ${isOfficial}`);
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from("post")
+        .select(`
+            postid,
+            subject,
+            body,
+            likes,
+            comments,
+            posted,
+            attachment,
+            student:studentid (
+                fname,
+                lname,
+                picture,
+                user_id
+            ),
+            organizations:orgid (
+                orgname
+            )
+        `)
+        .eq("orgid", orgId)       // Filter by organization ID
+        .eq("isofficial", isOfficial) // Filter by official status
+        .order("posted", { ascending: false });
+
+    if (error) {
+        console.error(`[getOrgPosts] ERROR fetching posts for org ${orgId} (official: ${isOfficial}):`, error.message);
+        return [];
+    }
+
+    if (!data || data.length === 0) {
+        console.log(`[getOrgPosts] INFO: No posts found for org ${orgId} (official: ${isOfficial}).`);
+        return [];
+    }
+
+    console.log(`[getOrgPosts] INFO: Raw data fetched for org ${orgId} (official: ${isOfficial}):`, data);
+
+    const typedData: OrgPostQueryResult[] = data as OrgPostQueryResult[];
+
+    const formattedPosts: Poster[] = typedData.map((post) => {
+        const student = post.student;
+        const organization = post.organizations;
+
+        // Adjust posterName and posterID logic for official posts
+        const currentPosterName = isOfficial
+            ? organization?.orgname ?? "Official Post"
+            : (student ? `${student.fname} ${student.lname}` : "Unknown User");
+
+        const currentPosterID = isOfficial
+            ? orgId
+            : (student?.studentid?.toString() || "unknown"); // Use studentid if student, else orgId
+
+        const currentPosterPictureUrl = isOfficial
+            ? null // Assuming official posts don't have a student picture, or you'd get org logo
+            : (student?.picture ?? null);
+        
+        const currentPosterUserID = isOfficial
+            ? null // Official posts aren't tied to a specific user
+            : (student?.user_id ?? null);
+
+        return {
+            postID: post.postid.toString(),
+            posterName: currentPosterName,
+            posterID: currentPosterID,
+            posterPictureUrl: currentPosterPictureUrl,
+            title: post.subject,
+            posterUserID: currentPosterUserID,
+            imageSrc: post.attachment ?? null,
+            content: post.body ?? 'No content',
+            likes: post.likes ?? 0,
+            comments: post.comments ?? 0,
+            daysSincePosted: post.posted ? differenceInDays(new Date(), new Date(post.posted)) : 0,
+            recipient: organization?.orgname ?? 'Direct Post' // This should be the target org, which is the current org
+        };
+    });
+
+    return formattedPosts;
+}
 
 export async function getPostsByStudent(studentId: number): Promise<Poster[]> {
     console.log(`[getPostsByStudent] START: Called for studentId: ${studentId}`);
