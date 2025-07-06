@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 import { v4 as uuidv4 } from 'uuid';
 import type { TablesUpdate } from "@/lib/database.types";
 import { Tables } from "@/lib/database.types";
-
+import type { CommentType } from "@/lib/types/types";
 import { differenceInDays } from 'date-fns';
 
 type OrgPostQueryResult = Tables<'post'> & {
@@ -28,8 +28,7 @@ type PostWithLikesResult = Tables<'post'> & {
         orgname: string | null;
     } | null;
     post_likes: { user_id: string }[];
-    // We add user_has_liked to the type, which will be an array.
-    user_has_liked: { user_id: string }[];
+    comments: CommentType[];
 };
 
 export async function getOrgPosts(orgId: string, isOfficial: boolean): Promise<Poster[]> {
@@ -52,7 +51,8 @@ export async function getOrgPosts(orgId: string, isOfficial: boolean): Promise<P
             organizations:orgid (
                 orgname
             ),
-            post_likes ( user_id )
+            post_likes ( user_id ),
+            comments ( *, author:student(fname, lname, picture) )
         `)
         .eq("orgid", orgId)
         .eq("isofficial", isOfficial)
@@ -98,7 +98,7 @@ export async function getOrgPosts(orgId: string, isOfficial: boolean): Promise<P
             imageSrc: post.attachment ?? null,
             content: post.body ?? 'No content',
             likes: likeCount, // Use the new, accurate count
-            comments: post.comments ?? 0, // Assuming comments count is still on the post table
+            comments: post.comments ?? [], 
             daysSincePosted: post.posted ? differenceInDays(new Date(), new Date(post.posted)) : 0,
             recipient: organization?.orgname ?? 'Direct Post',
             initialHasLiked: hasLiked, // Pass this new property to the client
@@ -128,7 +128,8 @@ export async function getPostsByStudent(studentId: number): Promise<Poster[]> {
             organizations:orgid (
                 orgname
             ),
-            post_likes ( user_id )
+            post_likes ( user_id ),
+            comments ( *, author:student(fname, lname, picture) )
         `)
         .eq("studentid", studentId)
         .order("posted", { ascending: false });
@@ -176,7 +177,7 @@ export async function getPostsByStudent(studentId: number): Promise<Poster[]> {
             imageSrc: post.attachment ?? null,
             content: post.body ?? 'No content',
             likes: likeCount,
-            comments: post.comments ?? 0,
+            comments: post.comments ?? [], 
             daysSincePosted: post.posted ? differenceInDays(new Date(), new Date(post.posted)) : 0,
             // Use the 'organization' variable
             recipient: organization?.orgname ?? 'Direct Post',
@@ -259,7 +260,6 @@ export async function createPost(formData: FormData) {
             body: content,
             attachment: attachmentUrl, // The path to the image in Storage
             isofficial: false, // Student posts are not official
-            comments: 0,
             posted: new Date().toISOString(),
             ispinned: false
         });
@@ -271,6 +271,7 @@ export async function createPost(formData: FormData) {
 
     // 5. Tell Next.js to refresh the data on the profile page
     revalidatePath('/profile');
+    revalidatePath('/organization/[org-id]/newsfeed', 'page')
 
     return { success: "Post created successfully!" };
 }

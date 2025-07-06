@@ -1,4 +1,4 @@
-export interface Poster {
+export type Poster = {
     recipient: string | undefined;
     postID: string;
     posterID: string;
@@ -10,9 +10,21 @@ export interface Poster {
     imageSrc?: string | null;
     content: string;
     likes: number;
-    comments: number;
+    comments: CommentType[];
     initialHasLiked?: boolean;
+    
 }
+
+export type CommentType = {
+  comment_id: number | string;
+  comment_text: string;
+  created_at: string;
+  author: {
+    fname: string | null;
+    lname:string | null;
+    picture: string | null;
+  } | null;
+};
 
 export interface Commenter {
     commentID: string;

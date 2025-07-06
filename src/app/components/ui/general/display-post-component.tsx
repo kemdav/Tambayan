@@ -14,6 +14,7 @@ import { CreatePostComponent } from "./create-post-component";
 import { DateTimePicker } from "./date-picker/date-picker-component";
 import { deletePost, updatePost } from "@/lib/actions/post";
 import { togglePostLike } from "@/lib/actions/like";
+import { CommentType } from "@/lib/types/types";
 
 interface DisplayPostComponentProps {
   posterName: string;
@@ -27,7 +28,7 @@ interface DisplayPostComponentProps {
   content: string;
   imageSrc?: string | null;
   likes: number;
-  comments: number;
+  comments: CommentType[];
   tags?: string[];
   initialHasLiked?: boolean;
   posterID: string;
@@ -311,7 +312,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
             <LikeIcon className="w-4 h-4" /> {likeCount}
           </Button>
           <Button className="flex items-center gap-1 px-2 py-1 text-xs" onClick={() => setShowComment(true)}>
-            <CommentIcon className="w-4 h-4" /> {comments}
+            <CommentIcon className="w-4 h-4" /> {comments.length}
           </Button>
         </div>
       </div>
@@ -319,11 +320,12 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
         open={showComment}
         onClose={() => setShowComment(false)}
         posterName={posterName}
+        postID={Number(postID)}
         avatarSrc={avatarSrc}
         daysSincePosted={daysSincePosted}
         content={displayContent}
+         initialComments={comments}
         imageSrc={displayImage ?? ""}
-        comments={[]}
       />
       {showEdit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
