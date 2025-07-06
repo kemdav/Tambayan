@@ -10,13 +10,15 @@ import { useState } from "react";
 import { UpcomingEventComponent } from "../general/upcoming-event-component";
 import UpcomingorgEventComponent from "../general/upcomingorg-event-component";
 import DropDownRole from "../general/dropdown/dropdown-role";
-import { DropdownStatus } from "../general/dropdown/dropdown-status";
+
 
 interface Props extends studentProps {
     className?: string;
     myButtons: ButtonConfig[];
     selectedButtonId: string;
+    posts: Poster[];
     onButtonSelect: (id: string) => void;
+    currentUserID: string;
 }
 
 interface studentProps {
@@ -59,76 +61,41 @@ const AboutPage = ({ studentId, studentCourse, studentEmail, studentYear, studen
     );
 }
 
-export const Posts: Poster[] = [
-    {
-        postID: "1942",
-        posterName: "Excel Duran",
-        daysSincePosted: 3,
-         posterID:"123456787",
-        content: "This is my fifth post",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        postID: "2343",
-        posterName: "Excel Duran",
-        daysSincePosted: 4,
-         posterID:"123456787",
-        content: "This is my fourth post",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        postID: "5742",
-        posterName: "Excel Duran",
-        daysSincePosted: 6,
-         posterID:"123456787",
-        content: "This is my third post",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        postID: "2341",
-        posterName: "Excel Duran",
-        daysSincePosted: 8,
-         posterID:"123456787",
-        content: "This is my second post",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        postID: "572142",
-        posterName: "Excel Duran",
-        daysSincePosted: 10,
-         posterID:"123456787",
-        content: "This is my first post",
-        likes: 3,
-        comments: 3,
-    }
-];
 
 const options = [
-  { value: "recent", label: "Most Recent" },
-  { value: "oldest", label: "Oldest" },
-  { value: "mostLikedAllTime", label: "Most Liked All Time" },
-  { value: "mostLikedMonth", label: "Most Liked Month" },
-  { value: "mostLikedWeek", label: "Most Liked Week" }
+    { value: "recent", label: "Most Recent" },
+    { value: "oldest", label: "Oldest" },
+    { value: "mostLikedAllTime", label: "Most Liked All Time" },
+    { value: "mostLikedMonth", label: "Most Liked Month" },
+    { value: "mostLikedWeek", label: "Most Liked Week" }
 ];
-const PostPage = () => {
+const PostPage = ({ posts, currentUserID }: { posts: Poster[], currentUserID: string }) => {
+    console.log("PostPage received posts:", posts);
+    console.log("PostPage received currentUserID:", currentUserID);
     return (
         <div className="mt-3">
             <div className="mb-3">
                 <DropDownRole options={options} placeholder="Filtering" width="w-xs"></DropDownRole>
             </div>
-            {Posts.length === 0 ? (<p>No users found</p>) : (
+            {posts.length === 0 ? (<p>No posts found for this user.</p>) : ( // Use 'posts' here
                 <ul className="space-y-4">
-                    {Posts.map((Posts) => (
-                        <DisplayPostComponent key={Posts.postID} posterName={Posts.posterName}
-                            daysSincePosted={Posts.daysSincePosted}
-                            content={Posts.content}
-                            likes={Posts.likes}
-                            comments={Posts.comments}
-                            recipient="ICPEP" />
+                    {posts.map((post) => ( // Use 'post' as the iteration variable
+                        <DisplayPostComponent
+                            key={post.postID}
+                            postID={post.postID}
+                            posterName={post.posterName}
+                            avatarSrc={post.posterPictureUrl}
+                            title={post.title}
+                            imageSrc={post.imageSrc}
+                            posterUserID={post.posterUserID}
+                            daysSincePosted={post.daysSincePosted}
+                            content={post.content}
+                            likes={post.likes}
+                            comments={post.comments}
+                            recipient={post.recipient} 
+                            currentUserID={currentUserID}
+                            posterID="might_remove"
+                        />
                     ))}
                 </ul>
             )}
@@ -190,34 +157,20 @@ export const Comments: Commenter[] = [
 ];
 
 const CommentPage = () => {
-    return (
-        <div className="mt-3">
-            {Posts.length === 0 ? (<p>No users found</p>) : (
-                <ul className="space-y-4">
-                    {Comments.map((Comments) => (
-                        <CommentToOrgCard key={Comments.commentID}
-                            commenterName={Comments.commenterName}
-                            daysSinceCommented={Comments.daysSinceCommented}
-                            replyText={Comments.content}
-                            postTitle={Comments.postTitle}
-                            postOrg={Comments.organizationPosted} />
-                    ))}
-                </ul>
-            )}
-        </div>
-    );
+
 }
 
 
-export default function StudentProfileCard({ className, myButtons, selectedButtonId, onButtonSelect, studentId, studentCourse, studentEmail, studentYear, studentJoinDate, studentEventsJoined, studentTotalOrg }: Props) {
+export default function StudentProfileCard({ className, myButtons, currentUserID, selectedButtonId, posts, onButtonSelect, studentId, studentCourse, studentEmail, studentYear, studentJoinDate, studentEventsJoined, studentTotalOrg }: Props) {
     const combinedClassName = `flex flex-col ${className || ''}`;
-
+    console.log("StudentProfileCard received posts:", posts);
+    
+    console.log("StudentProfileCard received currentUserID:", currentUserID);
     return (
         <div className={combinedClassName}>
             <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect}></HorizontalNavBar>
             {selectedButtonId === "about" && <AboutPage studentId={studentId} studentCourse={studentCourse} studentEmail={studentEmail} studentYear={studentYear} studentJoinDate={studentJoinDate} studentEventsJoined={studentEventsJoined} studentTotalOrg={studentTotalOrg} />}
-            {selectedButtonId === "post" && <PostPage></PostPage>}
-            {selectedButtonId === "comment" && <CommentPage></CommentPage>}
+            {selectedButtonId === "post" && <PostPage posts={posts} currentUserID={currentUserID}></PostPage>}
         </div>
     );
 }

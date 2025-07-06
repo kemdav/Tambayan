@@ -5,7 +5,6 @@ import { ButtonConfig } from '../button-type';
 import { DisplayPostComponent } from '../display-post-component';
 import { UpcomingEventComponent } from '../upcoming-event-component';
 import HorizontalNavBar from '../horizontal-navigation-bar-component';
-import ContentManagementComponent from '../content-management-components/all-combined';
 
 interface Props {
     className?: string;
@@ -15,51 +14,7 @@ interface Props {
 }
 
 export const OfficalPosts: Poster[] = [
-    {
-        postID:"1942",
-        posterName:"ICPEP",
-         posterID:"123456787",
-        daysSincePosted:3,
-        content:"This is my fifth post",
-        likes:3,
-        comments:3,
-    },
-    {
-        postID:"2343",
-        posterName:"CE",
-         posterID:"123456787",
-        daysSincePosted:4,
-        content:"This is my fourth post",
-        likes:3,
-        comments:3,
-    },
-    {
-        postID:"5742",
-         posterID:"123456787",
-        posterName:"DOST",
-        daysSincePosted:6,
-        content:"This is my third post",
-        likes:3,
-        comments:3,
-    },
-    {
-        postID:"2341",
-         posterID:"123456787",
-        posterName:"SSG",
-        daysSincePosted:8,
-        content:"This is my second post",
-        likes:3,
-        comments:3,
-    },
-    {
-        postID:"572142",
-         posterID:"123456787",
-        posterName:"Honor Society",
-        daysSincePosted:10,
-        content:"This is my first post",
-        likes:3,
-        comments:3,
-    }
+
   ];
 
 
@@ -83,89 +38,20 @@ const OfficialPostPage = () => {
 
 
 export const CommunityPost: Poster[] = [
-    {
-        postID:"1942",
-        posterID:"123456787",
-        posterName:"Excel Duran",
-        daysSincePosted:3,
-        content:"This is my fifth post",
-        likes:3,
-        comments:3,
-    },
-    {
-        postID:"2343",
-         posterID:"123456787",
-        posterName:"Kem David",
-        daysSincePosted:4,
-        content:"This is my fourth post",
-        likes:3,
-        comments:3,
-    },
-    {
-        postID:"5742",
-         posterID:"123456787",
-        posterName:"Gihun",
-        daysSincePosted:6,
-        content:"This is my third post",
-        likes:3,
-        comments:3,
-    },
-    {
-        postID:"2341",
-         posterID:"123456787",
-        posterName:"Steve",
-        daysSincePosted:8,
-        content:"This is my second post",
-        likes:3,
-        comments:3,
-    },
-    {
-        postID:"572142",
-         posterID:"123456787",
-        posterName:"Monkey D. Luffy",
-        daysSincePosted:10,
-        content:"This is my first post",
-        likes:3,
-        comments:3,
-    }
+
   ];
 
 
 const ContentMagementPage = ( ) => {
     const router = useRouter();
     return (
-         <div className="mt-3">
-            <table className='table-auto'>
-                <thead>
-                    <tr>
-                        <th>Song</th>
-                        <th>Song</th>
-                        <th>Song</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>a</td>
-                        <td>a</td>
-                        <td>a</td>
-                    </tr>
-
-                    <tr>
-                        <td>b</td>
-                        <td>b</td>
-                        <td>b</td>
-                    </tr>
-
-                    <tr>
-                        <td>c</td>
-                         <td>c</td>
-                          <td>c</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div className="mt-3">
+            <ContentMagementPage></ContentMagementPage>
         </div>
     );
 }
+
+
 
 
 
@@ -176,6 +62,7 @@ export default function OfficersCard({ className, myButtons, selectedButtonId, o
     return (
         <div className={combinedClassName}>
             <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect}></HorizontalNavBar>
+            {selectedButtonId === "member" && <OfficialPostPage></OfficialPostPage>}
             {selectedButtonId === "content" && <ContentMagementPage></ContentMagementPage>}
         </div>
     );
