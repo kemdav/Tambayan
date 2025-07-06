@@ -5,7 +5,10 @@ import { Input } from "@/app/components/ui/general/input/input";
 import { AvatarIcon } from "@/app/components/ui/general/avatar-icon-component";
 import { DropdownStatus } from "@/app/components/ui/general/dropdown/dropdown-status";
 import { Button } from "@/app/components/ui/general/button";
-import { createClient } from "@/lib/supabase/client";
+import {
+  getTeacherProfile,
+  updateTeacherProfile,
+} from "@/lib/actions/settings-admin";
 
 const departmentOptions = [
   { value: "student-affairs", label: "Student Affairs" },
@@ -24,27 +27,18 @@ export default function SettingAdminView() {
   const [isSaving, setIsSaving] = useState(false);
 
   const teacherId = 2;
-  const supabase = createClient();
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data, error } = await supabase
-        .from("staff")
-        .select("*")
-        .eq("teacherid", teacherId)
-        .single();
-
-      if (error) {
-        console.error("Fetch error:", error.message);
-        return;
-      }
-
-      if (data) {
+      try {
+        const data = await getTeacherProfile(teacherId);
         setFullName(data.fullname || "");
         setEmail(data.email || "");
         setPosition(data.position || "");
         setDepartment(data.department || departmentOptions[0].value);
         setProfilePic(data.profile || null);
+      } catch (err: any) {
+        console.error("Failed to fetch profile:", err.message);
       }
     };
 
@@ -61,25 +55,20 @@ export default function SettingAdminView() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    const { error } = await supabase
-      .from("staff")
-      .update({
+    try {
+      await updateTeacherProfile(teacherId, {
         fullname: fullName,
         email,
         position,
         department,
         profile: profilePic || "",
-      })
-      .eq("teacherid", teacherId);
-
-    setIsSaving(false);
-
-    if (error) {
-      console.error("Update error:", error.message);
-      alert("Failed to save changes.");
-    } else {
+      });
       alert("Changes saved!");
+    } catch (err: any) {
+      console.error("Update error:", err.message);
+      alert("Failed to save changes.");
     }
+    setIsSaving(false);
   };
 
   const handleCancel = () => {
