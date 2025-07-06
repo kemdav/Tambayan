@@ -32,7 +32,7 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
   }, [search, organizations]); // Dependency array is now correct
 
   // 4. THE ACTION HANDLER: This logic was already correct.
-  const handleJoinClick = async (orgID: string) => {
+  const handleSubscribeClick = async (orgID: string) => {
     setIsLoading(orgID);
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -48,21 +48,21 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
       if (profileError || !studentProfile) throw new Error("Could not find student profile.");
       
       const { error: insertError } = await supabase
-        .from('orgmember')
-        .insert({ orgid: orgID, studentid: studentProfile.studentid, position: 'Member' });
+        .from('subscribedorg')
+        .insert({ orgid: orgID, studentid: studentProfile.studentid })
       if (insertError) throw insertError;
       
       // This correctly updates the state, which will now trigger a re-render
       setOrganizations(currentOrgs =>
         currentOrgs.map(org =>
           org.orgID === orgID
-            ? { ...org, joinLabel: "Joined", joinDisabled: true }
+            ? { ...org, joinLabel: "Subscribed", joinDisabled: true }
             : org
         )
       );
-      console.log(`Successfully joined organization ${orgID}`);
+      console.log(`Successfully subscribed to organization ${orgID}`);
     } catch (error) {
-      console.error("Error joining organization:", error);
+      console.error("Error subscribing organization:", error);
     } finally {
       setIsLoading(null);
     }
@@ -88,9 +88,9 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
             <OrgRecruitCard
               {...orgProps}
               onView={() => console.log("View clicked", orgProps.orgID)}
-              onJoin={() => handleJoinClick(orgProps.orgID)}
+              onJoin={() => handleSubscribeClick(orgProps.orgID)}
               joinDisabled={orgProps.joinDisabled || isLoading === orgProps.orgID}
-              joinLabel={isLoading === orgProps.orgID ? "Joining..." : orgProps.joinLabel}
+              joinLabel={isLoading === orgProps.orgID ? "Subscribing..." : orgProps.joinLabel}
             />
           </div>
         ))}

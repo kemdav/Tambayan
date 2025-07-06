@@ -100,7 +100,7 @@ export default function StudentVerticalNavigation({ children }: Props) {
 
       // --- THIS IS THE NEW, SIMPLIFIED LOGIC ---
       // Make a single call to our new RPC function.
-      const { data, error } = await supabase.rpc('get_user_org_options');
+       const { data, error } = await supabase.rpc('get_user_subscribed_org_options');
 
       if (error) {
         console.error("Error fetching organization options:", error);

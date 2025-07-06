@@ -9,8 +9,8 @@ import { OrgRecruitCardProps } from "@/app/components/ui/general/org-recruit-car
 // Interface for the base organization data
 interface Organization {
   orgid: string;
-  orgname: string;
-  status: string;
+  orgname: string | null; // <-- Allow null
+  status: string | null;  // <-- Allow null
   picture: string | null;
   cover_photo_path: string | null;
 }
@@ -44,6 +44,17 @@ export default async function JoinOrganizationPage() {
     console.error("Student Profile Error:", profileError);
     return <div>Error: Student profile not found.</div>;
   }
+
+    if (!studentProfile.universityid) {
+    // This student isn't associated with a university, so they can't join any orgs.
+    console.warn("Student profile is missing a universityid.");
+    // Return an empty state or a message.
+    return (
+        <div className="container mx-auto py-8">
+            <p>Your profile is not yet associated with a university. Please contact support.</p>
+        </div>
+    );
+  }
   
   const { data: orgIdObjects, error: orgIdError } = await supabase.from('organizations').select('orgid').eq('universityid', studentProfile.universityid);
   if (orgIdError) {
@@ -53,7 +64,7 @@ export default async function JoinOrganizationPage() {
   const orgIds = orgIdObjects.map(o => o.orgid);
 
   // Parallel Data Fetching for Performance
-  const [orgsResult, memberCountsResult, eventCountsResult, joinedOrgsResult] = await Promise.all([
+  const [orgsResult, memberCountsResult, eventCountsResult, subscribedOrgsResult] = await Promise.all([
     // 1. Get base organizations
     supabase
       .from("organizations")
@@ -74,7 +85,7 @@ export default async function JoinOrganizationPage() {
 
     // 4. Get orgs the student has joined
     supabase
-      .from("orgmember")
+      .from("subscribedorg")
       .select("orgid")
       .eq("studentid", studentProfile.studentid),
   ]);
@@ -82,10 +93,10 @@ export default async function JoinOrganizationPage() {
   const { data: orgsData, error: orgsError } = orgsResult;
   const { data: memberCountsData, error: memberCountsError } = memberCountsResult;
   const { data: eventCountsData, error: eventCountsError } = eventCountsResult;
-  const { data: joinedOrgsData, error: joinedOrgsError } = joinedOrgsResult;
+  const { data: subscribedOrgsData, error: subscribedOrgsError } = subscribedOrgsResult;
   
-  if (orgsError || memberCountsError || eventCountsError || joinedOrgsError) {
-    console.error("Data Fetching Errors:", { orgsError, memberCountsError, eventCountsError, joinedOrgsError });
+  if (orgsError || memberCountsError || eventCountsError || subscribedOrgsError) {
+    console.error("Data Fetching Errors:", { orgsError, memberCountsError, eventCountsError, subscribedOrgsError });
     return <div>Error fetching organization data.</div>;
   }
 
@@ -94,25 +105,26 @@ export default async function JoinOrganizationPage() {
   // CORRECTED LOGIC: Access the count via the table name property.
   const memberCountsMap = new Map(memberCountsData.map((item: MemberCountData) => [item.orgid, item.orgmember[0]?.count ?? 0]));
   const eventCountsMap = new Map(eventCountsData.map((item: EventCountData) => [item.orgid, item.events[0]?.count ?? 0]));
-  const joinedOrgIds = new Set(joinedOrgsData.map((m: { orgid: string }) => m.orgid));
+  const subscribedOrgIds = new Set(subscribedOrgsData.map((m: { orgid: string }) => m.orgid));
 
+  
   // Transform the data, looking up counts from the Maps
   const transformedOrgs: OrgRecruitCardProps[] = orgsData.map((org: Organization) => {
-    const hasJoined = joinedOrgIds.has(org.orgid);
+    const hasSubscribed = subscribedOrgIds.has(org.orgid);
 
     return {
       orgID: org.orgid,
-      title: org.orgname,
+      title: org.orgname  || "Untitled Organization",
       subtitle: "University Organization",
       memberCount: memberCountsMap.get(org.orgid) || 0,
       eventCount: eventCountsMap.get(org.orgid) || 0,
       avatarUrl: org.picture ? supabase.storage.from("organization-assets").getPublicUrl(org.picture).data.publicUrl : undefined,
       coverPhotoUrl: org.cover_photo_path ? supabase.storage.from("organization-assets").getPublicUrl(org.cover_photo_path).data.publicUrl : undefined,
-      tagText: org.status === 'active' ? 'Active' : 'Inactive',
+       tagText: org.status === 'active' ? 'Active' : 'Inactive', 
       tagBgColor: org.status === 'active' ? 'bg-green-100' : 'bg-red-100',
       tagTextColor: org.status === 'active' ? 'text-green-800' : 'text-red-800',
-      joinLabel: hasJoined ? "Joined" : "Join",
-      joinDisabled: hasJoined,
+      joinLabel: hasSubscribed ? "Joined" : "Join",
+      joinDisabled: hasSubscribed,
     };
   });
 
