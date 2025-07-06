@@ -10,6 +10,8 @@ import { useState } from "react";
 import { UpcomingEventComponent } from "../general/upcoming-event-component";
 import UpcomingorgEventComponent from "../general/upcomingorg-event-component";
 import DropDownRole from "../general/dropdown/dropdown-role";
+import { StudentComment } from "@/lib/actions/comment";
+import StudentCommentCard from "./studdent-comment-card";
 
 
 interface Props extends studentProps {
@@ -19,6 +21,7 @@ interface Props extends studentProps {
     posts: Poster[];
     onButtonSelect: (id: string) => void;
     currentUserID: string;
+     initialComments: StudentComment[];
 }
 
 interface studentProps {
@@ -93,6 +96,7 @@ const PostPage = ({ posts, currentUserID }: { posts: Poster[], currentUserID: st
                             likes={post.likes}
                             comments={post.comments}
                             recipient={post.recipient} 
+                            initialHasLiked={post.initialHasLiked}
                             currentUserID={currentUserID}
                             posterID="might_remove"
                         />
@@ -103,74 +107,38 @@ const PostPage = ({ posts, currentUserID }: { posts: Poster[], currentUserID: st
     );
 }
 
-export const Comments: Commenter[] = [
-    {
-        commentID: "1942",
-        postTitle: "This is a test.",
-        organizationPosted: "ICPEP",
-        commenterName: "Excel Duran",
-        daysSinceCommented: 3,
-        content: "This is my fifth comment",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        commentID: "2343",
-        postTitle: "This is a test.",
-        organizationPosted: "ICPEP",
-        commenterName: "Excel Duran",
-        daysSinceCommented: 4,
-        content: "This is my fourth comment",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        commentID: "5742",
-        postTitle: "This is a test.",
-        organizationPosted: "ICPEP",
-        commenterName: "Excel Duran",
-        daysSinceCommented: 6,
-        content: "This is my third comment",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        commentID: "2341",
-        postTitle: "This is a test.",
-        organizationPosted: "ICPEP",
-        commenterName: "Excel Duran",
-        daysSinceCommented: 8,
-        content: "This is my second comment",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        commentID: "572142",
-        postTitle: "This is a test.",
-        organizationPosted: "ICPEP",
-        commenterName: "Excel Duran",
-        daysSinceCommented: 10,
-        content: "This is my first comment",
-        likes: 3,
-        comments: 3,
-    }
-];
-
-const CommentPage = () => {
-
+const CommentPage = ({ comments }: { comments: StudentComment[] }) => {
+    
+    return (
+        <div className="mt-3">
+            {comments.length === 0 ? (
+                <p>You have not made any comments yet.</p>
+            ) : (
+                <ul className="space-y-4">
+                    {comments.map((comment, i) => (
+                        <li key={i}>
+                            <StudentCommentCard comment={comment} />
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
 }
 
 
-export default function StudentProfileCard({ className, myButtons, currentUserID, selectedButtonId, posts, onButtonSelect, studentId, studentCourse, studentEmail, studentYear, studentJoinDate, studentEventsJoined, studentTotalOrg }: Props) {
+export default function StudentProfileCard({ className, myButtons,initialComments, currentUserID, selectedButtonId, posts, onButtonSelect, studentId, studentCourse, studentEmail, studentYear, studentJoinDate, studentEventsJoined, studentTotalOrg }: Props) {
     const combinedClassName = `flex flex-col ${className || ''}`;
     console.log("StudentProfileCard received posts:", posts);
     
     console.log("StudentProfileCard received currentUserID:", currentUserID);
+    console.log("COMMENT PAGE COMMENT STUDENT PROFILE CARD=", initialComments);
     return (
         <div className={combinedClassName}>
             <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect}></HorizontalNavBar>
             {selectedButtonId === "about" && <AboutPage studentId={studentId} studentCourse={studentCourse} studentEmail={studentEmail} studentYear={studentYear} studentJoinDate={studentJoinDate} studentEventsJoined={studentEventsJoined} studentTotalOrg={studentTotalOrg} />}
             {selectedButtonId === "post" && <PostPage posts={posts} currentUserID={currentUserID}></PostPage>}
+             {selectedButtonId === "comment" && <CommentPage comments={initialComments} />}
         </div>
     );
 }

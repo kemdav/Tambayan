@@ -19,9 +19,9 @@ export const myButtons: ButtonConfig[] = [
     },
     {
         id: "newsfeed",
-      children: "Officers",
+      children: "Newsfeed",
       variant: "sideNavigation",
-      href:"officers",
+      href:"newsfeed",
       className:
         "sideNavBarButtonText",
       icon: <NewsfeedIcon className="size-10" />,

@@ -9,17 +9,20 @@ import { ProfileViewNavBarContents } from "../../navBars/navBarContents";
 import { type StudentProfile } from "@/lib/types/database";
 import { createClient } from "@/lib/supabase/client";
 import { type Poster } from "@/lib/types/types";
+import { StudentComment } from '@/lib/actions/comment';
 
 // Define the props that this component will receive
 interface ProfileViewProps {
   initialProfile: StudentProfile;
   initialPosts: Poster[];
   currentUserID: string;
+  initialComments: StudentComment[];
 }
 
-export default function ProfileView({ initialProfile, initialPosts, currentUserID }: ProfileViewProps) {
+export default function ProfileView({ initialProfile, initialPosts, currentUserID, initialComments }: ProfileViewProps) {
   console.log("ProfileView received initialPosts:", initialPosts);
     console.log("ProfileView received currentUserID:", currentUserID);
+    console.log("COMMENT PAGE COMMENT 2=", initialComments);
   // All your hooks and state management live here!
   const [profile, setProfile] = useState<StudentProfile>(initialProfile);
   const [selectedNavId, setSelectedNavId] = useState<string>("post");
@@ -64,6 +67,7 @@ export default function ProfileView({ initialProfile, initialPosts, currentUserI
             studentTotalOrg="3"
             currentUserID={currentUserID}
             posts={initialPosts}
+            initialComments={initialComments}
           ></StudentProfileCard>
         </div>
       </main>
