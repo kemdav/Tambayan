@@ -93,6 +93,7 @@ const PostPage = ({ posts, currentUserID }: { posts: Poster[], currentUserID: st
                             likes={post.likes}
                             comments={post.comments}
                             recipient={post.recipient} 
+                            initialHasLiked={post.initialHasLiked}
                             currentUserID={currentUserID}
                             posterID="might_remove"
                         />

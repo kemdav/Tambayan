@@ -11,6 +11,7 @@ export interface Poster {
     content: string;
     likes: number;
     comments: number;
+    initialHasLiked?: boolean;
 }
 
 export interface Commenter {

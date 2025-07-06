@@ -13,6 +13,7 @@ import { FormattableInput } from "./input/FormattableInput";
 import { CreatePostComponent } from "./create-post-component";
 import { DateTimePicker } from "./date-picker/date-picker-component";
 import { deletePost, updatePost } from "@/lib/actions/post";
+import { togglePostLike } from "@/lib/actions/like";
 
 interface DisplayPostComponentProps {
   posterName: string;
@@ -28,7 +29,7 @@ interface DisplayPostComponentProps {
   likes: number;
   comments: number;
   tags?: string[];
-
+  initialHasLiked?: boolean;
   posterID: string;
   onLike?: () => void;
   onComment?: () => void;
@@ -76,6 +77,8 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   isDetailed = false,
   eventLocation,
   eventDate,
+  likes: initialLikes,
+    initialHasLiked = false,
   registrationPeriod,
   onAvatarClicked,
 }) => {
@@ -114,14 +117,17 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   const [displayEventLocation, setDisplayEventLocation] = useState(eventLocation || "");
   const [editImagePreview, setEditImagePreview] = useState(initialImageSrc || "");
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
+  const [likeCount, setLikeCount] = useState(initialLikes);
+    const [hasLiked, setHasLiked] = useState(initialHasLiked);
+    const [isLikeSubmitting, setIsLikeSubmitting] = useState(false);
 
 
 
-  console.log(`--- Post ID: ${postID} ---`);
-  console.log(`currentUserID:`, currentUserID, `(${typeof currentUserID})`);
-  console.log(`posterUserID:`, posterUserID, `(${typeof posterUserID})`);
-  console.log(`Are they equal?`, currentUserID === posterUserID);
-  console.log(`canEditOrDelete:`, canEditOrDelete);
+  //console.log(`--- Post ID: ${postID} ---`);
+  //console.log(`currentUserID:`, currentUserID, `(${typeof currentUserID})`);
+  //console.log(`posterUserID:`, posterUserID, `(${typeof posterUserID})`);
+  //console.log(`Are they equal?`, currentUserID === posterUserID);
+  //console.log(`canEditOrDelete:`, canEditOrDelete);
 
   React.useEffect(() => {
     if (editPhoto) {
@@ -150,6 +156,25 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
       setShowDeleteConfirm(false);
     }
   };
+
+  const handleLike = async () => {
+        if (isLikeSubmitting) return;
+        setIsLikeSubmitting(true);
+
+        // Optimistic UI Update: Update the UI immediately for a snappy feel
+        setHasLiked(!hasLiked);
+        setLikeCount(hasLiked ? likeCount - 1 : likeCount + 1);
+
+        const result = await togglePostLike(Number(postID), hasLiked);
+
+        // If the server fails, revert the optimistic update
+        if (result.error) {
+            alert(result.error);
+            setHasLiked(hasLiked); // Revert to original state
+            setLikeCount(likeCount); // Revert to original count
+        }
+        setIsLikeSubmitting(false);
+    };
 
   const handleSaveChanges = async () => {
     setIsSubmitting(true);
@@ -280,8 +305,10 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
           </div>
         )}
         <div className="flex items-center gap-4 mt-2">
-          <Button className="flex items-center gap-1 px-2 py-1 text-xs" onClick={onLike}>
-            <LikeIcon className="w-4 h-4" /> {likes}
+          <Button className="flex items-center gap-1 px-2 py-1 text-xs"
+                onClick={handleLike}
+                disabled={isLikeSubmitting}>
+            <LikeIcon className="w-4 h-4" /> {likeCount}
           </Button>
           <Button className="flex items-center gap-1 px-2 py-1 text-xs" onClick={() => setShowComment(true)}>
             <CommentIcon className="w-4 h-4" /> {comments}
