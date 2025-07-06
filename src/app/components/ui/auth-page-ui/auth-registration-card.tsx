@@ -64,7 +64,7 @@ export default function AuthRegCard({
   onLogin,
 }: AuthRegCardProps) {
   return (
-    <div className="card w-100 lg:w-130 h-150 p-5 lg:p-10 overflow-auto">
+    <div className="card w-100 lg:w-130 h-150 p-5 lg:p-10 overflow-auto lg:overflow-visible">
       <div className="flex flex-col justify-center items-center mb-5">
         <h1 className="responsiveCardHeading mb-2">Student Registration</h1>
         <p className="textAuthResponsive text-sm">
@@ -130,23 +130,24 @@ export default function AuthRegCard({
           </div>
         </div>
 
-        <div className="flex lg:mt-3 gap-3">
-          <div className="">
+        <div className="flex flex-col lg:flex-row lg:mt-3 gap-3">
+          <div className="w-full">
             <p className="textAuthResponsive">Year Level</p>
             <DropdownRole
               options={yearOptions}
               onSelect={onYearChange}
               placeholder="Choose Year"
+              width="w-full"
             />
           </div>
 
-          <div className="grow">
+          <div className="w-full lg:max-w-[280px]">
             <p className="textAuthResponsive">Course</p>
             <DropdownRole
               options={courseOptions}
-              width="w-full lg:max-w-[280px]"
               onSelect={onCourseChange}
               placeholder="Choose Course"
+              width="w-full"
             />
           </div>
         </div>
