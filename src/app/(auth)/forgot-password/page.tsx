@@ -1,6 +1,6 @@
 "use client";
 import AuthEnterEmailCard from "@/app/components/ui/auth-page-ui/auth-enter-email-card";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -13,6 +13,7 @@ export default function ForgotPasswordPage() {
   const handleReset = async () => {
     setLoading(true);
     setError(null);
+    const supabase = createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     setLoading(false);
     if (error) {

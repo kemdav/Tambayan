@@ -31,21 +31,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center">
-      <AuthLoginCard
-        email={email}
-        password={password}
-        rememberMe={rememberMe}
-        loading={loading}
-        error={error}
-        onEmailChange={e => setEmail(e.target.value)}
-        onPasswordChange={e => setPassword(e.target.value)}
-        onRememberMeChange={e => setRememberMe(e.target.checked)}
-        // Here we pass our corrected handleLogin function
-        onSubmit={handleLogin}
-        onForgotPassword={() => router.push("/forgot-password")}
-        onSignUp={() => router.push("/register")}
-      />
+    <div className="min-h-screen flex items-center justify-center bg-transparent">
+      <div className="flex items-center justify-center w-full">
+        <AuthLoginCard
+          email={email}
+          password={password}
+          rememberMe={rememberMe}
+          loading={loading}
+          error={error}
+          onEmailChange={e => setEmail(e.target.value)}
+          onPasswordChange={e => setPassword(e.target.value)}
+          onRememberMeChange={e => setRememberMe(e.target.checked)}
+          onSubmit={handleLogin}
+          onForgotPassword={() => router.push("/forgot-password")}
+          onSignUp={() => router.push("/register")}
+        />
+      </div>
     </div>
   );
 }
