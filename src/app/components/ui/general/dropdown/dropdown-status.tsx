@@ -44,6 +44,9 @@ interface DropdownStatusProps {
   dropdownHoverTextColor?: string;
   dropdownHoverBgColor?: string;
   dropdownActiveBgColor?: string;
+
+  value?: Option | null;
+  onChange?: (selected: Option) => void;
 }
 
 export function DropdownStatus({
@@ -67,11 +70,16 @@ export function DropdownStatus({
   dropdownHoverTextColor = "hover:text-neutral-pure-white",
   dropdownHoverBgColor = "hover:bg-action-seafoam-green",
   dropdownActiveBgColor = "active:bg-action-moss-green",
+
+  value,
+  onChange,
 }: DropdownStatusProps) {
   const [open, setOpen] = React.useState(false);
-  const [selectedOption, setSelectedOption] = React.useState<Option | null>(
+  const isControlled = value !== undefined;
+  const [internalSelected, setInternalSelected] = React.useState<Option | null>(
     null
   );
+  const selectedOption = isControlled ? value : internalSelected;
 
   return (
     <div className="flex items-center space-x-4">
@@ -111,6 +119,9 @@ export function DropdownStatus({
           align="start"
         >
           <Command>
+            <CommandInput
+              placeholder={`Search ${placeholder.toLowerCase()}...`}
+            />
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup>
@@ -119,9 +130,10 @@ export function DropdownStatus({
                     key={option.value}
                     value={option.value}
                     onSelect={(value: string) => {
-                      setSelectedOption(
-                        options.find((o) => o.value === value) || null
-                      );
+                      const selected =
+                        options.find((o) => o.value === value) || null;
+                      if (!isControlled) setInternalSelected(selected);
+                      if (onChange && selected) onChange(selected);
                       setOpen(false);
                     }}
                     className={cn(

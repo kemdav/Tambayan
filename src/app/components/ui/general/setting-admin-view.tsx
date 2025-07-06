@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/app/components/ui/general/input/input";
 import { AvatarIcon } from "@/app/components/ui/general/avatar-icon-component";
 import { DropdownStatus } from "@/app/components/ui/general/dropdown/dropdown-status";
 import { Button } from "@/app/components/ui/general/button";
+import { createClient } from "@/lib/supabase/client";
 
 const departmentOptions = [
   { value: "student-affairs", label: "Student Affairs" },
@@ -15,14 +16,40 @@ const departmentOptions = [
 ];
 
 export default function SettingAdminView() {
-  const [profilePic, setProfilePic] = useState<string | null>(
-    "https://randomuser.me/api/portraits/women/44.jpg"
-  );
-  const [fullName, setFullName] = useState("Admin User");
-  const [email, setEmail] = useState("admin@university.edu");
-  const [position, setPosition] = useState("School Administrator");
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [position, setPosition] = useState("");
   const [department, setDepartment] = useState(departmentOptions[0].value);
   const [isSaving, setIsSaving] = useState(false);
+
+  const teacherId = 2;
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data, error } = await supabase
+        .from("staff")
+        .select("*")
+        .eq("teacherid", teacherId)
+        .single();
+
+      if (error) {
+        console.error("Fetch error:", error.message);
+        return;
+      }
+
+      if (data) {
+        setFullName(data.fullname || "");
+        setEmail(data.email || "");
+        setPosition(data.position || "");
+        setDepartment(data.department || departmentOptions[0].value);
+        setProfilePic(data.profile || null);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleImageChange = (file: File) => {
     const reader = new FileReader();
@@ -32,132 +59,123 @@ export default function SettingAdminView() {
     reader.readAsDataURL(file);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
+    const { error } = await supabase
+      .from("staff")
+      .update({
+        fullname: fullName,
+        email,
+        position,
+        department,
+        profile: profilePic || "",
+      })
+      .eq("teacherid", teacherId);
+
+    setIsSaving(false);
+
+    if (error) {
+      console.error("Update error:", error.message);
+      alert("Failed to save changes.");
+    } else {
       alert("Changes saved!");
-    }, 1000);
+    }
   };
 
   const handleCancel = () => {
-    setFullName("Admin User");
-    setEmail("admin@university.edu");
-    setPosition("School Administrator");
-    setDepartment(departmentOptions[0].value);
-    setProfilePic("https://randomuser.me/api/portraits/women/44.jpg");
+    window.location.reload();
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <div
-        className="card bg-white shadow-2xl flex justify-center transition-shadow duration-300 hover:shadow-[0_8px_32px_0_rgba(102,122,107,0.15)] w-full max-w-[629px] h-auto"
-        style={{
-          border: "2px solid #667A6B",
-          borderRadius: 15,
-        }}
-      >
-        <div
-          className="w-full px-4 py-6 sm:px-8 sm:py-8 flex flex-col font-sans text-[#2d3a2e]"
-          style={{ minHeight: "100%" }}
-        >
-          <h2 className="text-[22px] sm:text-[26px] font-bold mb-2 text-left tracking-tight mt-2">
-            Account Settings
-          </h2>
+      <div className="card bg-white shadow-2xl w-full max-w-[629px] rounded-[15px] border-[2px] border-[#667A6B]">
+        <div className="w-full px-4 py-6 sm:px-8 sm:py-8 text-[#2d3a2e]">
+          <h2 className="text-[26px] font-bold mb-2">Account Settings</h2>
           <div className="border-b border-[#e3e8e1] mb-8" />
-          <div className="flex flex-col items-start mb-8">
-            <span className="text-[16px] sm:text-[17px] font-semibold mb-3 text-left text-[#3d4d3a]">
-              Profile Picture
-            </span>
-            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 w-full">
+
+          <div className="mb-8">
+            <span className="font-semibold mb-3 block">Profile Picture</span>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
               <AvatarIcon
-                src={profilePic}
+                src={profilePic || ""}
                 isEditable
                 onImageChange={handleImageChange}
-                className="mb-2 h-20 w-20 rounded-full border border-[#e3e8e1] shadow-sm"
+                className="h-20 w-20 rounded-full border"
               />
               <Button
                 variant="outline"
                 size="sm"
-                className="mb-2 mt-0 bg-[#e6ede6] text-[#3d4d3a] font-semibold text-[15px] sm:text-[16px] px-5 sm:px-6 py-2 rounded-lg border border-[#bfcabf] shadow hover:bg-[#dbe7db] hover:text-[#2d3a2e] transition-colors duration-200"
+                className="bg-[#e6ede6] text-[#3d4d3a] px-6 py-2 rounded-lg border border-[#bfcabf] hover:bg-[#dbe7db]"
                 onClick={() => {
-                  if (document.querySelector('input[type="file"]')) {
-                    (
-                      document.querySelector(
-                        'input[type="file"]'
-                      ) as HTMLInputElement
-                    ).click();
-                  }
+                  const fileInput = document.querySelector(
+                    'input[type="file"]'
+                  ) as HTMLInputElement;
+                  if (fileInput) fileInput.click();
                 }}
               >
                 Change Photo
               </Button>
             </div>
           </div>
-          <div className="space-y-6 flex-1">
+
+          <div className="space-y-6">
             <div>
-              <label className="block text-[15px] sm:text-[16px] font-semibold mb-2 text-left text-[#3d4d3a]">
-                Full Name
-              </label>
+              <label className="font-semibold mb-2 block">Full Name</label>
               <Input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Full Name"
-                className="h-11 sm:h-12 text-[15px] sm:text-[16px] placeholder-[#bfcabf] border-[#667A6B] border-[1.5px] rounded-[8px] bg-transparent focus:border-[#7b8f87] focus:ring-2 focus:ring-[#7b8f87] transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-[15px] sm:text-[16px] font-semibold mb-2 text-left text-[#3d4d3a]">
-                Email Address
-              </label>
+              <label className="font-semibold mb-2 block">Email Address</label>
               <Input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email Address"
                 type="email"
-                className="h-11 sm:h-12 text-[15px] sm:text-[16px] placeholder-[#bfcabf] border-[#667A6B] border-[1.5px] rounded-[8px] bg-transparent focus:border-[#7b8f87] focus:ring-2 focus:ring-[#7b8f87] transition-all duration-200"
               />
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 w-full items-start">
+            <div className="flex flex-col sm:flex-row gap-4">
               <div className="w-full sm:w-1/2">
-                <label className="block text-[16px] font-semibold mb-2 text-left text-[#3d4d3a] leading-none">
-                  Position
-                </label>
+                <label className="font-semibold mb-2 block">Position</label>
                 <Input
                   value={position}
                   onChange={(e) => setPosition(e.target.value)}
                   placeholder="Position"
-                  className="h-12 w-full text-[16px] px-4 placeholder-[#bfcabf] border-[#667A6B] border-[1.5px] rounded-[8px] bg-transparent focus:border-[#7b8f87] focus:ring-2 focus:ring-[#7b8f87] transition-all duration-200"
                 />
               </div>
               <div className="w-full sm:w-1/2">
-                <label className="block text-[16px] font-semibold mb-2 text-left text-[#3d4d3a] leading-none">
-                  Department
-                </label>
+                <label className="font-semibold mb-2 block">Department</label>
                 <DropdownStatus
-                  label=""
                   options={departmentOptions}
-                  placeholder="Select Department"
-                  widthbutton="h-12 w-full text-[16px] px-4 border border-[#667A6B] border-[1.5px] rounded-[8px] bg-transparent focus-visible:border-[#7b8f87] focus-visible:ring-2 focus-visible:ring-[#7b8f87] shadow-none placeholder-[#bfcabf] transition-all duration-200"
+                  value={
+                    departmentOptions.find((d) => d.value === department) ||
+                    null
+                  }
+                  onChange={(selected) => setDepartment(selected.value)}
+                  placeholder="Department"
+                  widthbutton="h-12 w-full"
                   widthdropdown="w-full"
                 />
               </div>
             </div>
           </div>
+
           <div className="border-t border-[#e3e8e1] mt-10 mb-6" />
-          <div className="flex flex-col sm:flex-row justify-end gap-4 mt-2">
+          <div className="flex justify-end gap-4">
             <Button
               variant="outline"
               onClick={handleCancel}
               disabled={isSaving}
-              className="px-8 py-2 bg-[#e6ede6] text-[#3d4d3a] font-semibold text-[15px] sm:text-[16px] rounded-lg border border-[#bfcabf] shadow hover:bg-[#dbe7db] hover:text-[#2d3a2e] transition-colors duration-200"
+              className="px-8 py-2 bg-[#e6ede6] text-[#3d4d3a] rounded-lg border border-[#bfcabf]"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-8 py-2 bg-[#7b8f87] text-white font-semibold text-[15px] sm:text-[16px] rounded-lg border-none shadow hover:bg-[#5e7263] transition-colors duration-200"
+              className="px-8 py-2 bg-[#7b8f87] text-white rounded-lg"
             >
               {isSaving ? "Saving..." : "Save Changes"}
             </Button>
