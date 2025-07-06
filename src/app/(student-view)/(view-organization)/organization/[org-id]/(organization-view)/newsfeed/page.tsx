@@ -1,26 +1,46 @@
-"use client";
+// app/.../newsfeed/page.tsx
 
-import StudentProfileCard from "@/app/components/ui/student-view-ui/student-profile-card";
-import StudentProfileHeader from "@/app/components/ui/student-view-ui/student-profile-header";
-import { useState } from "react";
-import StudentNewsfeedCard from "@/app/components/ui/student-view-ui/student-newsfeed-card";
-import { myButtons } from "./navBarContents";
-import StudentOrgNewsfeedCard from "@/app/components/ui/student-view-ui/student-org-newsfeed-card";
+import { getOrgPosts } from "@/lib/actions/post";
+import { getOrganizationProfile } from "@/lib/actions/organization";
+import OrganizationNewsfeedPageClient from "./organization-newsfeed-page-client";
+import { createClient } from "@/lib/supabase/server"; // To get current user
 
-export default function TagComponentTestPage() {
-    const [selectedNavId, setSelectedNavId] = useState<string>("official");
+interface NewsfeedPageProps {
+  params: { "org-id": string; };
+}
 
-  return (
-    <main className="w-full grid place-items-center items-start mt-10 md:mt-0">
-        <div className="h-auto w-full max-w-3xl shadow-lg/100 p-4">
-        <StudentProfileHeader isEditable={true} name="ICPEP"></StudentProfileHeader>
-            <StudentOrgNewsfeedCard className="h-1/2" 
-            myButtons={myButtons} 
-            selectedButtonId={selectedNavId}
-             onButtonSelect={setSelectedNavId}></StudentOrgNewsfeedCard>
-            
-        </div>
-        
-    </main>
-  );
-} 
+export default async function NewsfeedPage({ params }: NewsfeedPageProps) {
+    const orgId = params["org-id"];
+    const supabase = createClient(); // Server client
+
+    // Fetch current user to determine edit permissions
+    const { data: { user } } = await (await supabase).auth.getUser();
+
+    // Fetch organization profile
+    const organizationProfile = await getOrganizationProfile(orgId);
+
+    if (!organizationProfile) {
+        return <div>Organization not found.</div>;
+    }
+
+    // Determine if the current user can edit.
+    // Your logic here might be more complex (e.g., check if user is an org member with 'admin' role).
+    // For now, let's assume for simplicity that only a logged-in user can edit *any* profile.
+    // A better check would be:
+    // const { data: membership } = await supabase.from('orgmember').select().eq('orgid', orgId).eq('user_id', user.id).single();
+    // const canEdit = !!user && membership?.position === 'admin';
+    const canEdit = !!user; // Simple check for now.
+
+    // Fetch posts
+    const officialPosts = await getOrgPosts(orgId, true);
+    const communityPosts = await getOrgPosts(orgId, false);
+
+    return (
+        <OrganizationNewsfeedPageClient
+            initialOrganizationProfile={organizationProfile}
+            officialPosts={officialPosts}
+            communityPosts={communityPosts}
+            canEdit={canEdit}
+        />
+    );
+}

@@ -8,11 +8,11 @@ import { FormattableInput } from "./input/FormattableInput";
 import { TagComponent } from "./tag-component";
 import { DateTimePicker } from "@/app/components/ui/general/date-picker/date-picker-component";
 
-const orgOptions = [
-  { value: "icpep", label: "ICPEP" },
-  { value: "jpia", label: "JPIA" },
-  { value: "ces", label: "CES" },
-];
+type OrgOption = {
+  value: string;
+  label: string;
+};
+
 
 const postTypeOptions = [
   { value: "default", label: "Default" },
@@ -29,6 +29,7 @@ interface CreatePostComponentProps {
   onTitleChange: (title: string) => void;
   content: string;
   onContentChange: (content: string) => void;
+  orgOptions?: OrgOption[];
   onPost: () => void;
   // Default post fields
   tags?: string[];
@@ -50,11 +51,13 @@ interface CreatePostComponentProps {
   // Button text (optional)
   postButtonText?: string;
   isEditMode?: boolean;
+  isUserPosting?:boolean;
+  isSubmitting?: boolean;
 }
 
 export function CreatePostComponent({
   className = "",
-  postType,
+  postType = "default",
   onPostTypeChange,
   org,
   onOrgChange,
@@ -67,6 +70,8 @@ export function CreatePostComponent({
   tagInput = "",
   onTagInputChange,
   onAddTag,
+  orgOptions = [],
+  isSubmitting = false,
   onRemoveTag,
   photoFile = null,
   onPhotoChange,
@@ -80,11 +85,12 @@ export function CreatePostComponent({
   onRegistrationEndChange,
   postButtonText = "Post",
   isEditMode = false,
+  isUserPosting = true,
 }: CreatePostComponentProps) {
   return (
     <div className={`rounded-2xl border border-gray-200 bg-white p-6 flex flex-col gap-4 shadow-sm w-full mx-auto mb-4 ${className}`}>
       <div className="flex flex-row gap-4 w-full">
-        {!isEditMode && (
+        {!isEditMode && !isUserPosting  && (
           <div className="flex-1">
             <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Create Post:</label>
             <DropdownRole
@@ -116,7 +122,7 @@ export function CreatePostComponent({
             type="text"
             placeholder="Post Title"
             value={title}
-            onChange={e => onTitleChange(e.target.value)}
+            onChange={e => onTitleChange(e.target.value ?? "")}
             className="mb-2"
           />
           <label className="text-sm font-medium text-neutral-muted-olive">Post Content</label>
@@ -220,7 +226,7 @@ export function CreatePostComponent({
         </>
       )}
       <div className="flex justify-end mt-2">
-        <Button onClick={onPost}>{postButtonText}</Button>
+        <Button onClick={onPost} disabled={isSubmitting}>{isSubmitting ? "Posting..." : postButtonText}</Button>
       </div>
     </div>
   );

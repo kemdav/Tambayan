@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import { AvatarIcon } from "./avatar-icon-component";
 import { Button } from "./button";
@@ -11,18 +12,24 @@ import { Input } from "./input/input";
 import { FormattableInput } from "./input/FormattableInput";
 import { CreatePostComponent } from "./create-post-component";
 import { DateTimePicker } from "./date-picker/date-picker-component";
+import { deletePost, updatePost } from "@/lib/actions/post";
 
 interface DisplayPostComponentProps {
   posterName: string;
+  postID: string; // <-- ADD THIS
+  currentUserID?: string;
   event?: string;
+  posterUserID?: string | null;
   avatarSrc?: string | null;
   daysSincePosted: number;
-  title?: string;
+  title?: string | null;
   content: string;
-  imageSrc?: string;
+  imageSrc?: string | null;
   likes: number;
   comments: number;
   tags?: string[];
+
+  posterID: string;
   onLike?: () => void;
   onComment?: () => void;
   orgLabel?: string;
@@ -31,7 +38,7 @@ interface DisplayPostComponentProps {
   eventLocation?: string;
   eventDate?: string;
   registrationPeriod?: string;
-  onAvatarClicked?:()=>void,
+  onAvatarClicked?: () => void,
 }
 
 const EllipsisIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -58,10 +65,13 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   imageSrc: initialImageSrc,
   likes,
   comments,
+  postID,
+  currentUserID,
   tags: initialTags = [],
   onLike,
   onComment,
   orgLabel: initialOrgLabel,
+  posterUserID,
   recipient,
   isDetailed = false,
   eventLocation,
@@ -69,10 +79,15 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   registrationPeriod,
   onAvatarClicked,
 }) => {
+
+
+
   const [showComment, setShowComment] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const canEditOrDelete = currentUserID === posterUserID;
   const [editTitle, setEditTitle] = useState(initialTitle || "");
   const [editContent, setEditContent] = useState(initialContent);
   const [editOrg, setEditOrg] = useState(orgOptions.find(o => o.label === initialOrgLabel)?.value || null);
@@ -81,7 +96,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   const [editRegistrationStart, setEditRegistrationStart] = useState<Date | undefined>(undefined);
   const [editRegistrationEnd, setEditRegistrationEnd] = useState<Date | undefined>(undefined);
   const [editEventLocation, setEditEventLocation] = useState(eventLocation || "");
-  const [editImage, setEditImage] = useState<string | undefined>(initialImageSrc);
+  const [editImage, setEditImage] = useState(initialImageSrc ?? "");
   const [editTags, setEditTags] = useState<string[]>(initialTags);
   const [editTagInput, setEditTagInput] = useState("");
   const [showPhoto, setShowPhoto] = useState(!!initialImageSrc);
@@ -90,54 +105,124 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   const contentRef = React.useRef<HTMLDivElement>(null);
   const [displayTitle, setDisplayTitle] = useState(initialTitle || "");
   const [displayContent, setDisplayContent] = useState(initialContent);
-  const [displayImage, setDisplayImage] = useState<string | undefined>(initialImageSrc);
+  const [displayImage, setDisplayImage] = useState<string | null | undefined>(initialImageSrc);
   const [displayEvent, setDisplayEvent] = useState(initialEvent || "");
   const [displayTags, setDisplayTags] = useState<string[]>(initialTags);
   const [displayOrg, setDisplayOrg] = useState(initialOrgLabel || "");
   const [displayRegistrationPeriod, setDisplayRegistrationPeriod] = useState<string | undefined>(registrationPeriod);
   const [displayRecipient, setDisplayRecipient] = useState(recipient);
   const [displayEventLocation, setDisplayEventLocation] = useState(eventLocation || "");
-  const [editImagePreview, setEditImagePreview] = useState<string | undefined>(initialImageSrc);
+  const [editImagePreview, setEditImagePreview] = useState(initialImageSrc || "");
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
+
+
+
+  console.log(`--- Post ID: ${postID} ---`);
+  console.log(`currentUserID:`, currentUserID, `(${typeof currentUserID})`);
+  console.log(`posterUserID:`, posterUserID, `(${typeof posterUserID})`);
+  console.log(`Are they equal?`, currentUserID === posterUserID);
+  console.log(`canEditOrDelete:`, canEditOrDelete);
 
   React.useEffect(() => {
     if (editPhoto) {
       const url = URL.createObjectURL(editPhoto);
       setEditImagePreview(url);
       return () => URL.revokeObjectURL(url);
+    } else if (removeExistingImage) { // If removing existing, clear preview
+      setEditImagePreview("");
     } else {
-      setEditImagePreview(initialImageSrc);
+      setEditImagePreview(initialImageSrc ?? "");
     }
-  }, [editPhoto, initialImageSrc]);
+  }, [editPhoto, initialImageSrc, removeExistingImage]);
+
+  const handleDelete = async () => {
+    setIsSubmitting(true);
+    const result = await deletePost(Number(postID));
+    setIsSubmitting(false);
+
+    if (result.error) {
+      alert(`Error: ${result.error}`);
+      setShowDeleteConfirm(false); // Close modal even on error
+    } else {
+      // On success, RLS on the server will revalidate the path.
+      // The post will disappear from the list automatically.
+      // We don't even need `setHidden(true)` anymore.
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    setIsSubmitting(true);
+
+    // Create FormData to send to the server action
+    const formData = new FormData();
+    formData.append('postId', postID);
+    formData.append('title', editTitle);
+    formData.append('content', editContent);
+    // Note: We are not handling image updates in this pass for simplicity.
+
+    if (editPhoto) {
+      formData.append('photoFile', editPhoto);
+    } else if (removeExistingImage && initialImageSrc) { // Only send flag if there was an existing image to remove
+      formData.append('removeImage', 'true');
+    }
+
+    const result = await updatePost(formData);
+    setIsSubmitting(false);
+
+    if (result.error) {
+      alert(`Error: ${result.error}`);
+    } else {
+      // Update local state to reflect changes after successful save
+      setDisplayTitle(editTitle);
+      setDisplayContent(editContent);
+      if (editPhoto) {
+        setDisplayImage(editImagePreview); // Set to new image preview URL
+        setEditPhoto(null); // Clear the file input state after successful upload
+      } else if (removeExistingImage) {
+        setDisplayImage(null); // Clear image from display
+        setRemoveExistingImage(false);
+      }
+      setShowEdit(false);
+    }
+  };
+
 
   if (hidden) return null;
+
+  console.log(`[DisplayPostComponent] Post ID: ${postID}`);
+  console.log(`[DisplayPostComponent] initialImageSrc prop received:`, initialImageSrc, `(Type: ${typeof initialImageSrc})`);
+  console.log(`[DisplayPostComponent] displayImage state value:`, displayImage, `(Type: ${typeof displayImage})`);
+  console.log(`[DisplayPostComponent] Is displayImage truthy for rendering?`, !!displayImage);
 
   return (
     <>
       <div className="border rounded-2xl p-4 bg-white shadow-sm max-w-4xl w-full mx-auto relative">
         <div className="absolute top-4 right-4 z-10">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Post options">
-                <EllipsisIcon className="w-6 h-6" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48 p-0">
-              <div className="flex flex-col divide-y">
-                <button className="px-4 py-2 text-left hover:bg-secondary-pale-sage" onClick={() => setShowEdit(true)}>
-                  Edit Post
-                </button>
-                <button className="px-4 py-2 text-left hover:bg-secondary-pale-sage" onClick={() => setHidden(true)}>
-                  Hide Post
-                </button>
-                <button className="px-4 py-2 text-left text-red-600 hover:bg-secondary-pale-sage" onClick={() => setShowDeleteConfirm(true)}>
-                  Delete Post
-                </button>
-              </div>
-            </PopoverContent>
-          </Popover>
+          {canEditOrDelete && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Post options">
+                  <EllipsisIcon className="w-6 h-6" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-0">
+                <div className="flex flex-col divide-y">
+                  <button className="px-4 py-2 text-left hover:bg-secondary-pale-sage" onClick={() => setShowEdit(true)}>
+                    Edit Post
+                  </button>
+                  <button className="px-4 py-2 text-left hover:bg-secondary-pale-sage" onClick={() => setHidden(true)}>
+                    Hide Post
+                  </button>
+                  <button className="px-4 py-2 text-left text-red-600 hover:bg-secondary-pale-sage" onClick={() => setShowDeleteConfirm(true)}>
+                    Delete Post
+                  </button>
+                </div>
+              </PopoverContent>
+            </Popover>)}
         </div>
         <div className="flex items-center gap-3 mb-2">
-          <AvatarIcon src={avatarSrc} alt={posterName} className="h-8 w-8 text-base" isClickable={true} onAvatarClicked={onAvatarClicked}/>
+          <AvatarIcon src={avatarSrc} alt={posterName} className="h-8 w-8 text-base" isClickable={true} onAvatarClicked={onAvatarClicked} />
           <div className="flex flex-col">
             {!isDetailed && displayRecipient && (
               <span className="font-semibold text-sm text-neutral-muted-olive flex items-center gap-2">
@@ -210,7 +295,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
         avatarSrc={avatarSrc}
         daysSincePosted={daysSincePosted}
         content={displayContent}
-        imageSrc={displayImage}
+        imageSrc={displayImage ?? ""}
         comments={[]}
       />
       {showEdit && (
@@ -252,28 +337,8 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
               onRegistrationEndChange={setEditRegistrationEnd}
               postButtonText="Save Changes"
               isEditMode={true}
-              onPost={() => {
-                setDisplayTitle(editTitle);
-                setDisplayContent(editContent);
-                setDisplayTags(editTags);
-                setDisplayOrg(orgOptions.find(o => o.value === editOrg)?.label || "");
-                setDisplayEvent(editPostType === "event" ? editTitle : "");
-                setDisplayImage(editPhoto ? editImagePreview : initialImageSrc);
-                setDisplayRegistrationPeriod(
-                  editPostType === "event" && editRegistrationStart && editRegistrationEnd
-                    ? `${editRegistrationStart.toLocaleString()} - ${editRegistrationEnd.toLocaleString()}`
-                    : undefined
-                );
-                if (editPostType === "default") {
-                  setDisplayOrg("");
-                  setDisplayEvent("");
-                  setDisplayRecipient(orgOptions.find(o => o.value === editOrg)?.label || undefined);
-                }
-                if (editPostType === "event") {
-                  setDisplayEventLocation(editEventLocation);
-                }
-                setShowEdit(false);
-              }}
+              onPost={handleSaveChanges}
+              isSubmitting={isSubmitting}
             />
             <div className="mt-4">
               <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Edit Image</label>
@@ -284,15 +349,29 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
                 onChange={e => {
                   const file = e.target.files?.[0] || null;
                   setEditPhoto(file);
-                  if (file) {
-                    const url = URL.createObjectURL(file);
-                    setEditImagePreview(url);
-                  } else {
-                    setEditImagePreview(initialImageSrc);
-                  }
+                  setRemoveExistingImage(false); // If new file selected, don't remove existing
                   e.target.value = "";
                 }}
               />
+              {(initialImageSrc || editImagePreview) && ( // Show checkbox if there's an initial image or a new one selected
+                <label className="flex items-center mt-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={removeExistingImage}
+                    onChange={(e) => {
+                      setRemoveExistingImage(e.target.checked);
+                      if (e.target.checked) {
+                        setEditPhoto(null); // If checking remove, clear any pending new photo
+                        // editImagePreview will be cleared by the useEffect
+                      } else {
+                        // editImagePreview will be reset by the useEffect
+                      }
+                    }}
+                    className="mr-2"
+                  />
+                  Remove current image
+                </label>
+              )}
               {editImagePreview && (
                 <img src={editImagePreview} alt="edit preview" className="rounded-lg max-h-40 mt-2 mx-auto" />
               )}
@@ -306,8 +385,10 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
             <h2 className="text-lg font-bold mb-4">Delete Post?</h2>
             <p className="mb-4">Are you sure you want to delete this post? This action cannot be undone.</p>
             <div className="flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
-              <Button variant="destructive" onClick={() => { setShowDeleteConfirm(false); setHidden(true); }}>Delete</Button>
+              <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)} disabled={isSubmitting}>Cancel</Button>
+              <Button variant="destructive" onClick={handleDelete} disabled={isSubmitting}>
+                {isSubmitting ? "Deleting..." : "Delete"}
+              </Button>
             </div>
           </div>
         </div>
