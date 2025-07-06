@@ -24,10 +24,11 @@ interface DisplayPostComponentProps {
   daysSincePosted: number;
   title?: string | null;
   content: string;
-  imageSrc?: string;
+  imageSrc?: string | null;
   likes: number;
   comments: number;
   tags?: string[];
+
   posterID: string;
   onLike?: () => void;
   onComment?: () => void;
@@ -95,7 +96,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   const [editRegistrationStart, setEditRegistrationStart] = useState<Date | undefined>(undefined);
   const [editRegistrationEnd, setEditRegistrationEnd] = useState<Date | undefined>(undefined);
   const [editEventLocation, setEditEventLocation] = useState(eventLocation || "");
-  const [editImage, setEditImage] = useState<string | undefined>(initialImageSrc);
+  const [editImage, setEditImage] = useState(initialImageSrc ?? "");
   const [editTags, setEditTags] = useState<string[]>(initialTags);
   const [editTagInput, setEditTagInput] = useState("");
   const [showPhoto, setShowPhoto] = useState(!!initialImageSrc);
@@ -104,14 +105,15 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   const contentRef = React.useRef<HTMLDivElement>(null);
   const [displayTitle, setDisplayTitle] = useState(initialTitle || "");
   const [displayContent, setDisplayContent] = useState(initialContent);
-  const [displayImage, setDisplayImage] = useState<string | undefined>(initialImageSrc);
+  const [displayImage, setDisplayImage] = useState<string | null | undefined>(initialImageSrc);
   const [displayEvent, setDisplayEvent] = useState(initialEvent || "");
   const [displayTags, setDisplayTags] = useState<string[]>(initialTags);
   const [displayOrg, setDisplayOrg] = useState(initialOrgLabel || "");
   const [displayRegistrationPeriod, setDisplayRegistrationPeriod] = useState<string | undefined>(registrationPeriod);
   const [displayRecipient, setDisplayRecipient] = useState(recipient);
   const [displayEventLocation, setDisplayEventLocation] = useState(eventLocation || "");
-  const [editImagePreview, setEditImagePreview] = useState<string | undefined>(initialImageSrc);
+  const [editImagePreview, setEditImagePreview] = useState(initialImageSrc || "");
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
 
 
 
@@ -126,10 +128,12 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
       const url = URL.createObjectURL(editPhoto);
       setEditImagePreview(url);
       return () => URL.revokeObjectURL(url);
+    } else if (removeExistingImage) { // If removing existing, clear preview
+      setEditImagePreview("");
     } else {
-      setEditImagePreview(initialImageSrc);
+      setEditImagePreview(initialImageSrc ?? "");
     }
-  }, [editPhoto, initialImageSrc]);
+  }, [editPhoto, initialImageSrc, removeExistingImage]);
 
   const handleDelete = async () => {
     setIsSubmitting(true);
@@ -157,19 +161,39 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
     formData.append('content', editContent);
     // Note: We are not handling image updates in this pass for simplicity.
 
+    if (editPhoto) {
+      formData.append('photoFile', editPhoto);
+    } else if (removeExistingImage && initialImageSrc) { // Only send flag if there was an existing image to remove
+      formData.append('removeImage', 'true');
+    }
+
     const result = await updatePost(formData);
     setIsSubmitting(false);
 
     if (result.error) {
       alert(`Error: ${result.error}`);
     } else {
-      // On success, close the modal. The page will auto-refresh.
+      // Update local state to reflect changes after successful save
+      setDisplayTitle(editTitle);
+      setDisplayContent(editContent);
+      if (editPhoto) {
+        setDisplayImage(editImagePreview); // Set to new image preview URL
+        setEditPhoto(null); // Clear the file input state after successful upload
+      } else if (removeExistingImage) {
+        setDisplayImage(null); // Clear image from display
+        setRemoveExistingImage(false);
+      }
       setShowEdit(false);
     }
   };
 
 
   if (hidden) return null;
+
+  console.log(`[DisplayPostComponent] Post ID: ${postID}`);
+  console.log(`[DisplayPostComponent] initialImageSrc prop received:`, initialImageSrc, `(Type: ${typeof initialImageSrc})`);
+  console.log(`[DisplayPostComponent] displayImage state value:`, displayImage, `(Type: ${typeof displayImage})`);
+  console.log(`[DisplayPostComponent] Is displayImage truthy for rendering?`, !!displayImage);
 
   return (
     <>
@@ -271,7 +295,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
         avatarSrc={avatarSrc}
         daysSincePosted={daysSincePosted}
         content={displayContent}
-        imageSrc={displayImage}
+        imageSrc={displayImage ?? ""}
         comments={[]}
       />
       {showEdit && (
@@ -325,15 +349,29 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
                 onChange={e => {
                   const file = e.target.files?.[0] || null;
                   setEditPhoto(file);
-                  if (file) {
-                    const url = URL.createObjectURL(file);
-                    setEditImagePreview(url);
-                  } else {
-                    setEditImagePreview(initialImageSrc);
-                  }
+                  setRemoveExistingImage(false); // If new file selected, don't remove existing
                   e.target.value = "";
                 }}
               />
+              {(initialImageSrc || editImagePreview) && ( // Show checkbox if there's an initial image or a new one selected
+                <label className="flex items-center mt-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={removeExistingImage}
+                    onChange={(e) => {
+                      setRemoveExistingImage(e.target.checked);
+                      if (e.target.checked) {
+                        setEditPhoto(null); // If checking remove, clear any pending new photo
+                        // editImagePreview will be cleared by the useEffect
+                      } else {
+                        // editImagePreview will be reset by the useEffect
+                      }
+                    }}
+                    className="mr-2"
+                  />
+                  Remove current image
+                </label>
+              )}
               {editImagePreview && (
                 <img src={editImagePreview} alt="edit preview" className="rounded-lg max-h-40 mt-2 mx-auto" />
               )}

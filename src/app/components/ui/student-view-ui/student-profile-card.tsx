@@ -86,6 +86,7 @@ const PostPage = ({ posts, currentUserID }: { posts: Poster[], currentUserID: st
                             posterName={post.posterName}
                             avatarSrc={post.posterPictureUrl}
                             title={post.title}
+                            imageSrc={post.imageSrc}
                             posterUserID={post.posterUserID}
                             daysSincePosted={post.daysSincePosted}
                             content={post.content}

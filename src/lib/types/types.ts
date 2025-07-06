@@ -7,6 +7,7 @@ export interface Poster {
     posterPictureUrl?: string | null;
     title?: string | null;
     daysSincePosted: number;
+    imageSrc?: string | null;
     content: string;
     likes: number;
     comments: number;

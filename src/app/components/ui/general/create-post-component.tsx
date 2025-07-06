@@ -122,7 +122,7 @@ export function CreatePostComponent({
             type="text"
             placeholder="Post Title"
             value={title}
-            onChange={e => onTitleChange(e.target.value)}
+            onChange={e => onTitleChange(e.target.value ?? "")}
             className="mb-2"
           />
           <label className="text-sm font-medium text-neutral-muted-olive">Post Content</label>
