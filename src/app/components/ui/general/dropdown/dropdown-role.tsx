@@ -28,86 +28,68 @@ interface DropDownProps {
   placeholder?: string;
   width?: string;
   height?: string;
-
-  buttonTextColor?: string;
-  buttonBorderColor?: string;
-  buttonBgColor?: string;
-  buttonHoverTextColor?: string;
-  buttonHoverBgColor?: string;
-  buttonActiveBgColor?: string;
-
-  dropdownTextColor?: string;
-  dropdownBorderColor?: string;
-  dropdownBgColor?: string;
-  dropdownHoverTextColor?: string;
-  dropdownHoverBgColor?: string;
-  dropdownActiveBgColor?: string;
+  classNameButton?: string;
+  classNameDropdown?: string;
   onSelect?: (value: string) => void;
 }
 
 export default function DropDownRole({
   options = [],
-  placeholder = "Select an option...",
-  width = "w-[145px]",
+  placeholder = "Select option...",
+  width = "w-full sm:w-40",
   height = "h-10",
-
-  buttonTextColor = "text-action-seafoam-green",
-  buttonBorderColor = "border-secondary-muted-sage",
-  buttonBgColor = "bg-transparent",
-  buttonHoverTextColor = "hover:text-neutral-pure-white",
-  buttonHoverBgColor = "hover:bg-action-seafoam-green",
-  buttonActiveBgColor = "active:bg-action-moss-green",
-
-  dropdownTextColor = "text-action-seafoam-green",
-  dropdownBorderColor = "border-secondary-muted-sage",
-  dropdownBgColor = "bg-neutral-pure-white",
-  dropdownHoverTextColor = "hover:text-neutral-pure-white",
-  dropdownHoverBgColor = "hover:bg-action-seafoam-green",
-  dropdownActiveBgColor = "active:bg-action-moss-green",
+  classNameButton = "text-action-seafoam-green border-secondary-muted-sage bg-transparent hover:text-neutral-pure-white hover:bg-action-moss-green active:bg-secondary-light-moss",
+  classNameDropdown = "text-action-seafoam-green border-secondary-muted-sage bg-neutral-pure-white",
   onSelect,
 }: DropDownProps) {
   if (!Array.isArray(options)) {
-    console.warn('DropDownRole: options prop is not an array or is undefined.');
+    console.warn("DropDownRole: options prop is not an array or is undefined.");
     options = [];
   }
 
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
+  const [dropdownWidth, setDropdownWidth] = React.useState<number>();
+  const triggerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (open && triggerRef.current) {
+      setDropdownWidth(triggerRef.current.offsetWidth);
+    }
+  }, [open]);
 
   const selectedLabel = options.find((o) => o.value === value)?.label;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn(
-            width,
-            height,
-            buttonTextColor,
-            buttonBorderColor,
-            buttonBgColor,
-            buttonHoverTextColor,
-            buttonHoverBgColor,
-            buttonActiveBgColor,
-            "rounded-[5px] justify-between cursor-pointer transition-all duration-150 ease-in-out active:scale-95"
-          )}
-        >
-          {selectedLabel || placeholder}
-          <ChevronsUpDown className="opacity-50 ml-2 h-4 w-4" />
-        </Button>
+        <div ref={triggerRef} className={cn(width)}>
+          <Button
+            type="button"
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn(
+              "w-full",
+              height,
+              "rounded-[5px] justify-between items-center cursor-pointer transition-all duration-150 ease-in-out active:scale-95",
+              classNameButton
+            )}
+          >
+            <span
+              className="truncate overflow-hidden whitespace-nowrap flex-1 text-left"
+              title={selectedLabel ?? placeholder}
+            >
+              {selectedLabel || placeholder}
+            </span>
+            <ChevronsUpDown className="opacity-50 ml-2 h-4 w-4 shrink-0" />
+          </Button>
+        </div>
       </PopoverTrigger>
 
       <PopoverContent
-        className={cn(
-          width,
-          dropdownTextColor,
-          dropdownBorderColor,
-          dropdownBgColor,
-          "p-0 rounded-md shadow-md"
-        )}
+        style={{ width: dropdownWidth }}
+        className={cn("p-0 rounded-md shadow-md", classNameDropdown)}
       >
         <Command>
           <CommandList>
@@ -124,11 +106,9 @@ export default function DropDownRole({
                     if (onSelect) onSelect(newValue);
                   }}
                   className={cn(
-                    "cursor-pointer",
-                    dropdownTextColor,
-                    dropdownHoverBgColor,
-                    dropdownHoverTextColor,
-                    dropdownActiveBgColor
+                    "cursor-pointer transition-colors px-2 py-1 rounded-sm",
+                    "hover:text-neutral-pure-white hover:bg-action-moss-green",
+                    "active:bg-secondary-light-moss"
                   )}
                 >
                   {option.label}

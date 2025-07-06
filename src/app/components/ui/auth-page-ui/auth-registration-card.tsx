@@ -64,7 +64,7 @@ export default function AuthRegCard({
   onLogin,
 }: AuthRegCardProps) {
   return (
-    <div className="card w-100 lg:w-130 h-160 p-5 lg:p-10">
+    <div className="card w-100 lg:w-130 h-150 p-5 lg:p-10 overflow-auto">
       <div className="flex flex-col justify-center items-center mb-5">
         <h1 className="responsiveCardHeading mb-2">Student Registration</h1>
         <p className="textAuthResponsive text-sm">
@@ -125,6 +125,7 @@ export default function AuthRegCard({
               options={universityOptions}
               width="w-full"
               onSelect={onUniversityChange}
+              placeholder="Choose University"
             />
           </div>
         </div>
@@ -132,15 +133,20 @@ export default function AuthRegCard({
         <div className="flex lg:mt-3 gap-3">
           <div className="">
             <p className="textAuthResponsive">Year Level</p>
-            <DropdownRole options={yearOptions} onSelect={onYearChange} />
+            <DropdownRole
+              options={yearOptions}
+              onSelect={onYearChange}
+              placeholder="Choose Year"
+            />
           </div>
 
           <div className="grow">
             <p className="textAuthResponsive">Course</p>
             <DropdownRole
               options={courseOptions}
-              width="w-full"
+              width="w-full lg:max-w-[280px]"
               onSelect={onCourseChange}
+              placeholder="Choose Course"
             />
           </div>
         </div>
@@ -173,7 +179,7 @@ export default function AuthRegCard({
 
         {/* --- MODIFICATION: Removed formAction, it's now a standard submit button --- */}
         <Button
-          className="text-neutral-linen-white bg-linear-to-r from-action-seafoam-green to-action-forest-green hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 font-bold text-xl w-full mt-5 lg:mt-10"
+          className="text-neutral-linen-white bg-linear-to-r from-action-seafoam-green to-action-forest-green hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 font-bold text-xl w-full mt-5 lg:mt-6"
           type="submit"
           disabled={loading}
         >
@@ -183,7 +189,11 @@ export default function AuthRegCard({
 
       <div className="flex items-center justify-center">
         <p className="textAuthResponsive">Already have an account?</p>
-        <Button variant="link" className="textAuthResponsive" onClick={onLogin}>
+        <Button
+          variant="link"
+          className="textAuthResponsive pl-1"
+          onClick={onLogin}
+        >
           Log in
         </Button>
       </div>

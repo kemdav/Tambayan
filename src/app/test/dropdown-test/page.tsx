@@ -30,22 +30,6 @@ export default function Home() {
         <DropdownRole
           // Placeholder and Size
           placeholder="Select Role"
-          width="w-[145px]"
-          height="h-10"
-          //Button
-          buttonTextColor="text-[#7DBA9D]"
-          buttonBorderColor="border-[#98BAA9]"
-          buttonBgColor="bg-transparent"
-          buttonHoverTextColor="hover:text-white"
-          buttonHoverBgColor="hover:bg-[#7DBA9D]"
-          buttonActiveBgColor="active:bg-[#358163]"
-          //Dropdown
-          dropdownTextColor="text-[#7DBA9D]"
-          dropdownBorderColor="border-[#98BAA9]"
-          dropdownBgColor="bg-white"
-          dropdownHoverTextColor="hover:text-white"
-          dropdownHoverBgColor="hover:bg-[#7DBA9D]"
-          dropdownActiveBgColor="active:bg-[#358163]"
           // Options
           options={roleOptions}
         />
