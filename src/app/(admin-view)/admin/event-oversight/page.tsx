@@ -1,63 +1,32 @@
 "use client";
 
 import AllEventOversights from "@/app/components/ui/event-oversight-components/all-event-oversights";
-import { createClient } from "@/lib/supabase/client";
+import {
+  fetchEvents,
+  getSampleOptions,
+  getSampleStatuses,
+  type EventData,
+} from "@/lib/actions/event-oversight";
 import { useEffect, useState } from "react";
-
-// Define the EventData type to match the tableData structure
-interface EventData {
-  eventName: string;
-  organization: string;
-  date: string;
-  location: string;
-  status?: string;
-  onClickView: () => void;
-  onClickEdit: () => void;
-}
-
-const sampleOptions = [
-  { value: "cs-society", label: "Computer Science Society" },
-  { value: "math-club", label: "Math Club" },
-  { value: "debate-club", label: "Debate Club" },
-];
-
-const sampleStatuses = [
-  { label: "Upcoming", bgColor: "bg-yellow-100", textColor: "text-yellow-800" },
-  { label: "Ongoing", bgColor: "bg-green-100", textColor: "text-green-800" },
-  { label: "Completed", bgColor: "bg-blue-100", textColor: "text-blue-800" },
-];
 
 export default function EventOversightPage() {
   const [tableData, setTableData] = useState<EventData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const loadEvents = async () => {
       setLoading(true);
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("events")
-        .select("eventid, title, orgid, date, location, status");
-      if (error) {
-        console.error("Error fetching events:", error);
+      try {
+        const events = await fetchEvents();
+        setTableData(events);
+      } catch (error) {
+        console.error("Error loading events:", error);
         setTableData([]);
+      } finally {
         setLoading(false);
-        return;
       }
-      // Map events to tableData format
-      const mapped: EventData[] = (data || []).map((event) => ({
-        eventName: event.title || "Untitled Event",
-        organization: event.orgid || "Unknown Org",
-        date: event.date ? new Date(event.date).toLocaleDateString() : "-",
-        location: event.location || "-",
-        status: event.status || "-",
-        onClickView: () => alert(`View ${event.title}`),
-        onClickEdit: () => alert(`Edit ${event.title}`),
-      }));
-      setTableData(mapped);
-      setLoading(false);
     };
-    fetchEvents();
+    loadEvents();
   }, []);
 
   return (
@@ -69,8 +38,8 @@ export default function EventOversightPage() {
       </div>
       <div className="w-full max-w-[1089px] mx-auto bg-white border rounded-[10px] shadow-sm p-6">
         <AllEventOversights
-          options={sampleOptions}
-          statuses={sampleStatuses}
+          options={getSampleOptions()}
+          statuses={getSampleStatuses()}
           tableData={tableData}
         />
         {loading && <div className="mt-4 text-gray-500">Loading events...</div>}
