@@ -19,9 +19,16 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    // It's better to redirect to a page that can display the error
-    // For now, redirecting to /login with an error message is a good pattern
-    redirect('/login?message=Could not authenticate user')
+    // Return error message instead of redirecting
+    // Map known Supabase error codes/messages to user-friendly messages
+    if (error.message.includes('Invalid login credentials')) {
+      return { error: 'Incorrect email or password. Please try again.' };
+    }
+    if (error.message.includes('Email not confirmed')) {
+      return { error: 'Your email is not confirmed. Please check your inbox for a confirmation email.' };
+    }
+    // Add more mappings as needed
+    return { error: 'Login failed. Please try again.' };
   }
 
   revalidatePath('/', 'layout')
