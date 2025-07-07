@@ -27,6 +27,8 @@ export default function ProfileView({ initialProfile, initialPosts, currentUserI
   const [profile, setProfile] = useState<StudentProfile>(initialProfile);
   const [selectedNavId, setSelectedNavId] = useState<string>("post");
 
+  
+
   useEffect(() => {
     setProfile(initialProfile);
   }, [initialProfile]);
@@ -57,18 +59,14 @@ export default function ProfileView({ initialProfile, initialPosts, currentUserI
             myButtons={ProfileViewNavBarContents}
             selectedButtonId={selectedNavId}
             onButtonSelect={setSelectedNavId}
-            // Use the data from the 'initialProfile' prop
-            studentId={studentid.toString()}
-            studentCourse={course || "N/A"}
-            studentEmail={email || "N/A"}
-            studentYear={yearlevel || "N/A"}
-            studentJoinDate="September 17, 2004" // You can pass this down too
-            studentEventsJoined="6"
-            studentTotalOrg="3"
             currentUserID={currentUserID}
             posts={initialPosts}
-            initialComments={initialComments}
-          ></StudentProfileCard>
+            initialComments={initialComments} // Changed from 'comments' to 'initialComments' to match the prop name
+            // Pass the entire profile object
+            profile={profile}
+            // Pass the update handler down
+            onProfileUpdate={handleProfileUpdate}
+          />
         </div>
       </main>
     </main>

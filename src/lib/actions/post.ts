@@ -16,7 +16,7 @@ type OrgPostQueryResult = Tables<'post'> & {
     organizations: Pick<Tables<'organizations'>, 'orgname'> | null;
 };
 
-type PostWithLikesResult = Tables<'post'> & {
+export type PostWithLikesResult = Tables<'post'> & {
     student: {
         fname: string | null;
         lname: string | null;
@@ -26,6 +26,7 @@ type PostWithLikesResult = Tables<'post'> & {
     } | null;
     organizations: {
         orgname: string | null;
+         picture: string | null;
     } | null;
     post_likes: { user_id: string }[];
     comments: CommentType[];

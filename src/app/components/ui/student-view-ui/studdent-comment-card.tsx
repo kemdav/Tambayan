@@ -25,7 +25,7 @@ export default function StudentCommentCard({ comment }: StudentCommentCardProps)
                 {comment.posted && <span className="ml-2 text-xs">({daysAgo} days ago)</span>}
             </p>
             <blockquote className="border-l-4 border-secondary-pale-sage pl-4 italic">
-                <p className="text-gray-800">{comment.comment}</p>
+                <p className="text-gray-800">{comment.comment_text}</p>
             </blockquote>
         </div>
     );

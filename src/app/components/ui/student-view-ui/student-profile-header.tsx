@@ -12,10 +12,13 @@ interface Props {
     isEditable?: boolean;
     initialProfile: StudentProfile;
     onProfileUpdate: (updatedData: Partial<StudentProfile>) => void;
+    profileName?: string;
+    profilePictureUrl?: string | null;
+    name: string;
 }
 
 
-export default function StudentProfileHeader({ isEditable = false, initialProfile, onProfileUpdate }: Props) {
+export default function StudentProfileHeader({ isEditable = false, initialProfile, profileName, profilePictureUrl, onProfileUpdate }: Props) {
     const supabase = createClient();
     const [user, setUser] = useState<User | null>(null); // You need the user object
     const [isUploading, setIsUploading] = useState(false);
@@ -61,7 +64,7 @@ export default function StudentProfileHeader({ isEditable = false, initialProfil
 
             if (dbError) throw dbError;
 
-             onProfileUpdate({ picture: publicUrl });
+            onProfileUpdate({ picture: publicUrl });
 
             alert("Avatar updated successfully!");
 
@@ -78,7 +81,7 @@ export default function StudentProfileHeader({ isEditable = false, initialProfil
             alert("You must be logged in to upload an avatar.");
             return;
         }
-        
+
         try {
             setIsUploading(true);
             const fileName = `${user.id}/cover-${Date.now()}`; // Use a slightly different name

@@ -20,6 +20,7 @@ interface DisplayPostComponentProps {
   posterName: string;
   postID: string; // <-- ADD THIS
   currentUserID?: string;
+   canAdministerPost?: boolean; 
   event?: string;
   posterUserID?: string | null;
   avatarSrc?: string | null;
@@ -68,6 +69,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   likes,
   comments,
   postID,
+  canAdministerPost = false,
   currentUserID,
   tags: initialTags = [],
   onLike,
@@ -91,7 +93,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   const [showEdit, setShowEdit] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const canEditOrDelete = currentUserID === posterUserID;
+  const canEditOrDelete = (posterUserID && currentUserID && posterUserID === currentUserID) || canAdministerPost;
   const [editTitle, setEditTitle] = useState(initialTitle || "");
   const [editContent, setEditContent] = useState(initialContent);
   const [editOrg, setEditOrg] = useState(orgOptions.find(o => o.label === initialOrgLabel)?.value || null);
