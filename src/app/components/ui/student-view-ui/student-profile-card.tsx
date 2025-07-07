@@ -12,55 +12,67 @@ import UpcomingorgEventComponent from "../general/upcomingorg-event-component";
 import DropDownRole from "../general/dropdown/dropdown-role";
 import { StudentComment } from "@/lib/actions/comment";
 import StudentCommentCard from "./studdent-comment-card";
+import { StudentProfile } from "@/lib/types/database";
+import EditAboutModal from "./edit-about-modal";
 
 
-interface Props extends studentProps {
-    className?: string;
-    myButtons: ButtonConfig[];
-    selectedButtonId: string;
-    posts: Poster[];
-    onButtonSelect: (id: string) => void;
-    currentUserID: string;
-     initialComments: StudentComment[];
-}
-
-interface studentProps {
+interface AboutPageProps {
     studentId: string;
-    studentCourse: string;
-    studentEmail: string;
-    studentYear: string;
-    studentJoinDate: string;
-    studentEventsJoined: string;
-    studentTotalOrg: string;
+    studentCourse: string | null;
+    studentEmail: string | null;
+    studentYear: string | null;
+    // These seem like placeholder data, so let's make them optional
+    studentJoinDate?: string;
+    studentEventsJoined?: string;
+    studentTotalOrg?: string;
+    // Add the new props
+    aboutText: string | null;
+    onEditClick: () => void;
+    isOwnProfile: boolean;
 }
 
-const AboutPage = ({ studentId, studentCourse, studentEmail, studentYear, studentJoinDate, studentEventsJoined, studentTotalOrg }: studentProps) => {
+// 2. Fix the AboutPage component to accept ONE props object
+const AboutPage = ({
+    studentId,
+    studentCourse,
+    studentEmail,
+    studentYear,
+    studentJoinDate,
+    studentEventsJoined,
+    studentTotalOrg,
+    aboutText,
+    onEditClick,
+    isOwnProfile
+}: AboutPageProps) => {
 
-    return (<div className="flex flex-col sm:flex-row">
-        <div className="flex flex-col">
-
-            <div className="flex flex-col sm:flex-row sm:gap-10">
-                <div>
-                    <p className="text-action-forest-green"><strong>Student ID:</strong> {studentId}</p>
-                    <p className="text-action-forest-green"><strong>Major:</strong> {studentCourse}</p>
-                    <p className="text-action-forest-green"><strong>Email:</strong> {studentEmail}</p>
-                    <p className="text-action-forest-green"><strong>Year:</strong> {studentYear}</p>
+    return (
+        <div className="flex flex-col sm:flex-row">
+            <div className="flex flex-col">
+                <div className="flex flex-col sm:flex-row sm:gap-10">
+                    <div>
+                        <p><strong>Student ID:</strong> {studentId}</p>
+                        <p><strong>Major:</strong> {studentCourse || 'N/A'}</p>
+                        <p><strong>Email:</strong> {studentEmail || 'N/A'}</p>
+                        <p><strong>Year:</strong> {studentYear || 'N/A'}</p>
+                    </div>
+                    <div>
+                        {/* These are likely placeholders, can be removed if not in your profile object */}
+                        <p><strong>Joined:</strong> {studentJoinDate || 'N/A'}</p>
+                        <p><strong>Events Joined:</strong> {studentEventsJoined || 'N/A'} events</p>
+                        <p><strong>Joined Organizations:</strong> {studentTotalOrg || 'N/A'}</p>
+                    </div>
                 </div>
                 <div>
-                    <p className="text-action-forest-green"><strong>Joined:</strong> {studentJoinDate}</p>
-                    <p className="text-action-forest-green"><strong>Events Joined:</strong> {studentEventsJoined} events</p>
-                    <p className="text-action-forest-green"><strong>Joined Organizations:</strong> {studentTotalOrg}</p>
+                    <p className="text-action-forest-green">
+                        <strong>Description </strong>
+                        {isOwnProfile && <Button onClick={onEditClick}>Edit Description</Button>}
+                    </p>
+                    <p className="max-w-250 text-action-forest-green whitespace-pre-line">
+                        {aboutText || "No description provided."}
+                    </p>
                 </div>
             </div>
-
-            <div>
-                <p className="text-action-forest-green"><strong>Description </strong><Button>Edit Description</Button></p>
-                <p className="max-w-250 text-action-forest-green">This is a placeholder description for the student profile. You can edit this description to provide more details about the student.</p>
-            </div>
-
         </div>
-
-    </div>
     );
 }
 
@@ -127,18 +139,68 @@ const CommentPage = ({ comments }: { comments: StudentComment[] }) => {
 }
 
 
-export default function StudentProfileCard({ className, myButtons,initialComments, currentUserID, selectedButtonId, posts, onButtonSelect, studentId, studentCourse, studentEmail, studentYear, studentJoinDate, studentEventsJoined, studentTotalOrg }: Props) {
+interface Props {
+    className?: string;
+    myButtons: ButtonConfig[];
+    selectedButtonId: string;
+    onButtonSelect: (id: string) => void;
+    currentUserID: string;
+    posts: Poster[];
+    initialComments: StudentComment[];
+    profile: StudentProfile;
+    onProfileUpdate: (updatedData: Partial<StudentProfile>) => void;
+    isOwnProfile: boolean;
+}
+
+
+export default function StudentProfileCard({
+    className,
+    myButtons,
+    initialComments,
+    profile,
+    onProfileUpdate,
+    currentUserID,
+    selectedButtonId,
+    posts,
+    onButtonSelect,
+    isOwnProfile
+}: Props) {
     const combinedClassName = `flex flex-col ${className || ''}`;
-    console.log("StudentProfileCard received posts:", posts);
-    
-    console.log("StudentProfileCard received currentUserID:", currentUserID);
-    console.log("COMMENT PAGE COMMENT STUDENT PROFILE CARD=", initialComments);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+    const handleSaveAbout = (newAboutText: string) => {
+        onProfileUpdate({ about: newAboutText });
+    };
+
     return (
-        <div className={combinedClassName}>
-            <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect}></HorizontalNavBar>
-            {selectedButtonId === "about" && <AboutPage studentId={studentId} studentCourse={studentCourse} studentEmail={studentEmail} studentYear={studentYear} studentJoinDate={studentJoinDate} studentEventsJoined={studentEventsJoined} studentTotalOrg={studentTotalOrg} />}
-            {selectedButtonId === "post" && <PostPage posts={posts} currentUserID={currentUserID}></PostPage>}
-             {selectedButtonId === "comment" && <CommentPage comments={initialComments} />}
-        </div>
+        <>
+            <EditAboutModal 
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                currentAbout={profile.about}
+                onSave={handleSaveAbout}
+            />
+            <div className={combinedClassName}>
+                <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect} />
+                {selectedButtonId === "about" && (
+                    // 3. Update the call to AboutPage, passing props from the 'profile' object
+                    <AboutPage
+                        studentId={profile.studentid.toString()}
+                        studentCourse={profile.course}
+                        studentEmail={profile.email}
+                        studentYear={profile.yearlevel}
+                        aboutText={profile.about}
+                        onEditClick={() => setIsEditModalOpen(true)}
+                        // Pass placeholders or remove if not needed
+                        studentJoinDate="Sep 2024" 
+                        studentEventsJoined="0"
+                        studentTotalOrg="0"
+                        isOwnProfile={isOwnProfile}
+                    />
+                )}
+                {selectedButtonId === "post" && <PostPage posts={posts} currentUserID={currentUserID} />}
+                {selectedButtonId === "comment" && <CommentPage comments={initialComments} />}
+            </div>
+        </>
     );
 }

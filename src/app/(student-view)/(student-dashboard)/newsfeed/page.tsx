@@ -1,22 +1,20 @@
-"use client";
+// app/.../newsfeed/page.tsx
+// REMOVE "use client";
 
-import StudentProfileCard from "@/app/components/ui/student-view-ui/student-profile-card";
-import StudentProfileHeader from "@/app/components/ui/student-view-ui/student-profile-header";
-import { useState } from "react";
-import { myButtons } from "./navBarContents";
-import StudentNewsfeedCard from "@/app/components/ui/student-view-ui/student-newsfeed-card";
+import { getNewsfeedPosts } from '@/lib/actions/newsfeed'; // Import the new action
+import StudentNewsfeedClient from './student-newsfeed-client'; // We will create this new client component
 
-export default function TagComponentTestPage() {
-    const [selectedNavId, setSelectedNavId] = useState<string>("officialPost");
+// This is now a Server Component
+export default async function NewsfeedPage() {
+    // Fetch both official and community posts on the server
+    const officialPosts = await getNewsfeedPosts(true);
+    const communityPosts = await getNewsfeedPosts(false);
 
-  return (
-    <main className="w-full grid place-items-center items-start mt-10 md:mt-0">
-        <div className="mainContentCard">
-            <StudentNewsfeedCard className="h-1/2" 
-            myButtons={myButtons} 
-            selectedButtonId={selectedNavId}
-             onButtonSelect={setSelectedNavId}></StudentNewsfeedCard>
-        </div>
-    </main>
-  );
-} 
+    // Pass the fetched data down to a client component for interactivity
+    return (
+        <StudentNewsfeedClient
+            initialOfficialPosts={officialPosts}
+            initialCommunityPosts={communityPosts}
+        />
+    );
+}

@@ -11,6 +11,7 @@ interface Props {
     className?: string;
     myButtons: ButtonConfig[];
     selectedButtonId: string;
+    canManageOrg: boolean;
     onButtonSelect: (id: string) => void;
     officialPosts: Poster[]; // New prop to receive official posts
     communityPosts: Poster[]; // New prop to receive community posts
@@ -18,7 +19,7 @@ interface Props {
 }
 
 // OfficialPostPage now receives its posts as a prop
-const OfficialPostPage = ({ posts, currentUserID }: { posts: Poster[], currentUserID?: string }) => {
+const OfficialPostPage = ({ posts,canManageOrg, currentUserID }: { posts: Poster[], canManageOrg: boolean, currentUserID?: string }) => {
     return (
         <div className="mt-3">
             {posts.length === 0 ? (<p>No official posts found for this organization.</p>) : (
@@ -36,6 +37,7 @@ const OfficialPostPage = ({ posts, currentUserID }: { posts: Poster[], currentUs
                             content={post.content}
                             likes={post.likes}
                             comments={post.comments}
+                            canAdministerPost={canManageOrg}
                             recipient={post.recipient}
                             currentUserID={currentUserID} // Pass down to DisplayPostComponent
                             posterID={post.posterID} // Make sure this matches the prop in DisplayPostComponent
@@ -77,13 +79,13 @@ const CommunityPostPage = ({ posts, currentUserID }: { posts: Poster[], currentU
     );
 }
 
-export default function StudentOrgNewsfeedCard({ className, myButtons, selectedButtonId, onButtonSelect, officialPosts, communityPosts, currentUserID }: Props) {
+export default function StudentOrgNewsfeedCard({ className, myButtons, selectedButtonId, onButtonSelect, officialPosts, communityPosts, currentUserID, canManageOrg }: Props) {
     const combinedClassName = `flex flex-col ${className || ''}`;
 
     return (
         <div className={combinedClassName}>
             <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect}></HorizontalNavBar>
-            {selectedButtonId === "official" && <OfficialPostPage posts={officialPosts} currentUserID={currentUserID}></OfficialPostPage>}
+            {selectedButtonId === "official" && <OfficialPostPage canManageOrg={canManageOrg} posts={officialPosts} currentUserID={currentUserID}></OfficialPostPage>}
             {selectedButtonId === "community" && <CommunityPostPage posts={communityPosts} currentUserID={currentUserID}></CommunityPostPage>}
         </div>
     );

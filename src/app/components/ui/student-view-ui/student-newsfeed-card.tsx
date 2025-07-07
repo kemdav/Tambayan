@@ -14,24 +14,34 @@ interface Props {
     myButtons: ButtonConfig[];
     selectedButtonId: string;
     onButtonSelect: (id: string) => void;
+    officialPosts: Poster[]; // <-- Add this
+    communityPosts: Poster[]; // <-- Add this
 }
 
-export const OfficalPosts: Poster[] = [
- 
-  ];
-
-
-const OfficialPostPage = () => {
+const OfficialPostPage = ({ posts }: { posts: Poster[] }) => {
+    // ...
     return (
         <div className="mt-3">
-            {OfficalPosts.length === 0 ? (<p>No users found</p>) : (
+            {posts.length === 0 ? (<p>No official posts in your feed yet.</p>) : (
                 <ul className="space-y-4">
-                    {OfficalPosts.map((OfficalPosts) => (
-                        <DisplayPostComponent key={OfficalPosts.postID} posterName={OfficalPosts.posterName}
-                        daysSincePosted={OfficalPosts.daysSincePosted}
-                        content={OfficalPosts.content}
-                        likes={OfficalPosts.likes}
-                        comments={OfficalPosts.comments}/>
+                    {posts.map((post) => (
+                        <DisplayPostComponent
+                            key={post.postID}
+                            postID={post.postID}
+                            posterName={post.posterName}
+                            avatarSrc={post.posterPictureUrl}
+                            title={post.title}
+                            imageSrc={post.imageSrc}
+                            posterUserID={post.posterUserID}
+                            daysSincePosted={post.daysSincePosted}
+                            content={post.content}
+                            likes={post.likes}
+                            comments={post.comments}
+                            recipient={post.recipient} 
+                            initialHasLiked={post.initialHasLiked}
+                            currentUserID={post.posterID}
+                            posterID="might_remove"
+                        />
                     ))}
                 </ul>
             )}
@@ -40,31 +50,36 @@ const OfficialPostPage = () => {
 }
 
 
-export const CommunityPost: Poster[] = [
-
-  ];
-
-
-const CommunityPostPage = ( ) => {
-    const router = useRouter();
+const CommunityPostPage = ({ posts }: { posts: Poster[] }) => {
+    // ...
     return (
         <div className="mt-3">
-            {CommunityPost.length === 0 ? (<p>No users found</p>) : (
+            {posts.length === 0 ? (<p>No community posts in your feed yet.</p>) : (
                 <ul className="space-y-4">
-                    {CommunityPost.map((CommunityPost) => (
-                        <DisplayPostComponent key={CommunityPost.postID} posterName={CommunityPost.posterName}
-                        daysSincePosted={CommunityPost.daysSincePosted}
-                        content={CommunityPost.content}
-                        likes={CommunityPost.likes}
-                        comments={CommunityPost.comments}
-                        onAvatarClicked={()=>router.push(`/visit/${CommunityPost.posterID}`)}/>
+                    {posts.map((post) => (
+                        <DisplayPostComponent
+                            key={post.postID}
+                            postID={post.postID}
+                            posterName={post.posterName}
+                            avatarSrc={post.posterPictureUrl}
+                            title={post.title}
+                            imageSrc={post.imageSrc}
+                            posterUserID={post.posterUserID}
+                            daysSincePosted={post.daysSincePosted}
+                            content={post.content}
+                            likes={post.likes}
+                            comments={post.comments}
+                            recipient={post.recipient} 
+                            initialHasLiked={post.initialHasLiked}
+                            currentUserID={post.posterID}
+                            posterID="might_remove"
+                        />
                     ))}
                 </ul>
             )}
         </div>
     );
 }
-
 export const UpcomingEvents: Event[] = [
     {
         eventID: "1",
@@ -136,16 +151,23 @@ const UpcomingEventsPage = () => {
 
 
 
-export default function StudentNewsfeedCard({ className, myButtons, selectedButtonId, onButtonSelect}: Props) {
+export default function StudentNewsfeedCard({ 
+    className, 
+    myButtons, 
+    selectedButtonId, 
+    onButtonSelect,
+    officialPosts,  // <-- Destructure new props
+    communityPosts
+}: Props) {
     const combinedClassName = `flex flex-col ${className || ''}`;
-    const router = useRouter();
 
     return (
         <div className={combinedClassName}>
-            <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect}></HorizontalNavBar>
-            {selectedButtonId === "officialPost" && <OfficialPostPage></OfficialPostPage>}
-            {selectedButtonId === "communityPost" && <CommunityPostPage></CommunityPostPage>}
-            {selectedButtonId === "upcomingEvents" && <UpcomingEventsPage></UpcomingEventsPage>}
+            <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect} />
+            {/* Pass the fetched posts to the correct sub-page */}
+            {selectedButtonId === "officialPost" && <OfficialPostPage posts={officialPosts} />}
+            {selectedButtonId === "communityPost" && <CommunityPostPage posts={communityPosts} />}
+            {selectedButtonId === "upcomingEvents" && <UpcomingEventsPage />}
         </div>
     );
 }

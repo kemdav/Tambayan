@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { FaBook, FaUser, FaCogs, FaPlus, FaEllipsisV, FaTrash } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { createWikiSection, deleteWikiSection } from "@/lib/actions/wiki";
 
 interface CardItem {
   id: string;
@@ -13,16 +14,19 @@ interface CardItem {
 }
 
 interface WikiCardWithLinksProps {
+  initialWikiSections: WikiSectionData[]; // <-- Accept initial data
+  orgId: string; // <-- Need this to create/delete
   hasPermission?: boolean;
 }
 
-export default function WikiCardWithLinks({ hasPermission = false }: WikiCardWithLinksProps) {
+interface WikiSectionData {
+  id: string;
+  title: string;
+}
+
+export default function WikiCardWithLinks({ initialWikiSections, orgId, hasPermission = false }: WikiCardWithLinksProps) {
   const router = useRouter();
-  const [wikiCards, setWikiCards] = useState<CardItem[]>([
-    { id: "1", title: "Introduction", icon: <FaBook /> },
-    { id: "2", title: "How to Join", icon: <FaUser /> },
-    { id: "3", title: "Settings & Tools", icon: <FaCogs /> },
-  ]);
+  const [wikiCards, setWikiCards] = useState(initialWikiSections);
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
@@ -38,15 +42,22 @@ export default function WikiCardWithLinks({ hasPermission = false }: WikiCardWit
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleAddCard = () => {
-    const newId = (wikiCards.length + 1).toString();
-    const newCard: CardItem = {
-      id: newId,
-      title: `New Wiki ${newId}`,
-      icon: <FaPlus />,
-    };
-    setWikiCards([...wikiCards, newCard]);
+ const handleAddCard = async () => {
+    const title = prompt("Enter title for new section:");
+    if (!title) return;
+    // Call the server action
+    const result = await createWikiSection(orgId, title, "Default content.");
+    if (result.error) alert(result.error);
+    // Path revalidation will refresh the data on the page
   };
+
+   const handleDeleteCard = async (wikiId: string) => {
+    if (!confirm("Are you sure you want to delete this section?")) return;
+    // Call the server action
+    const result = await deleteWikiSection(Number(wikiId), orgId);
+    if (result.error) alert(result.error);
+    // Path revalidation will refresh
+  }
 
   return (
     <div className="flex flex-col items-center mt-10 min-h-screen px-4 bg-gray-100">
@@ -74,16 +85,13 @@ export default function WikiCardWithLinks({ hasPermission = false }: WikiCardWit
                 className="flex items-center flex-1 min-w-0"
                 role="button"
                 tabIndex={0}
-                onClick={() => router.push(`/wiki/${card.id}`)}
+                onClick={() => router.push(`/organization/${orgId}/wiki/${card.id}`)}
                 onKeyDown={e => {
                   if (e.key === 'Enter' || e.key === ' ') {
-                    router.push(`/wiki/${card.id}`);
+                    router.push(`/organization/${orgId}/wiki/${card.id}`);
                   }
                 }}
               >
-                {card.icon && (
-                  <span className="mr-3 text-green-600 text-lg">{card.icon}</span>
-                )}
                 <span className="text-base font-medium text-green-800 truncate">
                   {card.title}
                 </span>
@@ -110,7 +118,7 @@ export default function WikiCardWithLinks({ hasPermission = false }: WikiCardWit
                       className="w-full flex items-center px-4 py-2 text-red-600 hover:bg-red-50 hover:text-red-800"
                       onClick={e => {
                         e.stopPropagation();
-                        setWikiCards(wikiCards.filter(c => c.id !== card.id));
+                        handleDeleteCard(card.id)
                         setOpenMenuId(null);
                       }}
                     >
