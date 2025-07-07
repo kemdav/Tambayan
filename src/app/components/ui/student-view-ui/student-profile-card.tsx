@@ -28,6 +28,7 @@ interface AboutPageProps {
     // Add the new props
     aboutText: string | null;
     onEditClick: () => void;
+    isOwnProfile: boolean;
 }
 
 // 2. Fix the AboutPage component to accept ONE props object
@@ -40,7 +41,8 @@ const AboutPage = ({
     studentEventsJoined,
     studentTotalOrg,
     aboutText,
-    onEditClick
+    onEditClick,
+    isOwnProfile
 }: AboutPageProps) => {
 
     return (
@@ -63,7 +65,7 @@ const AboutPage = ({
                 <div>
                     <p className="text-action-forest-green">
                         <strong>Description </strong>
-                        <Button onClick={onEditClick}>Edit Description</Button>
+                        {isOwnProfile && <Button onClick={onEditClick}>Edit Description</Button>}
                     </p>
                     <p className="max-w-250 text-action-forest-green whitespace-pre-line">
                         {aboutText || "No description provided."}
@@ -147,6 +149,7 @@ interface Props {
     initialComments: StudentComment[];
     profile: StudentProfile;
     onProfileUpdate: (updatedData: Partial<StudentProfile>) => void;
+    isOwnProfile: boolean;
 }
 
 
@@ -159,7 +162,8 @@ export default function StudentProfileCard({
     currentUserID,
     selectedButtonId,
     posts,
-    onButtonSelect
+    onButtonSelect,
+    isOwnProfile
 }: Props) {
     const combinedClassName = `flex flex-col ${className || ''}`;
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -191,6 +195,7 @@ export default function StudentProfileCard({
                         studentJoinDate="Sep 2024" 
                         studentEventsJoined="0"
                         studentTotalOrg="0"
+                        isOwnProfile={isOwnProfile}
                     />
                 )}
                 {selectedButtonId === "post" && <PostPage posts={posts} currentUserID={currentUserID} />}

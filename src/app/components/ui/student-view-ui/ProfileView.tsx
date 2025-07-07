@@ -17,16 +17,20 @@ interface ProfileViewProps {
   initialPosts: Poster[];
   currentUserID: string;
   initialComments: StudentComment[];
+  isOwnProfile: boolean;
 }
 
-export default function ProfileView({ initialProfile, initialPosts, currentUserID, initialComments }: ProfileViewProps) {
-  console.log("ProfileView received initialPosts:", initialPosts);
-    console.log("ProfileView received currentUserID:", currentUserID);
-    console.log("COMMENT PAGE COMMENT 2=", initialComments);
+export default function ProfileView({ initialProfile, initialPosts, currentUserID, initialComments,  isOwnProfile }: ProfileViewProps) {
+  // console.log("ProfileView received initialPosts:", initialPosts);
+  //   console.log("ProfileView received currentUserID:", currentUserID);
+  //   console.log("COMMENT PAGE COMMENT 2=", initialComments);
+
+
   // All your hooks and state management live here!
   const [profile, setProfile] = useState<StudentProfile>(initialProfile);
   const [selectedNavId, setSelectedNavId] = useState<string>("post");
 
+  
   
 
   useEffect(() => {
@@ -45,6 +49,8 @@ export default function ProfileView({ initialProfile, initialPosts, currentUserI
   } = profile;
 
   const handleProfileUpdate = (updatedProfileData: Partial<StudentProfile>) => {
+    // We should only allow updates if it's our own profile
+    if (!isOwnProfile) return;
     setProfile(prevProfile => ({ ...prevProfile, ...updatedProfileData }));
   };
 
@@ -53,13 +59,14 @@ export default function ProfileView({ initialProfile, initialPosts, currentUserI
     <main className="w-full h-full">
       <main className="w-full grid place-items-center items-start">
         <div className="mainContentCard">
-          <StudentProfileHeader isEditable={true} initialProfile={profile} onProfileUpdate={handleProfileUpdate}></StudentProfileHeader>
+          <StudentProfileHeader isEditable={isOwnProfile} initialProfile={profile} onProfileUpdate={handleProfileUpdate} name={""}></StudentProfileHeader>
           <StudentProfileCard
             className="h-1/2"
             myButtons={ProfileViewNavBarContents}
             selectedButtonId={selectedNavId}
             onButtonSelect={setSelectedNavId}
             currentUserID={currentUserID}
+            isOwnProfile={isOwnProfile}
             posts={initialPosts}
             initialComments={initialComments} // Changed from 'comments' to 'initialComments' to match the prop name
             // Pass the entire profile object
