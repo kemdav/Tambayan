@@ -15,6 +15,16 @@ export default function AuthNavBar() {
         <Button
           variant="navigation"
           className="bg-secondary-muted-sage text-neutral-ivory-white lg:w-40 h-16"
+          onClick={() => router.push("/school-admin-register")}
+        >
+          <span className="flex flex-col items-center leading-tight">
+            University
+            <span>Registration</span>
+          </span>
+        </Button>
+        <Button
+          variant="navigation"
+          className="bg-secondary-muted-sage text-neutral-ivory-white lg:w-40 h-16"
           onClick={() => router.push("/register")}
         >
           Register
