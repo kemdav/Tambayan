@@ -5,6 +5,7 @@ import { getOrganizationProfile } from "@/lib/actions/organization";
 import OrganizationNewsfeedPageClient from "./organization-newsfeed-page-client";
 import { getUserOrgRole } from '@/lib/actions/permissions';
 import { createClient } from "@/lib/supabase/server"; // To get current user
+import { getOrgUpcomingEvents } from '@/lib/actions/events'; 
 
 interface NewsfeedPageProps {
   params: { "org-id": string; };
@@ -13,27 +14,36 @@ interface NewsfeedPageProps {
 export default async function NewsfeedPage({ params }: NewsfeedPageProps) {
   const { "org-id": orgId } = await params;
   const supabase = await createClient(); // Server client
+  
 
   // Fetch organization profile
   const [
     organizationProfile,
     officialPosts,
     communityPosts,
-    userRole, // <-- Get the user's role
-    { data: { user } } // <-- Get the current user
+    userRole, 
+    { data: { user } },
+    upcomingEventsData,
   ] = await Promise.all([
     getOrganizationProfile(orgId),
     getOrgPosts(orgId, true),
     getOrgPosts(orgId, false),
     getUserOrgRole(orgId), // <-- Use our new action
-    supabase.auth.getUser()
+    supabase.auth.getUser(),
+     getOrgUpcomingEvents(orgId),
   ]);
 
   if (!organizationProfile) {
     return <div>Organization not found.</div>;
   }
 
-  const canManageOrg = !!userRole.role;
+   const upcomingEvents = upcomingEventsData.map(event => ({
+        ...event,
+        date: event.date ? new Date(event.date).toISOString() : null,
+    }));
+
+  const officerRoles = ['President', 'VP', 'PRO'];
+    const canManageOrg = officerRoles.includes(userRole.role || '');
 
   return (
     <OrganizationNewsfeedPageClient
@@ -42,6 +52,7 @@ export default async function NewsfeedPage({ params }: NewsfeedPageProps) {
       communityPosts={communityPosts}
       canManageOrg={canManageOrg} // <-- Pass this new prop
       currentUserId={user?.id ?? undefined}
+       upcomingEvents={upcomingEvents}
     />
   );
 }
