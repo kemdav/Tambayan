@@ -7,6 +7,7 @@ import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
 import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
 import { LogOutIcon as SettingsIcon } from "@/app/components/icons/LogOutIcon";
 import Image from "next/image";
+import { AddIcon } from "@/app/components/icons/AddIcon";
 
 // A simple hamburger icon component for clarity
 const HamburgerIcon = ({ className }: { className?: string }) => (
@@ -62,6 +63,12 @@ const navButtons: ButtonConfig[] = [
     children: "Accreditation",
     icon: <img src="/accredit.svg" alt="Accreditation" className="w-4 h-5" />,
     href: "/admin/accreditation",
+  },
+  {
+    id: "create-org",
+    children: "Create New Organization",
+    icon: <AddIcon className="w-5 h-5" />,
+    href: "/admin/create-org",
   },
   {
     id: "settings",
