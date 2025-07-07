@@ -27,20 +27,20 @@ export const myButtons: ButtonConfig[] = [
       icon: <NewsfeedIcon className="size-10" />,
     },
     {
+        id: "upcomingEvents",
+        variant: "sideNavigation",
+        href:"upcoming-events",
+      children: "Upcoming Events",
+      className: "sideNavBarButtonText",
+      icon: <AddIcon className="size-10" />,
+    },
+    {
       id: "wiki",
       variant: "sideNavigation",
       href:"wiki",
       children: "Wiki",
       className: "sideNavBarButtonText",
       icon: <WikiIcon className="size-10" />,
-    },
-    {
-      id: "manage",
-      variant: "sideNavigation",
-      href:"manage",
-      children: "Settings",
-      className: "sideNavBarButtonText",
-      icon: <LogOutIcon className="size-10" />,
     }
   ];
 

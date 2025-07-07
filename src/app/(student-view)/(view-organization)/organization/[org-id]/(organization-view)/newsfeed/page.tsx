@@ -1,26 +1,47 @@
-"use client";
+// app/.../newsfeed/page.tsx
 
-import StudentProfileCard from "@/app/components/ui/student-view-ui/student-profile-card";
-import StudentProfileHeader from "@/app/components/ui/student-view-ui/student-profile-header";
-import { useState } from "react";
-import StudentNewsfeedCard from "@/app/components/ui/student-view-ui/student-newsfeed-card";
-import { myButtons } from "./navBarContents";
-import StudentOrgNewsfeedCard from "@/app/components/ui/student-view-ui/student-org-newsfeed-card";
+import { getOrgPosts } from "@/lib/actions/post";
+import { getOrganizationProfile } from "@/lib/actions/organization";
+import OrganizationNewsfeedPageClient from "./organization-newsfeed-page-client";
+import { getUserOrgRole } from '@/lib/actions/permissions';
+import { createClient } from "@/lib/supabase/server"; // To get current user
 
-export default function TagComponentTestPage() {
-    const [selectedNavId, setSelectedNavId] = useState<string>("official");
+interface NewsfeedPageProps {
+  params: { "org-id": string; };
+}
+
+export default async function NewsfeedPage({ params }: NewsfeedPageProps) {
+  const { "org-id": orgId } = await params;
+  const supabase = await createClient(); // Server client
+
+  // Fetch organization profile
+  const [
+    organizationProfile,
+    officialPosts,
+    communityPosts,
+    userRole, // <-- Get the user's role
+    { data: { user } } // <-- Get the current user
+  ] = await Promise.all([
+    getOrganizationProfile(orgId),
+    getOrgPosts(orgId, true),
+    getOrgPosts(orgId, false),
+    getUserOrgRole(orgId), // <-- Use our new action
+    supabase.auth.getUser()
+  ]);
+
+  if (!organizationProfile) {
+    return <div>Organization not found.</div>;
+  }
+
+  const canManageOrg = !!userRole.role;
 
   return (
-    <main className="w-full grid place-items-center items-start mt-10 md:mt-0">
-        <div className="h-auto w-full max-w-3xl shadow-lg/100 p-4">
-        <StudentProfileHeader isEditable={true} name="ICPEP"></StudentProfileHeader>
-            <StudentOrgNewsfeedCard className="h-1/2" 
-            myButtons={myButtons} 
-            selectedButtonId={selectedNavId}
-             onButtonSelect={setSelectedNavId}></StudentOrgNewsfeedCard>
-            
-        </div>
-        
-    </main>
+    <OrganizationNewsfeedPageClient
+      initialOrganizationProfile={organizationProfile}
+      officialPosts={officialPosts}
+      communityPosts={communityPosts}
+      canManageOrg={canManageOrg} // <-- Pass this new prop
+      currentUserId={user?.id ?? undefined}
+    />
   );
-} 
+}

@@ -35,7 +35,7 @@ export default async function SubscribedOrgsPage() {
   }
   
   const { data: subscribedOrgsData, error: orgsError } = await supabase
-    .from("orgmember")
+    .from("subscribedorg")
     .select(`
       organizations!inner (
         orgid, orgname, status, picture, cover_photo_path,
@@ -76,7 +76,7 @@ export default async function SubscribedOrgsPage() {
       tagTextColor: org.status === 'active' ? 'text-green-800' : 'text-red-800',
       buttons: [
         { label: "View", bgColor: "bg-blue-500", textColor: "text-white" },
-        { label: "Leave", bgColor: "bg-red-500", textColor: "text-white" },
+        { label: "Unsubscribe", bgColor: "bg-red-500", textColor: "text-white" },
       ],
     };
 

@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;600&family=Jaro:opsz@6..72&display=swap");
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -63,7 +64,10 @@
   --color-action-moss-green: #358163;
 }
 
-html {
+html,
+body {
+  background: #faf7f2;
+  font-family: "Poppins", sans-serif;
   scrollbar-gutter: stable;
 }
 
@@ -136,4 +140,8 @@ input[type="password"]::-webkit-password-reveal-button {
 
 .animation-button {
   @apply transition-all duration-150 ease-in-out active:scale-95;
+}
+
+.font-jaro {
+  font-family: "Jaro", sans-serif;
 }

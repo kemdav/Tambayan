@@ -5,17 +5,35 @@ import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import { CreatePostComponent } from "@/app/components/ui/general/create-post-component";
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
 import SearchBar from "@/app/components/ui/student-view-ui/search-bar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { createPost } from "@/lib/actions/post";
+import { redirect, useRouter } from "next/navigation";
+import { ShowcaseCardProps } from "@/app/components/ui/general/showcase-card-component";
 
 interface Props {
   children: React.ReactNode;
 }
+
+type OrgOption = {
+  value: string;
+  label: string;
+};
 
 export const myButtons: ButtonConfig[] = [
   {
     id: "profile",
     children: "Student Profile",
     href: "/profile",
+    variant: "sideNavigation",
+    className:
+      "sideNavBarButtonText",
+    icon: <StudentProfileIcon className="size-10" />,
+  },
+  {
+    id: "searchProfile",
+    children: "Search Profile",
+    href: "/search",
     variant: "sideNavigation",
     className:
       "sideNavBarButtonText",
@@ -64,14 +82,111 @@ const SideBar = () => {
   </div>);
 }
 
-function CreatePost() {
-  <CreatePostComponent></CreatePostComponent>
-}
-
 export default function StudentVerticalNavigation({ children }: Props) {
-
   const [isCreatePostOpen, setCreatePostOpen] = useState(false);
   const [selectedNavId, setSelectedNavId] = useState<string>("profile");
+  const [orgOptions, setOrgOptions] = useState<OrgOption[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  const [postType, setPostType] = useState("default");
+  const [org, setOrg] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [eventLocation, setEventLocation] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [registrationStart, setRegistrationStart] = useState<Date | undefined>();
+  const [registrationEnd, setRegistrationEnd] = useState<Date | undefined>();
+  const [submitted, setSubmitted] = useState<any>(null);
+
+  // Tag and photo state
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  useEffect(() => {
+    const fetchOrgOptions = async () => {
+      const supabase = createClient();
+
+      // --- THIS IS THE NEW, SIMPLIFIED LOGIC ---
+      // Make a single call to our new RPC function.
+       const { data, error } = await supabase.rpc('get_user_subscribed_org_options');
+
+      if (error) {
+        console.error("Error fetching organization options:", error);
+        return;
+      }
+
+      // The `data` is already in the perfect [{ value, label }] format.
+      // No .map() or .filter() needed!
+      if (data) {
+        setOrgOptions(data);
+      }
+    };
+
+    fetchOrgOptions();
+  }, []);
+  // Tag handlers
+  const handleAddTag = () => {
+    const trimmed = tagInput.trim();
+    if (trimmed && !tags.includes(trimmed)) {
+      setTags([...tags, trimmed]);
+    }
+    setTagInput("");
+  };
+  const handleRemoveTag = (tag: string) => {
+    setTags(tags.filter(t => t !== tag));
+  };
+
+  // Photo handler
+  const handlePhotoChange = (file: File | null) => {
+    setPhotoFile(file);
+  };
+  const handlePost = async () => {
+    // Basic validation on the client-side
+    if (!org) {
+      alert("Please select an organization.");
+      return;
+    }
+    if (!content.trim()) {
+      alert("Post content cannot be empty.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const formData = new FormData();
+    formData.append('orgId', org);
+    formData.append('title', title);
+    formData.append('content', content);
+    if (photoFile) {
+      formData.append('photoFile', photoFile);
+    }
+
+    // 2. Call the server action
+    const result = await createPost(formData);
+
+    setIsSubmitting(false); // Re-enable the button
+
+    // 3. Handle the result
+    if (result.error) {
+      alert(`Error: ${result.error}`); // Show an error message
+    } else {
+      // Success!
+      alert(result.success);
+      closeAndResetModal(); // Call a helper function to clean up
+      router.refresh(); // THIS IS THE MAGIC! It refetches server data and updates the UI.
+    }
+  };
+  const closeAndResetModal = () => {
+    setCreatePostOpen(false);
+    setPostType("default");
+    setOrg(null);
+    setTitle("");
+    setContent("");
+    setPhotoFile(null);
+    // Reset any other form fields here...
+  };
+
+
 
   return (
     <>
@@ -81,7 +196,36 @@ export default function StudentVerticalNavigation({ children }: Props) {
           onClick={() => setCreatePostOpen(false)}
         >
           <div onClick={(e) => e.stopPropagation()}>
-            <CreatePostComponent/>
+            <CreatePostComponent
+              className="max-w-2xl min-w-1xl md:w-2xl"
+              postType={postType}
+              onPostTypeChange={setPostType}
+              org={org}
+              onOrgChange={setOrg}
+              title={title}
+              orgOptions={orgOptions}
+              onTitleChange={setTitle}
+              content={content}
+              isSubmitting={isSubmitting}
+              onContentChange={setContent}
+              onPost={handlePost}
+              eventLocation={eventLocation}
+              onEventLocationChange={setEventLocation}
+              eventDate={eventDate}
+              onEventDateChange={setEventDate}
+              registrationStart={registrationStart}
+              onRegistrationStartChange={setRegistrationStart}
+              registrationEnd={registrationEnd}
+              onRegistrationEndChange={setRegistrationEnd}
+              tags={tags}
+              tagInput={tagInput}
+              onTagInputChange={setTagInput}
+              onAddTag={handleAddTag}
+              postButtonText={isSubmitting ? "Posting..." : "Post"}
+              onRemoveTag={handleRemoveTag}
+              photoFile={photoFile}
+              onPhotoChange={handlePhotoChange}
+            />
           </div>
         </div>
       )}
@@ -91,7 +235,6 @@ export default function StudentVerticalNavigation({ children }: Props) {
           <SideBar></SideBar>
         </div>
         <div className="flex-grow flex flex-col items-center pt-5">
-          <SearchBar className="w-full max-w-4xl"></SearchBar>
           {children}
         </div>
         <div className="z-20 fixed bottom-0 right-0 sm:mx-10 sm:my-10 opacity-50 md:opacity-100">

@@ -35,7 +35,7 @@ export default function AuthLoginCard({
   onSignUp,
 }: AuthLoginCardProps) {
   return (
-    <div className="card w-100 md:w-130 lg:w-130 h-105">
+    <div className="card w-100 md:w-130 lg:w-130 h-110">
       <div className="flex flex-col justify-center items-center">
         <h1 className="responsiveCardHeading text-center mb-2">
           Log In to Your Account
