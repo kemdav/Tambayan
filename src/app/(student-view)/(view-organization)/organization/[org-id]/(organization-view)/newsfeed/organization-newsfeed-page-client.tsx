@@ -10,6 +10,9 @@ import { Poster } from "@/lib/types/types";
 import { Tables } from "@/lib/database.types"; 
 
 type OrganizationProfile = Tables<'organizations'>;
+type EventWithOrg = Tables<'events'> & {
+    organizations: Pick<Tables<'organizations'>, 'orgname' | 'picture'> | null;
+};
 
 interface OrganizationNewsfeedPageClientProps {
   initialOrganizationProfile: OrganizationProfile; // Renamed for clarity
@@ -19,6 +22,7 @@ interface OrganizationNewsfeedPageClientProps {
   // You might want a prop to determine if the current user can edit
   // This would typically be checked on the server and passed down
   canManageOrg: boolean;
+  upcomingEvents: EventWithOrg[];
 }
 
 export default function OrganizationNewsfeedPageClient({
@@ -27,6 +31,7 @@ export default function OrganizationNewsfeedPageClient({
   communityPosts,
   currentUserId,
   canManageOrg,
+   upcomingEvents,
   canManageOrg: canEdit
 }: OrganizationNewsfeedPageClientProps) {
   const [selectedNavId, setSelectedNavId] = useState<string>("official");
@@ -40,6 +45,8 @@ export default function OrganizationNewsfeedPageClient({
       ...updatedData
     }));
   };
+
+  console.log("UPCOMING EVENTS CLIENT", upcomingEvents);
 
   return (
     <main className="w-full grid place-items-center items-start mt-10 md:mt-0">
@@ -58,6 +65,7 @@ export default function OrganizationNewsfeedPageClient({
                 communityPosts={communityPosts}
                 canManageOrg={canManageOrg} // <-- Pass it down
                 currentUserID={currentUserId} // <-- Pass it down
+                upcomingEvents={upcomingEvents}
             />
         </div>
     </main>

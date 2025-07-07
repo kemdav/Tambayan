@@ -3,18 +3,27 @@
 
 import { getNewsfeedPosts } from '@/lib/actions/newsfeed'; // Import the new action
 import StudentNewsfeedClient from './student-newsfeed-client'; // We will create this new client component
+import { getUpcomingEvents, getRegisteredEvents } from "@/lib/actions/events";
 
-// This is now a Server Component
 export default async function NewsfeedPage() {
-    // Fetch both official and community posts on the server
-    const officialPosts = await getNewsfeedPosts(true);
-    const communityPosts = await getNewsfeedPosts(false);
+    const [
+        officialPosts,
+        communityPosts,
+        upcomingEvents,
+        registeredEvents,
+    ] = await Promise.all([
+        getNewsfeedPosts(true),
+        getNewsfeedPosts(false),
+        getUpcomingEvents(),
+        getRegisteredEvents(),
+    ]);
 
-    // Pass the fetched data down to a client component for interactivity
     return (
         <StudentNewsfeedClient
-            initialOfficialPosts={officialPosts}
-            initialCommunityPosts={communityPosts}
+            initialOfficialPosts={officialPosts || []}
+            initialCommunityPosts={communityPosts || []}
+            initialUpcomingEvents={upcomingEvents || []}
+            initialRegisteredEvents={registeredEvents || []} // <-- Add fallback here
         />
     );
 }
