@@ -42,10 +42,10 @@ export const myButtons: ButtonConfig[] = [
     icon: <LogOutIcon className="size-10" />,
   },
   {
-    id: "settings",
+    id: "accreditation",
     variant: "sideNavigation",
-    href: "manage/officers",
-    children: "Settings",
+    href: "accreditation",
+    children: "Accreditation",
     className: "sideNavBarButtonText",
     icon: <LogOutIcon className="size-10" />,
   }
