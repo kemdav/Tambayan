@@ -30,8 +30,8 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ initial
     );
   }, [search, organizations]);
 
-  const handleLeaveClick = async (orgID: string) => {
-    if (!confirm("Are you sure you want to leave this organization?")) {
+  const handleUnsubscribeClick = async (orgID: string) => {
+    if (!confirm("Are you sure you want to unsubscribe from this organization? You will no longer see their posts in your feed.")) {
       return;
     }
     
@@ -46,7 +46,7 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ initial
 
       // Perform the DELETE operation on the orgmember table
       const { error } = await supabase
-        .from('orgmember')
+        .from('subscribedorg')
         .delete()
         .eq('orgid', orgID)
         .eq('studentid', studentProfile.studentid);
@@ -65,10 +65,10 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ initial
       setIsLoading(null);
     }
   };
-
   const handleButtonClick = (buttonLabel: string, orgID: string) => {
-    if (buttonLabel === "Leave") {
-      handleLeaveClick(orgID);
+    console.log("HANDLE BUTTON CLIOCK = ", buttonLabel);
+    if (buttonLabel === "Unsubscribe") {
+      handleUnsubscribeClick(orgID);
     } else if (buttonLabel === "View") {
       router.push(`/organization/${orgID}/newsfeed`);
     }
@@ -93,11 +93,11 @@ const SubscribedOrgComponent: React.FC<SubscribedOrgComponentProps> = ({ initial
             <ShowcaseCard
               {...orgProps}
               buttons={orgProps.buttons.map(btn => {
-                const isLeaving = isLoading === orgProps.orgID && btn.label === "Leave";
+                const isUnsubscribing = isLoading === orgProps.orgID && btn.label === "Unsubscribe";
                 return {
                   ...btn,
-                  label: isLeaving ? "Leaving..." : btn.label,
-                  disabled: isLeaving,
+                  label: isUnsubscribing ? "Unsubscribing..." : btn.label,
+                  disabled: isUnsubscribing,
                   onClick: () => handleButtonClick(btn.label, orgProps.orgID),
                 };
               })}

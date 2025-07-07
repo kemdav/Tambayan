@@ -16,15 +16,6 @@ export const myButtons: ButtonConfig[] = [
       className:
         "sideNavBarButtonText",
       icon: <StepBackIcon className="size-10" />,
-    },
-    {
-        id: "profile",
-      children: "Profile",
-      variant: "sideNavigation",
-      href:"newsfeed",
-      className:
-        "sideNavBarButtonText",
-      icon: <NewsfeedIcon className="size-10" />,
     }
   ];
 

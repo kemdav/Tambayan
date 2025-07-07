@@ -13,9 +13,16 @@
 
 1. Run this bash command to generate the migration file. Use a descriptive name like "create_orgs_and_students_tables".
 
+    For Database Schema
+
     ```bash
-    npx supabase db diff -f a_descriptive_name_for_your_change
+    npx supabase db diff -f branch_name_description_for_change
     ```
+
+    For Storage Changes
+
+    ```bash
+    supabase db diff --schema storage -f branch_name_description_for_change
 
 2. Verifying the entire migration chain. A success means that you can probably push it. I think?
 

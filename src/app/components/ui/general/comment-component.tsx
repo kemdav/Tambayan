@@ -1,16 +1,19 @@
 import * as React from "react";
 import { AvatarIcon } from "./avatar-icon-component";
 import { Button } from "./button";
+import { addComment } from "@/lib/actions/comment"; // Import the new action
+import type { CommentType } from "@/lib/types/types";
 
 interface CommentComponentProps {
   open: boolean;
   onClose: () => void;
   posterName: string;
+  postID: number;
   avatarSrc?: string | null;
   daysSincePosted: number;
   content: string;
   imageSrc?: string;
-  comments?: { name: string; avatarSrc?: string | null; text: string }[];
+  initialComments: CommentType[];
 }
 
 export const CommentComponent: React.FC<CommentComponentProps> = ({
@@ -21,14 +24,47 @@ export const CommentComponent: React.FC<CommentComponentProps> = ({
   daysSincePosted,
   content,
   imageSrc,
-  comments = [],
+  postID,
+  initialComments,
 }) => {
-  const [comment, setComment] = React.useState("");
-  const [commentList, setCommentList] = React.useState(comments);
+  console.log("Received initialComments:", initialComments);
+  const [commentList, setCommentList] = React.useState<CommentType[]>(initialComments);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [newComment, setNewComment] = React.useState("");
 
   React.useEffect(() => {
-    setCommentList(comments);
-  }, [comments, open]);
+    if (open) {
+      setCommentList(initialComments);
+    }
+  }, [initialComments, open]);
+
+  const handleSaveComment = async () => {
+    if (!newComment.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    const tempId = `temp-${Date.now()}`;
+    // Optimistic UI Update (optional but recommended)
+    // Create a temporary comment to show in the UI immediately
+    const tempComment: CommentType = {
+      comment_id: tempId, // Temporary key
+      comment_text: newComment,
+      created_at: new Date().toISOString(),
+      author: { fname: 'You', lname: '', picture: null } // Placeholder for author
+    };
+    setCommentList(prev => [...prev, tempComment]);
+    setNewComment("");
+
+    const result = await addComment(postID, newComment);
+
+    if (result.error) {
+      alert(result.error);
+      // If server fails, remove the temporary comment
+      setCommentList(prev => prev.filter(c => c.comment_id !== tempComment.comment_id));
+    }
+    // On success, revalidatePath on the server will handle getting the real data on next load.
+
+    setIsSubmitting(false);
+  };
 
   if (!open) return null;
 
@@ -74,16 +110,16 @@ export const CommentComponent: React.FC<CommentComponentProps> = ({
             commentList.map((c, i) => (
               <div key={i} className="flex items-start gap-2 mb-3 bg-neutral-pure-white rounded-lg">
                 <AvatarIcon
-                  src={c.avatarSrc}
-                  alt={c.name}
+                  src={c.author?.picture}
+                  alt={c.author?.fname || 'User'}
                   className="h-6 w-6 text-base"
                 />
                 <div>
                   <div className="font-semibold text-xs text-neutral-muted-olive">
-                    {c.name}
+                    {c.author?.fname} {c.author?.lname}
                   </div>
                   <div className="text-neutral-charcoal-green text-sm break-words">
-                    {c.text}
+                    {c.comment_text}
                   </div>
                 </div>
               </div>
@@ -97,8 +133,8 @@ export const CommentComponent: React.FC<CommentComponentProps> = ({
           <textarea
             className="w-full border rounded-lg p-2 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-secondary-light-moss bg-neutral-pure-white"
             rows={2}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
             placeholder="Write a comment..."
           />
           <div className="flex justify-end gap-2">
@@ -111,17 +147,11 @@ export const CommentComponent: React.FC<CommentComponentProps> = ({
             </Button>
             <Button
               className="bg-action-forest-green text-white px-4 py-1 rounded hover:bg-action-moss-green disabled:opacity-50"
-              onClick={() => {
-                setCommentList([
-                  ...commentList,
-                  { name: "You", avatarSrc: null, text: comment },
-                ]);
-                setComment("");
-              }}
-              disabled={!comment.trim()}
+              onClick={handleSaveComment}
+              disabled={!newComment.trim() || isSubmitting}
               type="button"
             >
-              Save
+              {isSubmitting ? "Saving..." : "Save"}
             </Button>
           </div>
         </div>

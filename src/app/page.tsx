@@ -1,9 +1,19 @@
 "use client";
 import { Button } from "@/app/components/ui/general/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const code = searchParams.get("code");
+    if (code) {
+      router.replace(`/reset-password?code=${encodeURIComponent(code)}`);
+    }
+  }, [searchParams, router]);
+
   return (
     <main>
       <h1 className="text-5xl">Quick Links</h1>
