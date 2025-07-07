@@ -31,6 +31,15 @@ export const myButtons: ButtonConfig[] = [
     icon: <StudentProfileIcon className="size-10" />,
   },
   {
+    id: "searchProfile",
+    children: "Search Profile",
+    href: "/search",
+    variant: "sideNavigation",
+    className:
+      "sideNavBarButtonText",
+    icon: <StudentProfileIcon className="size-10" />,
+  },
+  {
     id: "newsfeed",
     children: "Newsfeed",
     variant: "sideNavigation",
@@ -226,7 +235,6 @@ export default function StudentVerticalNavigation({ children }: Props) {
           <SideBar></SideBar>
         </div>
         <div className="flex-grow flex flex-col items-center pt-5">
-          <SearchBar className="w-full max-w-4xl"></SearchBar>
           {children}
         </div>
         <div className="z-20 fixed bottom-0 right-0 sm:mx-10 sm:my-10 opacity-50 md:opacity-100">

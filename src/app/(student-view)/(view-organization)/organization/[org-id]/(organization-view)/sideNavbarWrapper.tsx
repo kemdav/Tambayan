@@ -36,7 +36,7 @@ export const myButtons: ButtonConfig[] = [
   {
     id: "officers",
     variant: "sideNavigation",
-    href: "manage/officers",
+    href: "officers",
     children: "Officers",
     className: "sideNavBarButtonText",
     icon: <LogOutIcon className="size-10" />,
