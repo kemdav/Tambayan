@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/app/components/ui/general/button";
@@ -36,7 +35,7 @@ export default function AuthLoginCard({
   onSignUp,
 }: AuthLoginCardProps) {
   return (
-    <div className="card w-100 md:w-130 lg:w-130 h-100">
+    <div className="card w-100 md:w-130 lg:w-130 h-110">
       <div className="flex flex-col justify-center items-center">
         <h1 className="responsiveCardHeading text-center">
           Log In to Your Account

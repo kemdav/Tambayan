@@ -88,7 +88,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-transparent">
       <AuthLoginCard
         email={email}
         password={password}
@@ -97,7 +97,7 @@ export default function LoginPage() {
         error={error}
         onEmailChange={handleEmailChange}
         onPasswordChange={e => setPassword(e.target.value)}
-        onRememberMeChange={handleRememberMeChange}
+       onRememberMeChange={handleRememberMeChange}
         // Here we pass our corrected handleLogin function
         onSubmit={handleLogin}
         onForgotPassword={() => router.push("/forgot-password")}
