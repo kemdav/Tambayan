@@ -32,7 +32,7 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/newsfeed')
 }
 
 export async function signup(formData: FormData) {
