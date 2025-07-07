@@ -1,12 +1,11 @@
 // app/organization/[org-id]/wiki/WikiListClient.tsx
 "use client";
 
-import { FaBook, FaUser, FaCogs } from "react-icons/fa";
-import WikiListComponent from "@/app/components/ui/general/wiki-list-component";
-import { useRouter } from "next/navigation";
 import OrganizationProfileHeader from "@/app/components/ui/organization-view-ui/OrganizationProfileHeadert";
 import { Tables } from "@/lib/database.types";
 import { useState } from "react";
+import WikiCardWithLinks from "@/app/components/ui/general/wiki-card-with-links";
+
 
 interface WikiSection {
   id: string;
@@ -14,26 +13,14 @@ interface WikiSection {
 }
 type OrganizationProfile = Tables<'organizations'>;
 interface WikiListClientProps {
+  orgId: string;
   organization: OrganizationProfile | null;
-  wikiSections: WikiSection[];
-  canEdit: boolean; // <-- Receive permission from server
+  wikiSections: { id: string, title: string }[]; // You are already receiving this
+  canEdit: boolean;
 }
 
-const icons: { [key: string]: React.ReactNode } = {
-  "Introduction": <FaBook />,
-  "How to Join": <FaUser />,
-  "Settings & Tools": <FaCogs />,
-};
-
-export default function WikiListClient({ organization, wikiSections, canEdit }: WikiListClientProps) {
-  const router = useRouter();
-   const [profile, setProfile] = useState(organization);
-
-  const cardsWithNavigation = wikiSections.map(card => ({
-    ...card,
-    icon: icons[card.title] || <FaBook />,
-    onClick: () => router.push(`wiki/${card.id}`), // Assumes relative path works
-  }));
+export default function WikiListClient({ orgId, organization, wikiSections, canEdit }: WikiListClientProps)  {
+const [profile, setProfile] = useState(organization);
 
   if (!profile) {
     // We handle the null case here, so the header won't receive null
@@ -56,7 +43,11 @@ export default function WikiListClient({ organization, wikiSections, canEdit }: 
             });
           }}
         />
-        <WikiListComponent textcolor="text-green-700" cards={cardsWithNavigation} />
+        <WikiCardWithLinks
+          hasPermission={canEdit}
+          initialWikiSections={wikiSections} // Pass the sections from props
+          orgId={orgId} // Pass the orgId from props
+        />
       </div>
     </div>
   );

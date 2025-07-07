@@ -21,12 +21,22 @@ export const metadata: Metadata = {
 
 interface OrgLayoutProps {
   children: React.ReactNode;
-  params: { 'org-id': string };
+  params: Promise<{ 'org-id': string }>;
 }
 
-export default async function OrganizationLayout({ children, params: { 'org-id': orgId } }: OrgLayoutProps){
-   const { role } = await getUserOrgRole(orgId);
-   const isOfficer = ['President', 'VP', 'PRO'].includes(role || '');
+export default async function OrganizationLayout(props: OrgLayoutProps) {
+  const params = await props.params;
+
+  const {
+    'org-id': orgId
+  } = params;
+
+  const {
+    children
+  } = props;
+
+  const { role } = await getUserOrgRole(orgId);
+  const isOfficer = ['President', 'VP', 'PRO'].includes(role || '');
   return (
       <StudentVerticalNavigation isOfficer={isOfficer}>{children}</StudentVerticalNavigation>
   );
