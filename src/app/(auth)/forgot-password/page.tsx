@@ -13,8 +13,12 @@ export default function ForgotPasswordPage() {
   const handleReset = async () => {
     setLoading(true);
     setError(null);
+    
     const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "http://127.0.0.1:3000/reset-password"
+    });
+    
     setLoading(false);
     if (error) {
       setError(error.message);
