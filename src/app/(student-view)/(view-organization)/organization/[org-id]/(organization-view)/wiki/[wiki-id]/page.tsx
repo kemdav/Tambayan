@@ -1,56 +1,30 @@
-"use client";
+// app/organization/[org-id]/wiki/[wiki-id]/page.tsx
+"use server";
 
-import React from "react";
-import WikiViewComponent from "@/app/components/ui/general/view-wiki";
-import { FaInfoCircle } from "react-icons/fa";
-import StudentProfileHeader from "@/app/components/ui/student-view-ui/student-profile-header";
+import { getUserOrgRole } from "@/lib/actions/permissions";
+import WikiViewClient from "./WikiViewClient"; // Create this client component
+import { getOrganizationProfile } from "@/lib/actions/organization";
+// import { getWikiContent } from "@/lib/actions/wiki"; // You'll need an action for this
+export default async function WikiDetailPage({ params: { 'org-id': orgId, 'wiki-id': wikiId } }: { params: { 'org-id': string, 'wiki-id': string } }) {
+  
+  const [{ role }, organization] = await Promise.all([
+    getUserOrgRole(orgId),
+    getOrganizationProfile(orgId)
+  ]);
+  const canEdit = !!role;
 
-export default function WikiPage() {
-  const handleBack = () => {
-    console.log("Back button clicked");
+  const wikiPageData = {
+    title: "How to Join",
+    content: `### Steps to Join ICpEP \n\n * **Eligibility Criteria:** Must be a student in a computer engineering program.`
   };
 
-  const description = `
-### Introduction to ICpEP
-
-* Provide a brief overview of the Institute of Computer Engineers of the Philippines (ICpEP).
-* Highlight the club's mission, vision, and the significance of being part of a community focused on computer engineering.
-
-### Membership Fees
-
-* Specify any membership fees (if applicable) and the payment methods accepted (e.g., GCASH, onsite).
-* Explain what the fees cover, such as workshops, events, and materials.
-
-### Engagement and Participation
-
-* Encourage new members to actively participate in club meetings, workshops, and events.
-* Emphasize the importance of collaboration and sharing ideas within the club.
-
-### Contact Information
-
-* Provide contact details for the club president or membership officer for any inquiries regarding the joining process.
-
-### Steps to Join ICpEP
-
-* **Eligibility Criteria:**
-    * Must be a student in a computer engineering program or related field.
-    * Open to all students interested in computer engineering.
-* **Application Process:**
-    * Visit the official ICpEP page on the Tambayan platform.
-    * Click the "Subscribe" button to express your interest in joining.
-`;
 
   return (
-    <div className="w-full grid place-items-center items-start mt-10 md:mt-0">
-        <div className="h-auto w-full max-w-3xl shadow-lg/100 p-4">
-        <StudentProfileHeader isEditable={true} name="ICPEP"></StudentProfileHeader>
-            <WikiViewComponent
-              title="How to Join"
-              icon={<FaInfoCircle className="text-green-700" />}
-              description={description}
-              onBack={handleBack}
-            />
-        </div>
-    </div>
+      <WikiViewClient
+        canEdit={canEdit}
+        wikiTitle={wikiPageData.title}
+        wikiContent={wikiPageData.content}
+        organization={organization}
+      />
   );
 }

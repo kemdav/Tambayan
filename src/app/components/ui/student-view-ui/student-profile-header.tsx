@@ -14,6 +14,7 @@ interface Props {
     onProfileUpdate: (updatedData: Partial<StudentProfile>) => void;
     profileName?: string;
     profilePictureUrl?: string | null;
+    name: string;
 }
 
 

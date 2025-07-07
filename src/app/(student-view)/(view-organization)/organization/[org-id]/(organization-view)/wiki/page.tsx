@@ -1,39 +1,31 @@
-"use client";
+// app/organization/[org-id]/wiki/page.tsx
+"use server"; // This page now needs to be a server component to fetch data
 
-import { FaBook, FaUser, FaCogs } from "react-icons/fa";
-import WikiListComponent from "@/app/components/ui/general/wiki-list-component";
-import { useRouter } from "next/navigation";
-import StudentProfileHeader from "@/app/components/ui/student-view-ui/student-profile-header";
+import { getUserOrgRole } from "@/lib/actions/permissions";
+import WikiListClient from "./WikiListClient"; // We will create this client component
+import { getOrganizationProfile } from "@/lib/actions/organization";
+import { getWikiSections } from "@/lib/actions/wiki"; // Assuming you have an action to get wiki sections
 
-const wikiData = [
-  {
-    id: "1",
-    title: "Introduction",
-    icon: <FaBook />,
-  },
-  {
-    id: "2",
-    title: "How to Join",
-    icon: <FaUser />,
-  },
-  {
-    id: "3",
-    title: "Settings & Tools",
-    icon: <FaCogs />,
-  },
-];
+// This is the Server Component part of the page
+export default async function WikiListPage({ params: { 'org-id': orgId } }: { params: { 'org-id': string } }) {
+  
+  const [
+    { role },
+    organization, // Get the full object
+    wikiSections
+  ] = await Promise.all([
+    getUserOrgRole(orgId),
+    getOrganizationProfile(orgId), // Fetches the full profile
+    getWikiSections(orgId)
+  ]);
 
-export default function WikiListTest() {
-  const router = useRouter();
-  const cardsWithNavigation = wikiData.map(card => ({
-    ...card,
-    onClick: () => router.push(`wiki/${card.id}`),
-  }));
+  const canEdit = !!role; // User can edit if they have any role in the org
+
   return (
-  <div className="w-full grid place-items-center items-start mt-10 md:mt-0">
-      <div className="h-auto w-full max-w-3xl shadow-lg/100 p-4">
-      <StudentProfileHeader isEditable={true} name="ICPEP"></StudentProfileHeader>
-          <WikiListComponent textcolor="text-green-700" cards={cardsWithNavigation} />
-      </div>
-  </div>);
+    <WikiListClient 
+      organization={organization}
+      wikiSections={wikiSections}
+      canEdit={canEdit}
+    />
+  );
 }
