@@ -37,21 +37,21 @@ export default function AuthLoginCard({
   return (
     <div className="card w-100 md:w-130 lg:w-130 h-110">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="responsiveCardHeading text-center">
+        <h1 className="responsiveCardHeading text-center mb-2">
           Log In to Your Account
         </h1>
-        <p className="textAuthResponsive text-xs text-center">
+        <p className="textAuthResponsive text-s text-center">
           Please sign in to proceed
         </p>
       </div>
 
-      <form className="flex flex-col gap-5 mt-3" onSubmit={onSubmit}>
+      <form className="flex flex-col mt-4" onSubmit={onSubmit}>
         <div>
-          <p className="textAuthResponsive">Email</p>
+          <p className="textAuthResponsive mb-1">Email</p>
           <Input
             rightIcon={<UserPofileLoginIcon />}
             className="bg-secondary-light-moss/20"
-            name="email" 
+            name="email"
             value={email}
             onChange={onEmailChange}
             type="email"
@@ -59,10 +59,10 @@ export default function AuthLoginCard({
           />
         </div>
         <div>
-          <p className="textAuthResponsive">Password</p>
+          <p className="textAuthResponsive mb-1 mt-5">Password</p>
           <PasswordInput
             className="bg-secondary-light-moss/20"
-            name="password" 
+            name="password"
             value={password}
             onChange={onPasswordChange}
             required
@@ -81,7 +81,7 @@ export default function AuthLoginCard({
           />
           <Button
             variant="link"
-            className="textAuthResponsive text-xs"
+            className="textAuthResponsive text-sm p-0"
             type="button"
             onClick={onForgotPassword}
           >
@@ -94,9 +94,7 @@ export default function AuthLoginCard({
         )}
 
         <Button
-          className="text-neutral-linen-white \
-        bg-linear-to-r from-action-seafoam-green to-action-forest-green\n         hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 \
-         font-bold text-xl w-full mt-3"
+          className="text-neutral-linen-white bg-linear-to-r from-action-seafoam-green to-action-forest-green hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 font-bold text-xl w-full mt-5 transition-colors duration-300"
           type="submit"
           disabled={loading}
         >
@@ -108,7 +106,7 @@ export default function AuthLoginCard({
         <p className="textAuthResponsive">Don't have an account?</p>
         <Button
           variant="link"
-          className="textAuthResponsive"
+          className="textAuthResponsive pl-1"
           onClick={onSignUp}
         >
           Sign up
