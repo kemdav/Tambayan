@@ -27,8 +27,6 @@ export const myButtons: ButtonConfig[] = [
       icon: <NewsfeedIcon className="size-10" />,
     },
     {
-<<<<<<<< Updated upstream:src/app/(student-view)/(view-organization)/organization/[org-id]/(organization-manage)/manage/sideNavbarWrapper.tsx
-========
         id: "upcomingEvents",
         variant: "sideNavigation",
         href:"upcoming-events",
@@ -37,26 +35,12 @@ export const myButtons: ButtonConfig[] = [
       icon: <AddIcon className="size-10" />,
     },
     {
->>>>>>>> Stashed changes:src/app/(student-view)/(view-organization)/organization/sideNavbarWrapper.tsx
       id: "wiki",
       variant: "sideNavigation",
       href:"wiki",
       children: "Wiki",
       className: "sideNavBarButtonText",
       icon: <WikiIcon className="size-10" />,
-    },
-    {
-      id: "manage",
-      variant: "sideNavigation",
-<<<<<<<< Updated upstream:src/app/(student-view)/(view-organization)/organization/[org-id]/(organization-manage)/manage/sideNavbarWrapper.tsx
-      href:"manage",
-      children: "Settings",
-========
-      href:"manage/officers",
-      children: "Managse",
->>>>>>>> Stashed changes:src/app/(student-view)/(view-organization)/organization/sideNavbarWrapper.tsx
-      className: "sideNavBarButtonText",
-      icon: <LogOutIcon className="size-10" />,
     }
   ];
 

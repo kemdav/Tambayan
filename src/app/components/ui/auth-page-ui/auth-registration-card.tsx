@@ -4,9 +4,7 @@
 import { Button } from "@/app/components/ui/general/button";
 import { PasswordInput } from "@/app/components/ui/general/input/password-input";
 import { Input } from "@/app/components/ui/general/input/input";
-import {
-  EmailIcon,
-} from "../../icons";
+import { EmailIcon } from "../../icons";
 import DropdownRole from "@/app/components/ui/general/dropdown/dropdown-role";
 import React from "react";
 
@@ -65,32 +63,46 @@ export default function AuthRegCard({
   onSubmit,
   onLogin,
 }: AuthRegCardProps) {
-
   return (
-    <div className="card w-100 lg:w-130 h-160 p-5 lg:p-10">
-      <div className="flex flex-col justify-center items-center">
-        <h1 className="responsiveCardHeading">Student Registration</h1>
-        <p className="textAuthResponsive text-xs">
+    <div className="card w-100 lg:w-130 h-150 p-5 lg:p-10 overflow-auto lg:overflow-visible">
+      <div className="flex flex-col justify-center items-center mb-5">
+        <h1 className="responsiveCardHeading mb-2">Student Registration</h1>
+        <p className="textAuthResponsive text-sm">
           Enter your information to get started.
         </p>
       </div>
-      
+
       {/* --- MODIFICATION: Added onSubmit to the form tag --- */}
       <form onSubmit={onSubmit}>
         <div className="grid grid-cols-3 grid-row-1 gap-2 lg:grid-cols-4">
           <div className="col-span-2 lg:col-span-1 lg:order-1">
             <p className="textAuthResponsive">Last Name</p>
-            <Input className="inputAuthResponsive" value={lastName} onChange={onLastNameChange} required />
+
+            <Input
+              className="inputAuthResponsive"
+              value={lastName}
+              onChange={onLastNameChange}
+              required
+            />
           </div>
 
           <div className="lg:order-3">
             <p className="textAuthResponsive">Middle Name</p>
-            <Input className="inputAuthResponsive" value={middleName} onChange={onMiddleNameChange} />
+            <Input
+              className="inputAuthResponsive"
+              value={middleName}
+              onChange={onMiddleNameChange}
+            />
           </div>
 
           <div className="col-span-3 lg:col-span-2 lg:order-2">
             <p className="textAuthResponsive">First Name</p>
-            <Input className="inputAuthResponsive" value={firstName} onChange={onFirstNameChange} required />
+            <Input
+              className="inputAuthResponsive"
+              value={firstName}
+              onChange={onFirstNameChange}
+              required
+            />
           </div>
         </div>
 
@@ -113,41 +125,62 @@ export default function AuthRegCard({
               options={universityOptions}
               width="w-full"
               onSelect={onUniversityChange}
+              placeholder="Choose University"
             />
           </div>
         </div>
 
-        <div className="flex lg:mt-3 gap-3">
-          <div className="">
+        <div className="flex flex-col lg:flex-row lg:mt-3 gap-3">
+          <div className="w-full">
             <p className="textAuthResponsive">Year Level</p>
-            <DropdownRole options={yearOptions} onSelect={onYearChange} />
+            <DropdownRole
+              options={yearOptions}
+              onSelect={onYearChange}
+              placeholder="Choose Year"
+              width="w-full"
+            />
           </div>
 
-          <div className="grow">
+          <div className="w-full lg:max-w-[280px]">
             <p className="textAuthResponsive">Course</p>
-            <DropdownRole options={courseOptions} width="w-full" onSelect={onCourseChange} />
+            <DropdownRole
+              options={courseOptions}
+              onSelect={onCourseChange}
+              placeholder="Choose Course"
+              width="w-full"
+            />
           </div>
         </div>
 
         <div className="grid grid-row-2 lg:gap-3 lg:mt-3 lg:flex">
           <div>
             <p className="textAuthResponsive">Password</p>
-            <PasswordInput className="inputAuthResponsive" value={password} onChange={onPasswordChange} required />
+            <PasswordInput
+              className="inputAuthResponsive"
+              value={password}
+              onChange={onPasswordChange}
+              required
+            />
           </div>
 
           <div>
             <p className="textAuthResponsive">Confirm Password</p>
-            <PasswordInput className="inputAuthResponsive" value={confirmPassword} onChange={onConfirmPasswordChange} required />
+            <PasswordInput
+              className="inputAuthResponsive"
+              value={confirmPassword}
+              onChange={onConfirmPasswordChange}
+              required
+            />
           </div>
         </div>
 
         {error && (
           <div className="text-red-500 text-sm text-center mt-2">{error}</div>
         )}
-        
+
         {/* --- MODIFICATION: Removed formAction, it's now a standard submit button --- */}
         <Button
-          className="text-neutral-linen-white bg-linear-to-r from-action-seafoam-green to-action-forest-green hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 font-bold text-xl w-full mt-5 lg:mt-10"
+          className="text-neutral-linen-white bg-linear-to-r from-action-seafoam-green to-action-forest-green hover:from-action-seafoam-green/90 hover:to-action-forest-green/90 font-bold text-xl w-full mt-5 lg:mt-6"
           type="submit"
           disabled={loading}
         >
@@ -159,7 +192,7 @@ export default function AuthRegCard({
         <p className="textAuthResponsive">Already have an account?</p>
         <Button
           variant="link"
-          className="textAuthResponsive"
+          className="textAuthResponsive pl-1"
           onClick={onLogin}
         >
           Log in

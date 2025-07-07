@@ -1,22 +1,29 @@
-"use client";
+// app/.../newsfeed/page.tsx
+// REMOVE "use client";
 
-import StudentProfileCard from "@/app/components/ui/student-view-ui/student-profile-card";
-import StudentProfileHeader from "@/app/components/ui/student-view-ui/student-profile-header";
-import { useState } from "react";
-import { myButtons } from "./navBarContents";
-import StudentNewsfeedCard from "@/app/components/ui/student-view-ui/student-newsfeed-card";
+import { getNewsfeedPosts } from '@/lib/actions/newsfeed'; // Import the new action
+import StudentNewsfeedClient from './student-newsfeed-client'; // We will create this new client component
+import { getUpcomingEvents, getRegisteredEvents } from "@/lib/actions/events";
 
-export default function TagComponentTestPage() {
-    const [selectedNavId, setSelectedNavId] = useState<string>("officialPost");
+export default async function NewsfeedPage() {
+    const [
+        officialPosts,
+        communityPosts,
+        upcomingEvents,
+        registeredEvents,
+    ] = await Promise.all([
+        getNewsfeedPosts(true),
+        getNewsfeedPosts(false),
+        getUpcomingEvents(),
+        getRegisteredEvents(),
+    ]);
 
-  return (
-    <main className="w-full grid place-items-center items-start mt-10 md:mt-0">
-        <div className="mainContentCard">
-            <StudentNewsfeedCard className="h-1/2" 
-            myButtons={myButtons} 
-            selectedButtonId={selectedNavId}
-             onButtonSelect={setSelectedNavId}></StudentNewsfeedCard>
-        </div>
-    </main>
-  );
-} 
+    return (
+        <StudentNewsfeedClient
+            initialOfficialPosts={officialPosts || []}
+            initialCommunityPosts={communityPosts || []}
+            initialUpcomingEvents={upcomingEvents || []}
+            initialRegisteredEvents={registeredEvents || []} // <-- Add fallback here
+        />
+    );
+}

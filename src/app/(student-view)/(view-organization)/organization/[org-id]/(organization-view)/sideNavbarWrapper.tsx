@@ -4,67 +4,81 @@ import { Button } from "@/app/components/ui/general/button";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
 import { StepBackIcon } from "lucide-react";
-import { useParams } from "next/navigation";
 import { useState } from "react";
 
 export const myButtons: ButtonConfig[] = [
-    {
-        id: "back",
-      children: "Back",
-      href:"/profile",
-      variant: "sideNavigation",
-      className:
-        "sideNavBarButtonText",
-      icon: <StepBackIcon className="size-10" />,
-    },
-    {
-        id: "newsfeed",
-      children: "Officers",
-      variant: "sideNavigation",
-      href:"officers",
-      className:
-        "sideNavBarButtonText",
-      icon: <NewsfeedIcon className="size-10" />,
-    },
-    {
-      id: "wiki",
-      variant: "sideNavigation",
-      href:"wiki",
-      children: "Wiki",
-      className: "sideNavBarButtonText",
-      icon: <WikiIcon className="size-10" />,
-    },
-    {
-      id: "manage",
-      variant: "sideNavigation",
-      href:"manage/officers",
-      children: "Manage",
-      className: "sideNavBarButtonText",
-      icon: <LogOutIcon className="size-10" />,
+  {
+    id: "back",
+    children: "Back",
+    href: "/profile",
+    variant: "sideNavigation",
+    className:
+      "sideNavBarButtonText",
+    icon: <StepBackIcon className="size-10" />,
+  },
+  {
+    id: "newsfeed",
+    children: "Newsfeed",
+    variant: "sideNavigation",
+    href: "newsfeed",
+    className:
+      "sideNavBarButtonText",
+    icon: <NewsfeedIcon className="size-10" />,
+  },
+  {
+    id: "wiki",
+    variant: "sideNavigation",
+    href: "wiki",
+    children: "Wiki",
+    className: "sideNavBarButtonText",
+    icon: <WikiIcon className="size-10" />,
+  },
+  {
+    id: "officers",
+    variant: "sideNavigation",
+    href: "officers",
+    children: "Officers",
+    className: "sideNavBarButtonText",
+    icon: <LogOutIcon className="size-10" />,
+  },
+  {
+    id: "settings",
+    variant: "sideNavigation",
+    href: "manage/officers",
+    children: "Settings",
+    className: "sideNavBarButtonText",
+    icon: <LogOutIcon className="size-10" />,
+  }
+];
+
+const SideBar = ({ isOfficer }: { isOfficer: boolean }) => {
+  const [selectedNavId, setSelectedNavId] = useState<string>("newsfeed");
+  const visibleButtons = myButtons.filter(button => {
+    if (button.id === 'officers' || button.id === 'settings') {
+      return isOfficer;
     }
-  ];
+    return true;
+  });
+  console.log("VISIBLE BUTTONS", visibleButtons);
+  console.log("PERMISSION", isOfficer);
+  return (<div className="">
+    <SideNavBar myButtons={visibleButtons} selectedButtonId={selectedNavId} onButtonSelect={setSelectedNavId}></SideNavBar>
+  </div>);
+}
 
-  const SideBar = () => {
-    const [selectedNavId, setSelectedNavId] = useState<string>("newsfeed");
-    return (<div className="">
-          <SideNavBar myButtons={myButtons} selectedButtonId={selectedNavId} onButtonSelect={setSelectedNavId}></SideNavBar>
-      </div>);
-  }
+interface Props {
+  children: React.ReactNode;
+}
 
-  interface Props {
-    children : React.ReactNode;
-  }
-
-  export function StudentVerticalNavigation({children}: Props){
-    const params = useParams();
-    return (
-      <div className="relative flex flex-grow h-dvh">
-        <div className="z-20 fixed">
-          <SideBar></SideBar>
-        </div>
-        <div className="grow flex">
-          {children}
-        </div>
+export function StudentVerticalNavigation({ children, isOfficer }: { children: React.ReactNode, isOfficer: boolean }) {
+  return (
+    <div className="relative flex flex-grow h-dvh">
+      <div className="z-20 fixed">
+        <SideBar isOfficer={isOfficer} ></SideBar>
       </div>
+      <div className="grow flex">
+        {children}
+      </div>
+    </div>
   );
-  }
+}

@@ -19,6 +19,14 @@ export const myButtons: ButtonConfig[] = [
       icon: <StudentProfileIcon className="horizontalNavBarButtonIcons" />,
     },
     {
+        id: "registeredEvents",
+      children: "Registered Events",
+      variant: "horizontalNavigation",
+      className:
+        "horizontalNavBarButton",
+      icon: <StudentProfileIcon className="horizontalNavBarButtonIcons" />,
+    },
+    {
         id: "upcomingEvents",
       children: "Upcoming Events",
       variant: "horizontalNavigation",
