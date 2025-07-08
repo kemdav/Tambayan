@@ -111,14 +111,12 @@ export function CreatePostComponent({
         <label className="block text-sm font-medium text-neutral-muted-olive mb-1">
             {postType === 'event' ? "Description" : "Content"}
         </label>
-        <FormattableInput
-          value={content}
-          onChange={val => onContentChange(val as string)}
-          placeholder="Share details here..."
-          isFormattable={false}
-          multiline={true}
-          className="min-h-[120px] md:min-h-[150px]" 
-        />
+        <textarea
+              className="w-full min-h-[120px] md:min-h-[150px] p-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+              value={content}
+              onChange={e => onContentChange(e.target.value)}
+              placeholder="Share details here..."
+            />
       </div>
       
       {/* 3. Fields ONLY for Events */}
