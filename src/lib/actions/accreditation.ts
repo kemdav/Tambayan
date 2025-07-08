@@ -105,3 +105,87 @@ export async function submitAccreditationFile(orgId: string, academicYear: strin
     revalidatePath(`/organization/${orgId}/manage/accreditation`);
     return { success: true, filePath: filePath };
 }
+
+// Types for admin accreditation page
+export type AccreditationStatus = "Pending" | "Approved" | "Revision" | "Rejected";
+
+export type AccreditationData = {
+  orgid: string;
+  orgname: string | null;
+  created: string | null;
+  university: {
+    uname: string | null;
+  } | null;
+  status: AccreditationStatus;
+  file_path: string | null;
+};
+
+// Get accreditation statistics for admin dashboard
+export async function getAccreditationStats() {
+  const supabase = await createClient();
+  // Count by status
+  const statuses = ["Pending", "Approved", "Revision", "Rejected"];
+  const counts: Record<string, number> = {};
+  for (const status of statuses) {
+    const { count } = await supabase
+      .from("accreditations")
+      .select("id", { count: "exact", head: true })
+      .eq("submission_status", status);
+    counts[status] = count || 0;
+  }
+  return {
+    pending_count: counts["Pending"],
+    approved_count: counts["Approved"],
+    revision_count: counts["Revision"],
+    rejected_count: counts["Rejected"],
+  };
+}
+
+// Get organizations by accreditation status for admin view
+export async function getOrganizationsByStatus(status: AccreditationStatus): Promise<AccreditationData[]> {
+  const supabase = await createClient();
+  // Join accreditations with organizations and university
+  const { data, error } = await supabase
+    .from("accreditations")
+    .select(`orgid, created_at, submission_status, organizations:orgid (orgname, universityid, created, university:universityid (uname)), file_path`)
+    .eq("submission_status", status)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching organizations by status:", error.message);
+    return [];
+  }
+  // Map to AccreditationData
+  return (data || []).map((row: any) => ({
+    orgid: row.orgid,
+    orgname: row.organizations?.orgname || null,
+    created: row.organizations?.created || null,
+    university: row.organizations?.university || null,
+    status: row.submission_status,
+    file_path: row.file_path || null,
+  }));
+}
+
+// Update an organization's accreditation status (admin action)
+export async function updateOrganizationAccreditationStatus(
+  orgid: string,
+  newStatus: AccreditationStatus,
+  reviewerNotes?: string
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("accreditations")
+    .update({
+      submission_status: newStatus,
+      reviewer_notes: reviewerNotes || null,
+      submitted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("orgid", orgid);
+  if (error) {
+    console.error("Error updating accreditation status:", error.message);
+    return { success: false, error: error.message };
+  }
+  revalidatePath(`/admin/accreditation`);
+  return { success: true };
+}

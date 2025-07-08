@@ -8,6 +8,17 @@ import {
   type AccreditationData,
   type AccreditationStatus,
 } from "@/lib/actions/accreditation";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/app/components/ui/general/dropdown/dialog";
+import { Button } from "@/app/components/ui/general/button";
+import { Input } from "@/app/components/ui/general/input/input";
 
 export default function AccreditationPage() {
   const [activeTab, setActiveTab] = useState("Pending Review");
@@ -19,6 +30,13 @@ export default function AccreditationPage() {
   });
   const [orgRows, setOrgRows] = useState<AccreditationData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reviewOrg, setReviewOrg] = useState<{
+    orgid: string;
+    status: string;
+  } | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const tabs = ["Pending Review", "Approved", "Needs Revision", "Rejected"];
 
@@ -64,7 +82,9 @@ export default function AccreditationPage() {
             status = "Pending";
         }
 
-        const organizations = await getOrganizationsByStatus(status);
+        const organizations = await getOrganizationsByStatus(
+          status as AccreditationStatus
+        );
         setOrgRows(organizations);
       } catch (error) {
         console.error("Error loading organizations:", error);
@@ -81,21 +101,24 @@ export default function AccreditationPage() {
     setActiveTab(tab);
   };
 
-  const handleReviewClick = async (orgid: string, currentStatus: string) => {
-    try {
-      // This would typically open a review modal or navigate to a review page
-      console.log(
-        `Reviewing organization ${orgid} with status ${currentStatus}`
-      );
+  const handleReviewClick = (orgid: string, currentStatus: string) => {
+    setReviewOrg({ orgid, status: currentStatus });
+    setModalOpen(true);
+  };
 
-      // Example: Update status to approved
-      // const result = await updateOrganizationAccreditationStatus(orgid, 'Approved');
-      // if (result.success) {
-      //   // Refresh the data
-      //   window.location.reload();
-      // }
-    } catch (error) {
-      console.error("Error reviewing organization:", error);
+  const handleStatusChange = async (newStatus: AccreditationStatus) => {
+    if (!reviewOrg) return;
+    const result = await updateOrganizationAccreditationStatus(
+      reviewOrg.orgid,
+      newStatus,
+      notes // pass notes
+    );
+    setModalOpen(false);
+    setReviewOrg(null);
+    setNotes("");
+    if (result.success) {
+      // Refresh data
+      window.location.reload();
     }
   };
 
@@ -107,6 +130,12 @@ export default function AccreditationPage() {
     status: (org.status as AccreditationStatus) || "Pending",
     onReviewClick: () => handleReviewClick(org.orgid, org.status || "Pending"),
   }));
+
+  // Find the file_path for the org being reviewed
+  const reviewOrgData = reviewOrg
+    ? orgRows.find((o) => o.orgid === reviewOrg.orgid)
+    : null;
+  const filePath = reviewOrgData?.file_path;
 
   return (
     <div className="min-h-screen px-4 py-6 bg-gray-50">
@@ -123,20 +152,100 @@ export default function AccreditationPage() {
             <p className="mt-2 text-gray-600">Loading accreditation data...</p>
           </div>
         ) : (
-          <AccreditCombinedComponents
-            pendingCount={stats.pendingCount}
-            approvedCount={stats.approvedCount}
-            needsRevisionCount={stats.needsRevisionCount}
-            rejectedCount={stats.rejectedCount}
-            onPendingView={() => handleTabChange("Pending Review")}
-            onApprovedView={() => handleTabChange("Approved")}
-            onNeedsRevisionView={() => handleTabChange("Needs Revision")}
-            onRejectedView={() => handleTabChange("Rejected")}
-            tabs={tabs}
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-            orgRows={transformedOrgRows}
-          />
+          <>
+            <AccreditCombinedComponents
+              pendingCount={stats.pendingCount}
+              approvedCount={stats.approvedCount}
+              needsRevisionCount={stats.needsRevisionCount}
+              rejectedCount={stats.rejectedCount}
+              onPendingView={() => handleTabChange("Pending Review")}
+              onApprovedView={() => handleTabChange("Approved")}
+              onNeedsRevisionView={() => handleTabChange("Needs Revision")}
+              onRejectedView={() => handleTabChange("Rejected")}
+              tabs={tabs}
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              orgRows={transformedOrgRows}
+            />
+            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+              <DialogContent className="rounded-2xl bg-white">
+                <DialogHeader>
+                  <DialogTitle>Review Organization</DialogTitle>
+                </DialogHeader>
+                {filePath ? (
+                  <div className="mb-4">
+                    <div className="bg-gray-100 rounded-lg w-full flex flex-col items-start">
+                      <Button
+                        variant="link"
+                        className="w-full text-left p-2 h-auto text-blue-600 underline bg-transparent shadow-none hover:bg-transparent hover:underline focus:ring-0 focus:outline-none whitespace-normal break-words"
+                        title="Copy the storage path to clipboard"
+                        onClick={() => {
+                          navigator.clipboard.writeText(filePath || "");
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 1500);
+                        }}
+                      >
+                        Click here to copy the PDF link, then paste it into your
+                        browser’s address bar.
+                      </Button>
+                      {copied && (
+                        <span className="ml-2 text-green-600 text-sm">
+                          Copied!
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-4">
+                      <label
+                        htmlFor="review-notes"
+                        className="block mb-1 font-medium"
+                      >
+                        Notes
+                      </label>
+                      <Input
+                        id="review-notes"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Enter your review notes here..."
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-4 text-gray-500">
+                    No PDF file submitted.
+                  </div>
+                )}
+                <div className="flex flex-col gap-4">
+                  <Button
+                    variant="default"
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                    onClick={() => handleStatusChange("Approved")}
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    variant="default"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                    onClick={() => handleStatusChange("Revision")}
+                  >
+                    Needs Revision
+                  </Button>
+                  <Button
+                    variant="default"
+                    className="bg-red-700 hover:bg-red-800 text-white"
+                    onClick={() => handleStatusChange("Rejected")}
+                  >
+                    Reject
+                  </Button>
+                  <DialogClose asChild>
+                    <Button variant="link" className="mt-2">
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </>
         )}
       </div>
     </div>
