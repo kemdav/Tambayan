@@ -25,9 +25,12 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
     if (!search.trim()) {
       return organizations; // Use the state variable
     }
-    return organizations.filter(org => // Use the state variable
-      org.title.toLowerCase().includes(search.toLowerCase()) ||
-      org.subtitle.toLowerCase().includes(search.toLowerCase())
+    return organizations.filter(
+      (
+        org // Use the state variable
+      ) =>
+        org.title.toLowerCase().includes(search.toLowerCase()) ||
+        org.subtitle.toLowerCase().includes(search.toLowerCase())
     );
   }, [search, organizations]); // Dependency array is now correct
 
@@ -35,26 +38,30 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
   const handleSubscribeClick = async (orgID: string) => {
     setIsLoading(orgID);
     try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
       if (userError || !user) {
         throw new Error("User not authenticated");
       }
 
       const { data: studentProfile, error: profileError } = await supabase
-        .from('student')
-        .select('studentid')
-        .eq('user_id', user.id)
+        .from("student")
+        .select("studentid")
+        .eq("user_id", user.id)
         .single();
-      if (profileError || !studentProfile) throw new Error("Could not find student profile.");
-      
+      if (profileError || !studentProfile)
+        throw new Error("Could not find student profile.");
+
       const { error: insertError } = await supabase
-        .from('subscribedorg')
-        .insert({ orgid: orgID, studentid: studentProfile.studentid })
+        .from("subscribedorg")
+        .insert({ orgid: orgID, studentid: studentProfile.studentid });
       if (insertError) throw insertError;
-      
+
       // This correctly updates the state, which will now trigger a re-render
-      setOrganizations(currentOrgs =>
-        currentOrgs.map(org =>
+      setOrganizations((currentOrgs) =>
+        currentOrgs.map((org) =>
           org.orgID === orgID
             ? { ...org, joinLabel: "Subscribed", joinDisabled: true }
             : org
@@ -78,7 +85,7 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
           leftIcon={<SearchIcon width={20} height={20} />}
           placeholder="Search Organizations.."
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
       <div className="flex flex-wrap gap-6 justify-center md:justify-start mt-6">
@@ -89,8 +96,14 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
               {...orgProps}
               onView={() => console.log("View clicked", orgProps.orgID)}
               onJoin={() => handleSubscribeClick(orgProps.orgID)}
-              joinDisabled={orgProps.joinDisabled || isLoading === orgProps.orgID}
-              joinLabel={isLoading === orgProps.orgID ? "Subscribing..." : orgProps.joinLabel}
+              joinDisabled={
+                orgProps.joinDisabled || isLoading === orgProps.orgID
+              }
+              joinLabel={
+                isLoading === orgProps.orgID
+                  ? "Subscribing..."
+                  : orgProps.joinLabel
+              }
             />
           </div>
         ))}

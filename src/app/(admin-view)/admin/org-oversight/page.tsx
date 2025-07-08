@@ -1,98 +1,107 @@
-import JoinOrgCard from "@/app/components/ui/general/join-org-card";
+"use client";
 
-const mockOrgs = [
-  {
-    title: "ICPEP",
-    orgID: "icpep",
-    subtitle: "Institute of Computer Engineers of the Philippines",
-    tagText: "Engineering",
-    memberCount: 120,
-    eventCount: 8,
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-  {
-    title: "JPIA",
-    orgID: "jpia",
-    subtitle: "Junior Philippine Institute of Accountants",
-    tagText: "Accounting",
-    memberCount: 95,
-    eventCount: 5,
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-  {
-    title: "CES",
-    orgID: "ces",
-    subtitle: "Civil Engineering Society",
-    tagText: "Engineering",
-    memberCount: 80,
-    eventCount: 3,
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-  {
-    title: "UP Math Club",
-    orgID: "upmath",
-    subtitle: "University of the Philippines Mathematics Club",
-    tagText: "Mathematics",
-    memberCount: 60,
-    eventCount: 4,
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-  {
-    title: "UP Physics Society",
-    orgID: "upphys",
-    subtitle: "University of the Philippines Physics Society",
-    tagText: "Physics",
-    memberCount: 50,
-    eventCount: 2,
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-  {
-    title: "UP Chem Circle",
-    orgID: "upchem",
-    subtitle: "University of the Philippines Chemistry Circle",
-    tagText: "Chemistry",
-    memberCount: 70,
-    eventCount: 6,
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-  {
-    title: "UP BioSoc",
-    orgID: "upbio",
-    subtitle: "University of the Philippines Biological Society",
-    tagText: "Biology",
-    memberCount: 55,
-    eventCount: 3,
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-  {
-    title: "UP English Club",
-    orgID: "upeng",
-    subtitle: "University of the Philippines English Club",
-    tagText: "Literature",
-    memberCount: 40,
-    eventCount: 2,
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-  {
-    title: "UP Debate Society",
-    orgID: "updebate",
-    subtitle: "University of the Philippines Debate Society",
-    tagText: "Debate",
-    memberCount: 30,
-    eventCount: 5,
-    avatarUrl: undefined,
-    coverPhotoUrl: undefined,
-  },
-];
+import React, { useEffect, useState, useMemo } from "react";
+import ShowcaseCard from "@/app/components/ui/general/showcase-card-component";
+import { Input } from "@/app/components/ui/general/input/input";
+import { SearchIcon } from "@/app/components/icons/SearchIcon";
+import {
+  fetchOrganizations,
+  deleteOrganization,
+} from "@/lib/actions/orgoversight";
+
+interface Org {
+  orgid: string;
+  orgname: string;
+  school: string;
+  category: string;
+  picture?: string | null;
+  cover_photo_path?: string | null;
+}
 
 export default function OrgOversightPage() {
-  return <JoinOrgCard orgs={mockOrgs} />;
+  const [orgs, setOrgs] = useState<Org[]>([]);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const universityId = "1"; // Hardcoded for testing
+        const data = await fetchOrganizations(universityId);
+        setOrgs(data);
+      } catch (err) {
+        console.error("❌ Failed to fetch organizations:", err);
+      }
+    }
+    load();
+  }, []);
+
+  const handleRemove = async (orgID: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this organization?"
+    );
+    if (!confirmed) return;
+
+    try {
+      await deleteOrganization(orgID);
+      setOrgs((prev) => prev.filter((org) => org.orgid !== orgID));
+    } catch (err) {
+      console.error("❌ Failed to delete organization:", err);
+    }
+  };
+
+  const filteredOrgs = useMemo(() => {
+    if (!search.trim()) return orgs;
+    return orgs.filter(
+      (org) =>
+        org.orgname.toLowerCase().includes(search.toLowerCase()) ||
+        org.school.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [search, orgs]);
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+      <div className="w-full max-w-7xl h-[90vh] bg-white border rounded-xl shadow-md p-6 overflow-y-auto">
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 className="text-2xl font-bold">My Organizations</h1>
+          <Input
+            placeholder="Search organizations..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            leftIcon={<SearchIcon width={20} height={20} />}
+            className="max-w-sm"
+          />
+        </div>
+
+        <div className="flex flex-wrap gap-6 justify-center sm:justify-start">
+          {filteredOrgs.length > 0 ? (
+            filteredOrgs.map((org) => (
+              <ShowcaseCard
+                key={org.orgid}
+                orgID={org.orgid}
+                title={org.orgname}
+                subtitle={org.school}
+                tagText={org.category}
+                memberCount={0}
+                eventCount={0}
+                avatarUrl={org.picture ?? undefined}
+                coverPhotoUrl={org.cover_photo_path ?? undefined}
+                buttons={[
+                  {
+                    label: "Remove",
+                    bgColor: "bg-red-500",
+                    textColor: "text-white",
+                    onClick: () => handleRemove(org.orgid),
+                  },
+                ]}
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500 w-full pt-12">
+              No organizations found.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
