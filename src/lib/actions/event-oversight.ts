@@ -36,14 +36,30 @@ type EventWithOrg = {
 
 const supabase = createClient();
 
+// Helper to get the current admin's universityid
+const getCurrentAdminUniversityId = async (): Promise<string | null> => {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || !user.email) return null;
+  const { data: universityProfile } = await supabase
+    .from("university")
+    .select("universityid")
+    .eq("universityemail", user.email)
+    .single();
+  return universityProfile?.universityid || null;
+};
+
 /**
- * Fetch all events from the database
+ * Fetch all events from the database, filtered by the logged-in admin's universityid
  */
 export const fetchEvents = async (): Promise<EventData[]> => {
   try {
+    const universityid = await getCurrentAdminUniversityId();
+    if (!universityid) return [];
     const { data, error } = await supabase
       .from("events")
-      .select("eventid, title, orgid, date, location, status, organizations:orgid (orgname)");
+      .select("eventid, title, orgid, date, location, status, organizations:orgid (orgname)")
+      .eq("universityid", universityid);
 
     if (error) {
       console.error("Error fetching events:", JSON.stringify(error, null, 2));
@@ -287,9 +303,12 @@ export const getSampleStatuses = (): StatusStyle[] => [
 
 export const fetchOrganizationOptions = async (): Promise<Option[]> => {
   const supabase = createClient();
+  const universityid = await getCurrentAdminUniversityId();
+  if (!universityid) return [];
   const { data, error } = await supabase
     .from('organizations')
-    .select('orgid, orgname');
+    .select('orgid, orgname')
+    .eq('universityid', universityid);
   if (error || !data) return [];
   return data.map((org: { orgid: string; orgname: string }) => ({
     value: org.orgid,

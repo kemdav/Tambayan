@@ -132,6 +132,27 @@ export default function AdminLayout({
     setLoadingUniv(false);
   };
 
+  useEffect(() => {
+    // Fetch university info on mount
+    (async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setUnivInfo(null);
+        return;
+      }
+      // Adjust this query to your actual admin/university mapping
+      const { data: universityProfile } = await supabase
+        .from("university")
+        .select("universityid, universityemail, uname")
+        .eq("universityemail", user.email)
+        .single();
+      setUnivInfo(universityProfile || null);
+    })();
+  }, []);
+
   return (
     <AdminUserProvider>
       <div className="relative min-h-screen md:flex">
