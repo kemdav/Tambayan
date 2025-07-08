@@ -88,13 +88,12 @@ export default function StudentVerticalNavigation({ children }: Props) {
   const [orgOptions, setOrgOptions] = useState<OrgOption[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-
-  const [postType, setPostType] = useState("default");
+  const [postType, setPostType] = useState<'default' | 'official' | 'event'>("default");
   const [org, setOrg] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [eventLocation, setEventLocation] = useState("");
-  const [eventDate, setEventDate] = useState("");
+  const [eventDate, setEventDate] = useState<Date | undefined>();
   const [registrationStart, setRegistrationStart] = useState<Date | undefined>();
   const [registrationEnd, setRegistrationEnd] = useState<Date | undefined>();
   const [submitted, setSubmitted] = useState<any>(null);
@@ -109,7 +108,7 @@ export default function StudentVerticalNavigation({ children }: Props) {
 
       // --- THIS IS THE NEW, SIMPLIFIED LOGIC ---
       // Make a single call to our new RPC function.
-       const { data, error } = await supabase.rpc('get_user_subscribed_org_options');
+      const { data, error } = await supabase.rpc('get_user_subscribed_org_options');
 
       if (error) {
         console.error("Error fetching organization options:", error);
@@ -183,7 +182,8 @@ export default function StudentVerticalNavigation({ children }: Props) {
     setTitle("");
     setContent("");
     setPhotoFile(null);
-    // Reset any other form fields here...
+    setEventLocation("");
+    setEventDate(undefined);
   };
 
 
@@ -199,7 +199,6 @@ export default function StudentVerticalNavigation({ children }: Props) {
             <CreatePostComponent
               className="max-w-2xl min-w-1xl md:w-2xl"
               postType={postType}
-              onPostTypeChange={setPostType}
               org={org}
               onOrgChange={setOrg}
               title={title}
@@ -213,16 +212,7 @@ export default function StudentVerticalNavigation({ children }: Props) {
               onEventLocationChange={setEventLocation}
               eventDate={eventDate}
               onEventDateChange={setEventDate}
-              registrationStart={registrationStart}
-              onRegistrationStartChange={setRegistrationStart}
-              registrationEnd={registrationEnd}
-              onRegistrationEndChange={setRegistrationEnd}
-              tags={tags}
-              tagInput={tagInput}
-              onTagInputChange={setTagInput}
-              onAddTag={handleAddTag}
               postButtonText={isSubmitting ? "Posting..." : "Post"}
-              onRemoveTag={handleRemoveTag}
               photoFile={photoFile}
               onPhotoChange={handlePhotoChange}
             />
