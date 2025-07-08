@@ -197,7 +197,10 @@ const CommentPage = ({ comments }: { comments: StudentComment[] }) => {
         </div>
     );
 }
-
+type StudentStats = {
+  organizations_joined_count: number;
+  events_joined_count: number;
+} | null;
 
 interface Props {
     className?: string;
@@ -206,6 +209,7 @@ interface Props {
     onButtonSelect: (id: string) => void;
     currentUserID: string;
     posts: Poster[];
+     studentStats: StudentStats;
     initialComments: StudentComment[];
     profile: StudentProfile;
     onProfileUpdate: (updatedData: Partial<StudentProfile>) => void;
@@ -219,6 +223,7 @@ export default function StudentProfileCard({
     initialComments,
     profile,
     onProfileUpdate,
+    studentStats,
     currentUserID,
     selectedButtonId,
     posts,
@@ -285,6 +290,9 @@ export default function StudentProfileCard({
         }
     }, [posts, sortOption, filterOrgName]);
 
+
+    console.log("STUDENT STATS ", studentStats);
+
     return (
         <>
             <EditAboutModal 
@@ -306,8 +314,8 @@ export default function StudentProfileCard({
                         onEditClick={() => setIsEditModalOpen(true)}
                         // Pass placeholders or remove if not needed
                         studentJoinDate="Sep 2024" 
-                        studentEventsJoined="0"
-                        studentTotalOrg="0"
+                        studentEventsJoined={studentStats?.events_joined_count.toString()}
+                    studentTotalOrg={studentStats?.organizations_joined_count.toString()}
                         isOwnProfile={isOwnProfile}
                     />
                 )}

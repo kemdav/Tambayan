@@ -15,7 +15,7 @@ export const myButtons: ButtonConfig[] = [
       variant: "sideNavigation",
       className:
         "sideNavBarButtonText",
-      icon: <StepBackIcon className="size-10" />,
+      icon: <StepBackIcon className="size-5" />,
     }
   ];
 

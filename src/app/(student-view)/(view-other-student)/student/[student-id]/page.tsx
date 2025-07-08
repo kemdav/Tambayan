@@ -41,9 +41,10 @@ export default async function ViewStudentProfilePage({ params }: PageProps) {
   const isOwnProfile = user?.id === profileToView.user_id;
 
   // 4. Fetch the posts and comments for the viewed profile
-  const [posts, comments] = await Promise.all([
+  const [posts, comments, { data: studentStats }] = await Promise.all([
     getPostsByStudent(profileToView.studentid),
-    getCommentsByStudent(profileToView.studentid)
+    getCommentsByStudent(profileToView.studentid),
+    supabase.rpc('get_student_stats', { p_studentid: profileToView.studentid }).single()
   ]);
 
   // 5. Render the SAME ProfileView component, but pass the correct props
@@ -54,6 +55,7 @@ export default async function ViewStudentProfilePage({ params }: PageProps) {
       initialComments={comments}
       currentUserID={user?.id ?? ''} // Pass the current user's ID for "like" status etc.
       isOwnProfile={isOwnProfile} // <-- The new, crucial prop!
+      studentStats={studentStats}
     />
   );
 }
