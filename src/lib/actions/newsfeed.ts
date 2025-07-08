@@ -45,6 +45,7 @@ export async function getNewsfeedPosts(isOfficial: boolean): Promise<Poster[]> {
         console.log("[getNewsfeedPosts] User is not subscribed to any organizations.");
         return [];
     }
+    
 
     // Extract just the organization IDs into an array: ['org_1', 'org_2', ...]
     const subscribedOrgIds = subscriptions.map(sub => sub.orgid);
