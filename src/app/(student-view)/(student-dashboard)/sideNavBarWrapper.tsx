@@ -11,7 +11,20 @@ import { createPost } from "@/lib/actions/post";
 import { redirect, useRouter } from "next/navigation";
 import { ShowcaseCardProps } from "@/app/components/ui/general/showcase-card-component";
 import {Filter} from 'bad-words'; 
+import { HamburgerIcon } from "lucide-react";
+import { signOut } from "@/lib/actions/auth";
 const profanityFilter = new Filter();
+import {
+  UserCircle,      // For Student Profile
+  Users,           // For Joined Organizations
+  UserPlus,        // For Join Organization
+  Newspaper,       // For Newsfeed
+  Star,            // For Subscribed Organizations
+  Megaphone,       // For Broadcasts
+  Search,          // For Search Posts
+  UserSearch,      // For Search Profile
+  LogOut,          // For Logout
+} from "lucide-react";
 
 interface Props {
   children: React.ReactNode;
@@ -28,45 +41,40 @@ export const myButtons: ButtonConfig[] = [
     children: "Student Profile",
     href: "/profile",
     variant: "sideNavigation",
-    className:
-      "sideNavBarButtonText",
-    icon: <StudentProfileIcon className="size-10" />,
+    className: "sideNavBarButtonText",
+    icon: <UserCircle className="size-5" />,
   },
   {
     id: "searchProfile",
     children: "Search Profile",
     href: "/search",
     variant: "sideNavigation",
-    className:
-      "sideNavBarButtonText",
-    icon: <StudentProfileIcon className="size-10" />,
+    className: "sideNavBarButtonText",
+    icon: <UserSearch className="size-5" />,
   },
   {
     id: "searchPosts",
     children: "Search Posts",
     href: "/search-posts",
     variant: "sideNavigation",
-    className:
-      "sideNavBarButtonText",
-    icon: <StudentProfileIcon className="size-10" />,
+    className: "sideNavBarButtonText",
+    icon: <Search className="size-5" />,
   },
   {
     id: "newsfeed",
     children: "Newsfeed",
     variant: "sideNavigation",
     href: "/newsfeed",
-    className:
-      "sideNavBarButtonText",
-    icon: <NewsfeedIcon className="size-10" />,
+    className: "sideNavBarButtonText",
+    icon: <Newspaper className="size-5" />,
   },
   {
     id: "sub-org",
     children: "Subscribed Organizations",
     variant: "sideNavigation",
     href: "/subscribed",
-    className:
-      "sideNavBarButtonText",
-    icon: <SubscribedOrgIcon className="size-10" />,
+    className: "sideNavBarButtonText",
+    icon: <Star className="size-5" />,
   },
   {
     id: "joined-org",
@@ -74,7 +82,7 @@ export const myButtons: ButtonConfig[] = [
     href: "/joined",
     children: "Joined Organization",
     className: "sideNavBarButtonText",
-    icon: <AddIcon className="size-10" />,
+    icon: <Users className="size-5" />,
   },
   {
     id: "join-org",
@@ -82,7 +90,7 @@ export const myButtons: ButtonConfig[] = [
     href: "/join",
     children: "Join Organization",
     className: "sideNavBarButtonText",
-    icon: <AddIcon className="size-10" />,
+    icon: <UserPlus className="size-5" />,
   },
   {
     id: "broadcast",
@@ -90,15 +98,14 @@ export const myButtons: ButtonConfig[] = [
     href: "/broadcast",
     children: "Broadcasts",
     className: "sideNavBarButtonText",
-    icon: <AddIcon className="size-10" />,
+    icon: <Megaphone className="size-5" />,
   },
   {
     id: "logout",
     variant: "sideNavigation",
-    href: "/login",
     children: "Logout",
     className: "sideNavBarButtonText",
-    icon: <LogOutIcon className="size-10" />,
+    icon: <LogOut className="size-5" />,
   },
 ];
 
@@ -124,11 +131,14 @@ export default function StudentVerticalNavigation({ children }: Props) {
   const [registrationStart, setRegistrationStart] = useState<Date | undefined>();
   const [registrationEnd, setRegistrationEnd] = useState<Date | undefined>();
   const [submitted, setSubmitted] = useState<any>(null);
+  const [selected, setSelected] = useState("profile");
+  const [isNavOpen, setIsNavOpen] = useState(false);
 
   // Tag and photo state
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+
   useEffect(() => {
     const fetchOrgOptions = async () => {
       const supabase = createClient();
@@ -251,19 +261,43 @@ export default function StudentVerticalNavigation({ children }: Props) {
         </div>
       )}
 
-      <div className="relative flex h-dvh">
-        <div className="z-20 fixed overflow-y-auto">
-          <SideBar></SideBar>
-        </div>
-        <div className="flex-grow flex flex-col items-center pt-5">
-          {children}
-        </div>
-        <div className="z-20 fixed bottom-0 right-0 sm:mx-10 sm:my-10 opacity-50 md:opacity-100">
-          <Button className="size-15 sm:size-20 bg-black/0 hover:bg-black/0 hover:scale-110 transition delay-10 duration-300 ease-in-out hover:-translate-y-1"
-            onClick={() => setCreatePostOpen(true)}><AddIcon2 className="size-15 sm:size-20 text-action-moss-green"></AddIcon2></Button>
-        </div>
-
-      </div>
+      <div className="relative min-h-screen md:flex">
+            <div className="p-4 md:hidden">
+              <div className="flex justify-between items-center bg-tint-forest-fern text-white p-4 rounded-[20px] shadow-lg">
+                <div className="font-bold text-xl">Student</div>
+                <button onClick={() => setIsNavOpen(true)} className="cursor-pointer">
+                  <NavigationButtonIcon className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+      
+            {isNavOpen && (
+              <div
+                className="fixed inset-0 bg-black opacity-50 z-20 md:hidden"
+                onClick={() => setIsNavOpen(false)}
+              ></div>
+            )}
+      
+            <div
+              className={`
+                fixed top-0 left-0 h-full z-30
+                transform transition-transform duration-300 ease-in-out
+                ${isNavOpen ? "translate-x-0" : "-translate-x-full"}
+                
+                md:relative md:translate-x-0 md:z-auto md:h-auto
+              `}
+            >
+              <SideNavBar
+                myButtons={myButtons}
+                selectedButtonId={selectedNavId}
+                onButtonSelect={setSelectedNavId}
+                isOpen={isNavOpen}
+                onToggle={() => setIsNavOpen(!isNavOpen)}
+              />
+            </div>
+      
+            <main className="flex-1 bg-neutral-mint-white p-4">{children}</main>
+          </div>
     </>
   );
 }
