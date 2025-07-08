@@ -46,36 +46,68 @@ const AboutPage = ({
 }: AboutPageProps) => {
 
     return (
-        <div className="flex flex-col sm:flex-row">
-            <div className="flex flex-col">
-                <div className="flex flex-col sm:flex-row sm:gap-10">
-                    <div>
-                        <p><strong>Student ID:</strong> {studentId}</p>
-                        <p><strong>Major:</strong> {studentCourse || 'N/A'}</p>
-                        <p><strong>Email:</strong> {studentEmail || 'N/A'}</p>
-                        <p><strong>Year:</strong> {studentYear || 'N/A'}</p>
+        <div className="mt-6 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                
+                {/* Section 1: Core Academic Info */}
+                <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Academic Information</h3>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Student ID:</span>
+                        <span className="text-gray-800">{studentId}</span>
                     </div>
-                    <div>
-                        {/* These are likely placeholders, can be removed if not in your profile object */}
-                        <p><strong>Joined:</strong> {studentJoinDate || 'N/A'}</p>
-                        <p><strong>Events Joined:</strong> {studentEventsJoined || 'N/A'} events</p>
-                        <p><strong>Joined Organizations:</strong> {studentTotalOrg || 'N/A'}</p>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Major:</span>
+                        <span className="text-gray-800">{studentCourse || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Year Level:</span>
+                        <span className="text-gray-800">{studentYear || 'N/A'}</span>
+                    </div>
+                     <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Email:</span>
+                        <span className="text-gray-800">{studentEmail || 'N/A'}</span>
                     </div>
                 </div>
-                <div>
-                    <p className="text-action-forest-green">
-                        <strong>Description </strong>
-                        {isOwnProfile && <Button onClick={onEditClick}>Edit Description</Button>}
-                    </p>
-                    <p className="max-w-250 text-action-forest-green whitespace-pre-line">
-                        {aboutText || "No description provided."}
+
+                {/* Section 2: Community & Activity Stats */}
+                <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Community Stats</h3>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Joined Tambayan:</span>
+                        <span className="text-gray-800">{studentJoinDate || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Events Joined:</span>
+                        <span className="text-gray-800">{studentEventsJoined || '0'} events</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Organizations Joined:</span>
+                        <span className="text-gray-800">{studentTotalOrg || '0'}</span>
+                    </div>
+                </div>
+
+                {/* Section 3: Description (Spans full width) */}
+                <div className="md:col-span-2 mt-4">
+                    <div className="flex items-center justify-between border-b pb-2 mb-4">
+                         <h3 className="text-lg font-semibold text-gray-800">Description</h3>
+                         {isOwnProfile && (
+                             <Button 
+                                 onClick={onEditClick} 
+                                 className="bg-green-100 text-green-800 hover:bg-green-200 text-sm font-medium py-1 px-3 rounded-md"
+                             >
+                                 Edit
+                             </Button>
+                         )}
+                    </div>
+                    <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+                        {aboutText || "This user hasn't added a description yet."}
                     </p>
                 </div>
             </div>
         </div>
     );
 }
-
 
 const options = [
     { value: "recent", label: "Most Recent" },
