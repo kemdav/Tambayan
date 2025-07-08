@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/client";
 import { TablesInsert } from "@/lib/database.types";
 
 export interface Broadcast {
@@ -17,7 +16,9 @@ export interface RecipientOptions {
   specificSchools: boolean;
 }
 
-const supabase = createClient();
+// --- CLIENT-SIDE FUNCTIONS ---
+import { createClient as createClientClient } from "@/lib/supabase/client";
+const supabaseClient = createClientClient();
 
 /**
  * Get current user's university ID
@@ -26,13 +27,13 @@ export const getCurrentUserUniversityId = async (): Promise<string | null> => {
   try {
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await supabaseClient.auth.getUser();
     if (!user) {
       console.error("No authenticated user found");
       return null;
     }
 
-    const { data: studentProfile, error } = await supabase
+    const { data: studentProfile, error } = await supabaseClient
       .from("student")
       .select("universityid")
       .eq("user_id", user.id)
@@ -55,7 +56,7 @@ export const getCurrentUserUniversityId = async (): Promise<string | null> => {
  */
 export const loadBroadcastHistory = async (): Promise<Broadcast[]> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from("broadcast")
       .select("*")
       .order("date", { ascending: false });
@@ -66,7 +67,7 @@ export const loadBroadcastHistory = async (): Promise<Broadcast[]> => {
     }
 
     // Transform database data to component format
-    const transformedBroadcasts: Broadcast[] = data.map((item: any) => ({
+    const transformedBroadcasts: Broadcast[] = (data || []).map((item: any) => ({
       id: item.date || Date.now().toString(), // Using date as ID since there's no explicit ID
       title: item.title || "",
       message: item.message || "",
@@ -120,7 +121,7 @@ export const addBroadcastToDatabase = async (
       universityid: universityId,
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from("broadcast")
       .insert(broadcastData)
       .select();
@@ -160,7 +161,7 @@ export const saveDraftBroadcast = async (): Promise<void> => {
  */
 export const deleteBroadcast = async (broadcastId: string): Promise<void> => {
   try {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from("broadcast")
       .delete()
       .eq("date", broadcastId); // Using date as identifier since there's no explicit ID
@@ -183,7 +184,7 @@ export const updateBroadcast = async (
   updates: Partial<TablesInsert<"broadcast">>
 ): Promise<void> => {
   try {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from("broadcast")
       .update(updates)
       .eq("date", broadcastId); // Using date as identifier since there's no explicit ID
@@ -196,4 +197,47 @@ export const updateBroadcast = async (
     console.error("Error updating broadcast:", error);
     throw error;
   }
-}; 
+};
+
+// --- SERVER-SIDE FUNCTION ---
+"use server";
+import { createClient as createClientServer } from "@/lib/supabase/server";
+
+export async function getBroadcastsFor(context: 'student' | 'organization') {
+    const supabase = await createClientServer();
+
+    // Get the current user to find their university
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data: student } = await supabase
+        .from('student')
+        .select('universityid')
+        .eq('user_id', user.id)
+        .single();
+
+    if (!student || !student.universityid) {
+        console.error("Could not find student's university to fetch broadcasts.");
+        return [];
+    }
+    
+    // Determine which recipients to fetch based on the context
+    const targetRecipients = context === 'student'
+        ? ['all', 'students']
+        : ['all', 'organizations'];
+    
+    // Fetch all broadcasts for that university targeting the correct recipients
+    const { data: broadcasts, error } = await supabase
+        .from('broadcast')
+        .select('*')
+        .eq('universityid', student.universityid)
+        .in('recipient', targetRecipients) // Use .in() to match multiple values
+        .order('date', { ascending: false }); // Newest first
+
+    if (error) {
+        console.error(`Error fetching broadcasts for context '${context}':`, error.message);
+        return [];
+    }
+
+    return broadcasts || [];
+}

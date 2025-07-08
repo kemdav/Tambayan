@@ -69,10 +69,26 @@ export const myButtons: ButtonConfig[] = [
     icon: <SubscribedOrgIcon className="size-10" />,
   },
   {
+    id: "joined-org",
+    variant: "sideNavigation",
+    href: "/joined",
+    children: "Joined Organization",
+    className: "sideNavBarButtonText",
+    icon: <AddIcon className="size-10" />,
+  },
+  {
     id: "join-org",
     variant: "sideNavigation",
     href: "/join",
     children: "Join Organization",
+    className: "sideNavBarButtonText",
+    icon: <AddIcon className="size-10" />,
+  },
+  {
+    id: "broadcast",
+    variant: "sideNavigation",
+    href: "/broadcast",
+    children: "Broadcasts",
     className: "sideNavBarButtonText",
     icon: <AddIcon className="size-10" />,
   },
@@ -83,7 +99,7 @@ export const myButtons: ButtonConfig[] = [
     children: "Logout",
     className: "sideNavBarButtonText",
     icon: <LogOutIcon className="size-10" />,
-  }
+  },
 ];
 
 const SideBar = () => {
