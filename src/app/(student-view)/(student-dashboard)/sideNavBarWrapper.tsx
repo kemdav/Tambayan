@@ -69,6 +69,14 @@ export const myButtons: ButtonConfig[] = [
     icon: <SubscribedOrgIcon className="size-10" />,
   },
   {
+    id: "joined-org",
+    variant: "sideNavigation",
+    href: "/joined",
+    children: "Joined Organization",
+    className: "sideNavBarButtonText",
+    icon: <AddIcon className="size-10" />,
+  },
+  {
     id: "join-org",
     variant: "sideNavigation",
     href: "/join",

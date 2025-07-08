@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from "next/navigation";
 import JoinOrgCard from "@/app/components/ui/general/join-org-card";
 import { OrgRecruitCardProps } from "@/app/components/ui/general/org-recruit-card";
+const DEFAULT_AVATAR_URL = 'https://placehold.co/100x100/CCCCCC/FFFFFF?text=Org';
 
 // Define a type for the data returned by our new function
 interface OrgJoinData {
@@ -26,7 +27,7 @@ export default async function JoinOrganizationPage() {
   }
 
   // --- THIS IS THE NEW, SIMPLIFIED LOGIC ---
-  
+
   // 1. Make a single call to our new RPC function, passing the user's ID.
   const { data: orgsData, error } = await supabase
     .rpc('get_organizations_for_join_page', { p_user_id: user.id })
@@ -36,9 +37,9 @@ export default async function JoinOrganizationPage() {
     console.error("Error fetching organizations via RPC:", error);
     return <div>Error fetching organization data. Please try again later.</div>;
   }
-  
+
   if (!orgsData) {
-      return <div>No organizations found for your university.</div>
+    return <div>No organizations found for your university.</div>
   }
 
   // 2. Transform the data directly. No more manual joining needed!
@@ -47,8 +48,19 @@ export default async function JoinOrganizationPage() {
   if (!supabaseUrl) return <div>Configuration error.</div>;
 
   const transformedOrgs: OrgRecruitCardProps[] = orgsData.map((org) => {
-    const avatarUrl = org.picture_path ? `${supabaseUrl}/storage/v1/object/public/organization-assets/${org.picture_path}` : undefined;
-    const coverPhotoUrl = org.cover_photo_path ? `${supabaseUrl}/storage/v1/object/public/organization-assets/${org.cover_photo_path}` : undefined;
+    const getFinalUrl = (pathOrUrl: string | null | undefined): string | undefined => {
+      if (!pathOrUrl || pathOrUrl.trim() === '') {
+        return undefined; // Return undefined if there's no path
+      }
+      // Check if it's already a full HTTP URL
+      if (pathOrUrl.startsWith('http')) {
+        return pathOrUrl; // It's already a full URL, use it directly
+      }
+      // Otherwise, it's a path, so build the Supabase URL
+      return supabase.storage.from("organization-assets").getPublicUrl(pathOrUrl).data.publicUrl;
+    };
+    const avatarUrl = getFinalUrl(org.picture_path) || DEFAULT_AVATAR_URL; // Use default if the final URL is undefined
+    const coverPhotoUrl = getFinalUrl(org.cover_photo_path);
 
     return {
       orgID: org.org_id,
@@ -58,7 +70,7 @@ export default async function JoinOrganizationPage() {
       eventCount: org.event_count,
       avatarUrl: avatarUrl,
       coverPhotoUrl: coverPhotoUrl,
-      tagText: org.org_status === 'active' ? 'Active' : 'Inactive', 
+      tagText: org.org_status === 'active' ? 'Active' : 'Inactive',
       tagBgColor: org.org_status === 'active' ? 'bg-green-100' : 'bg-red-100',
       tagTextColor: org.org_status === 'active' ? 'text-green-800' : 'text-red-800',
       joinLabel: org.is_subscribed ? "Subscribed" : "Subscribe", // Use the pre-calculated boolean
