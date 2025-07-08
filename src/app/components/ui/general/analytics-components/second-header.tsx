@@ -46,14 +46,6 @@ export default function SecondHeader({
           onSelect={onFilterChange} // 💡 Pass it down
         />
       </div>
-
-      <Button
-        className="text-white w-full sm:w-auto"
-        onClick={() => console.log("Clicked")}
-      >
-        <Download className="w-4 h-4 mr-2" />
-        Export Report
-      </Button>
     </div>
   );
 }

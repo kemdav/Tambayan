@@ -20,13 +20,14 @@ interface OrganizationData {
 
 interface Props {
   data?: OrganizationData[];
+  title?: string;
 }
-export default function OrganizationActivity({ data = [] }: Props) {
+export default function OrganizationActivity({ data = [], title }: Props) {
   return (
-    <div className="border rounded-lg p-4 w-full max-w-[535px] shadow-sm bg-white mt-4 mr-0 md:mr-4">
+    <div className="border rounded-lg p-4 w-full max-w-full shadow-sm bg-white mt-4 mr-0 md:mr-4">
       <div className="flex justify-between items-start">
         <h2 className="text-base font-semibold text-muted-foreground">
-          Organization Activity
+          Organization Activity {title}
         </h2>
         <div className="flex gap-4 items-center text-sm text-muted-foreground">
           <div className="flex items-center gap-1">

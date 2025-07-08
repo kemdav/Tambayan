@@ -1,30 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import FirstHeader from "./first-header";
-import SecondHeader from "./second-header";
-import ActiveOrganization from "./active-organization";
-import StudentEngagement from "./student-engagement";
-import TotalEvents from "./total-events";
-import OrganizationActivity from "./organization-activity";
-import EngagementBySchool from "./engagement-by-school";
-import TopPerformingOrganizations from "./top-performing-organization";
-import EventEngagementMetrics from "./event-engagement-metrics";
 import {
   getTotalEvents,
   getOrgActivityForUniversity,
   getStudentEngagement,
   getOrgStatsByUniversity,
   getTopPerformingOrgs,
-  type Organization,
   getEventEngagementMetrics,
+  getAllUniversities,
+  type Organization,
 } from "@/lib/actions/analytics";
-
-const schoolOptions = [
-  { label: "Cebu Institute of Technology", value: "u1" },
-  { label: "Cebu Technological University", value: "u2" },
-  { label: "University of Cebu", value: "u3" },
-];
+import FirstHeader from "./first-header";
+import SecondHeader from "./second-header";
+import ActiveOrganization from "./active-organization";
+import StudentEngagement from "./student-engagement";
+import TotalEvents from "./total-events";
+import OrganizationActivity from "./organization-activity";
+import TopPerformingOrganizations from "./top-performing-organization";
+import EventEngagementMetrics from "./event-engagement-metrics";
 
 const timePeriodOptions = [
   { label: "This Week", value: "this_week" },
@@ -35,8 +29,11 @@ const timePeriodOptions = [
 ];
 
 export default function Analytics() {
+  const [schoolOptions, setSchoolOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
   const [selectedTimePeriod, setSelectedTimePeriod] = useState("this_week");
-  const [selectedSchool, setSelectedSchool] = useState("u1");
+  const [selectedSchool, setSelectedSchool] = useState("");
   const [totalEvents, setTotalEvents] = useState(0);
   const [orgStats, setOrgStats] = useState({ total: 0, active: 0 });
   const [studentEngagement, setStudentEngagement] = useState(0);
@@ -53,6 +50,20 @@ export default function Analytics() {
   });
 
   useEffect(() => {
+    async function loadUniversities() {
+      const options = await getAllUniversities();
+      setSchoolOptions(options);
+      if (options.length > 0) {
+        setSelectedSchool(options[0].value); // auto-select first university
+      }
+    }
+
+    loadUniversities();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedSchool) return;
+
     const load = async () => {
       const [events, orgs, engagement, activity, topOrgs, metrics] =
         await Promise.all([
@@ -82,7 +93,7 @@ export default function Analytics() {
         timeperiods={timePeriodOptions}
         filters={schoolOptions}
         onFilterChange={(value) => setSelectedSchool(value)}
-        onTimePeriodChange={(value) => setSelectedTimePeriod(value)} // 👈 Add this
+        onTimePeriodChange={(value) => setSelectedTimePeriod(value)}
       />
 
       <div className="flex flex-col gap-4 md:flex-row md:justify-between mt-4">
@@ -94,18 +105,8 @@ export default function Analytics() {
         <TotalEvents currentPercent={totalEvents} />
       </div>
 
-      <div className="flex flex-col gap-4 md:flex-row md:justify-between mt-4">
+      <div className="flex flex-col gap-4 md:flex-row md:justify-center mt-4">
         <OrganizationActivity data={orgActivity} />
-
-        <EngagementBySchool
-          data={[
-            { date: "Jul 1", engineering: 10, arts: 5, science: 3 },
-            { date: "Jul 2", engineering: 15, arts: 8, science: 4 },
-            { date: "Jul 3", engineering: 12, arts: 6, science: 2 },
-            { date: "Jul 4", engineering: 20, arts: 12, science: 5 },
-            { date: "Jul 5", engineering: 18, arts: 10, science: 6 },
-          ]}
-        />
       </div>
 
       <div className="mt-4">
