@@ -19,6 +19,36 @@ export async function getOrganizationProfile(orgId: string): Promise<Tables<'org
     return data;
 }
 
+export async function addMember(orgId: string, studentId: number) {
+    const supabase = await createClient();
+
+    // RLS will enforce that only authorized users (e.g., President) can add.
+    // It also needs to ensure the student is from the same university.
+
+    // Default new members to 'Member' position
+    const defaultPosition = 'Member'; 
+
+    const { error } = await supabase
+        .from('orgmember')
+        .insert({
+            orgid: orgId,
+            studentid: studentId,
+            position: defaultPosition
+        });
+
+    if (error) {
+        console.error("Error adding member:", error);
+        // Handle specific error codes if needed, e.g., unique violation if already a member
+        if (error.code === '23505') { // Unique violation code
+            return { error: "This student is already a member of this organization." };
+        }
+        return { error: `Failed to add member: ${error.message}` };
+    }
+
+    revalidatePath(`/organization/${orgId}/manage/officers`); // Revalidate to update the list
+    return { success: `Student added as '${defaultPosition}'.` };
+}
+
 export async function getOrganizationMembers(orgId: string) {
     const supabase = await createClient();
     

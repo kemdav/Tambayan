@@ -1,10 +1,15 @@
 // app/organization/[org-id]/manage/officers/OfficersClient.tsx
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Tables } from '@/lib/database.types';
-import { updateMemberRole, removeMember } from '@/lib/actions/organization';
+
+import { updateMemberRole, removeMember, addMember } from '@/lib/actions/organization';
 import { AvatarIcon } from '@/app/components/ui/general/avatar-icon-component'; // Assuming you have this
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/app/components/ui/general/button';
+import { Input } from '@/app/components/ui/general/input/input';
+import { SearchIcon } from 'lucide-react';
 
 type OrganizationProfile = Tables<'organizations'>;
 
@@ -19,7 +24,7 @@ type Member = {
         picture: string | null;
     } | null;
 };
-
+type StudentSearchResult = Pick<Tables<'student'>, 'studentid' | 'fname' | 'mname' | 'lname' | 'picture'>;
 interface OfficersClientProps {
     orgId: string;
     organization: OrganizationProfile | null;
@@ -33,6 +38,14 @@ export default function OfficersClient({ orgId, organization, initialMembers, ca
     const [members, setMembers] = useState(initialMembers);
     const [isSubmitting, setIsSubmitting] = useState<number | null>(null); // Track which row is submitting
 
+    const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+    const [searchStudentTerm, setSearchStudentTerm] = useState('');
+    const [searchResults, setSearchResults] = useState<StudentSearchResult[]>([]);
+    const [isSearchingStudents, setIsSearchingStudents] = useState(false);
+    const [currentUniversityId, setCurrentUniversityId] = useState<string | null>(null);
+
+    const memberStudentIds = useMemo(() => new Set(members.map(m => m.studentid)), [members]);
+
     const handleRoleChange = (studentId: number, newRole: string) => {
         setMembers(currentMembers =>
             currentMembers.map(member =>
@@ -40,7 +53,13 @@ export default function OfficersClient({ orgId, organization, initialMembers, ca
             )
         );
     };
-    
+
+    useEffect(() => {
+        if (organization?.universityid) {
+            setCurrentUniversityId(organization.universityid);
+        }
+    }, [organization?.universityid]);
+
     const handleSaveChanges = async (studentId: number) => {
         setIsSubmitting(studentId);
         const member = members.find(m => m.studentid === studentId);
@@ -60,13 +79,47 @@ export default function OfficersClient({ orgId, organization, initialMembers, ca
 
     const handleRemoveMember = async (studentId: number) => {
         if (!confirm("Are you sure you want to remove this member? This action is permanent.")) return;
-        
+
         setIsSubmitting(studentId);
         const result = await removeMember(orgId, studentId);
         if (result.error) {
             alert(result.error);
         }
         // Revalidation on the server will refresh the list, no need to manually filter client state
+        setIsSubmitting(null);
+    };
+
+    const handleSearchStudents = async () => {
+        if (!searchStudentTerm.trim() || !currentUniversityId) return;
+        setIsSearchingStudents(true);
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('student')
+            .select('studentid, fname, mname, lname, picture')
+            .eq('universityid', currentUniversityId) // Filter to only students from this university
+            .or(`fname.ilike.%${searchStudentTerm}%,lname.ilike.%${searchStudentTerm}%`)
+            .limit(10); // Limit results for performance
+
+        if (error) {
+            console.error("Error searching students:", error.message);
+            setSearchResults([]);
+        } else {
+            setSearchResults(data || []);
+        }
+        setIsSearchingStudents(false);
+    };
+
+    const handleAddStudent = async (studentIdToAdd: number) => {
+        if (!orgId) return;
+        setIsSubmitting(studentIdToAdd);
+        const result = await addMember(orgId, studentIdToAdd);
+        if (result.error) {
+            alert(result.error);
+        } else {
+            alert(result.success);
+            setIsAddMemberModalOpen(false); // Close modal on success
+            // Page will revalidate, so members list will refresh automatically
+        }
         setIsSubmitting(null);
     };
 
@@ -80,8 +133,13 @@ export default function OfficersClient({ orgId, organization, initialMembers, ca
 
             {/* Member Management Table */}
             <div className="mt-6 bg-white border rounded-lg shadow-md">
-                <div className="p-4 border-b">
+                <div className="p-4 border-b flex justify-between items-center">
                     <h2 className="text-xl font-semibold">Manage Members</h2>
+                    {canManage && (
+                        <Button onClick={() => setIsAddMemberModalOpen(true)} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            Add Member
+                        </Button>
+                    )}
                 </div>
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -144,6 +202,59 @@ export default function OfficersClient({ orgId, organization, initialMembers, ca
                     </table>
                 </div>
             </div>
+            {isAddMemberModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setIsAddMemberModalOpen(false)}>
+                    <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative" onClick={(e) => e.stopPropagation()}>
+                        <h2 className="text-2xl font-bold mb-4">Add New Member</h2>
+                        <div className="mb-4">
+                            <Input
+                                type="text"
+                                placeholder="Search student by name..."
+                                value={searchStudentTerm}
+                                onChange={(e) => setSearchStudentTerm(e.target.value)}
+                                onKeyDown={(e) => { if (e.key === 'Enter') handleSearchStudents(); }}
+                                leftIcon={<SearchIcon width={20} height={20} />}
+                            />
+                            <Button onClick={handleSearchStudents} className="mt-2 w-full bg-blue-500 hover:bg-blue-600" disabled={isSearchingStudents}>
+                                {isSearchingStudents ? "Searching..." : "Search"}
+                            </Button>
+                        </div>
+                        <div className="max-h-60 overflow-y-auto border rounded-md p-2 space-y-2">
+                            {searchResults.length === 0 && !isSearchingStudents && searchStudentTerm.trim() !== '' ? (
+                                <p className="text-gray-500 text-sm text-center">No students found.</p>
+                            ) : searchStudentTerm.trim() === '' ? (
+                                <p className="text-gray-500 text-sm text-center">Type a name to search for students.</p>
+                            ) : (
+                                searchResults.map(student => (
+                                    <div key={student.studentid} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+                                        <div className="flex items-center gap-3">
+                                            <AvatarIcon src={student.picture} alt={student.fname || ''} className="h-10 w-10" />
+                                            <div>
+                                                <p className="font-semibold">{`${student.fname || ''} ${student.lname || ''}`}</p>
+                                                <p className="text-sm text-gray-500">ID: {student.studentid}</p>
+                                            </div>
+                                        </div>
+                                        {memberStudentIds.has(student.studentid) ? (
+                                            <span className="text-green-600 text-sm font-semibold">Already Member</span>
+                                        ) : (
+                                            <Button
+                                                onClick={() => handleAddStudent(student.studentid)}
+                                                disabled={isSubmitting === student.studentid}
+                                                className="px-3 py-1 text-xs bg-green-500 hover:bg-green-600"
+                                            >
+                                                {isSubmitting === student.studentid ? "Adding..." : "Add"}
+                                            </Button>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                        <Button onClick={() => setIsAddMemberModalOpen(false)} className="mt-4 w-full bg-gray-300 hover:bg-gray-400 text-gray-800">
+                            Close
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
