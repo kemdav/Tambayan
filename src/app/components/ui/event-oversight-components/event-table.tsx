@@ -11,6 +11,7 @@ interface StatusStyle {
 interface EventData {
   eventName: string;
   organization: string;
+  orgname?: string;
   date: string;
   location: string;
   status?: string; // ✅ just a string like "Upcoming"
@@ -60,7 +61,7 @@ export default function EventTable({ tableData = [], statuses = [] }: Props) {
                   {event.eventName}
                 </td>
                 <td className="border-t border-y-tint-beige-cream px-2 py-2 sm:px-4 whitespace-nowrap">
-                  {event.organization}
+                  {event.orgname || event.organization}
                 </td>
                 <td className="border-t border-y-tint-beige-cream px-2 py-2 sm:px-4 whitespace-nowrap">
                   {event.date}

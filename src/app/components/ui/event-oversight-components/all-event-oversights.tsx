@@ -33,6 +33,7 @@ interface Props {
   tableData?: Data[];
   statuses?: StatusStyle[];
   onClickButton?: () => void;
+  onOrgChange?: (orgid: string | null) => void;
 }
 
 export default function AllEventOversights({
@@ -43,6 +44,7 @@ export default function AllEventOversights({
   tableData,
   statuses,
   onClickButton,
+  onOrgChange,
 }: Props) {
   return (
     <div className="flex flex-col items-center justify-center px-4 py-4 w-full">
@@ -53,6 +55,7 @@ export default function AllEventOversights({
           placeholder={placeholder}
           options={options}
           onClickButton={onClickButton}
+          onOrgChange={onOrgChange}
         />
         <EventTable tableData={tableData} statuses={statuses} />
       </div>

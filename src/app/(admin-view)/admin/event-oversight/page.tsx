@@ -3,15 +3,21 @@
 import AllEventOversights from "@/app/components/ui/event-oversight-components/all-event-oversights";
 import {
   fetchEvents,
-  getSampleOptions,
+  fetchOrganizationOptions,
   getSampleStatuses,
   type EventData,
+  type Option,
 } from "@/lib/actions/event-oversight";
 import { useEffect, useState } from "react";
 
 export default function EventOversightPage() {
   const [tableData, setTableData] = useState<EventData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [options, setOptions] = useState<Option[]>([]);
+  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
+  const filteredTableData = selectedOrg
+    ? tableData.filter((event) => event.organization === selectedOrg)
+    : tableData;
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -19,9 +25,12 @@ export default function EventOversightPage() {
       try {
         const events = await fetchEvents();
         setTableData(events);
+        const orgOptions = await fetchOrganizationOptions();
+        setOptions(orgOptions);
       } catch (error) {
         console.error("Error loading events:", error);
         setTableData([]);
+        setOptions([]);
       } finally {
         setLoading(false);
       }
@@ -38,9 +47,10 @@ export default function EventOversightPage() {
       </div>
       <div className="w-full max-w-[1089px] mx-auto bg-white border rounded-[10px] shadow-sm p-6">
         <AllEventOversights
-          options={getSampleOptions()}
+          options={options}
           statuses={getSampleStatuses()}
-          tableData={tableData}
+          tableData={filteredTableData}
+          onOrgChange={setSelectedOrg}
         />
         {loading && <div className="mt-4 text-gray-500">Loading events...</div>}
       </div>
