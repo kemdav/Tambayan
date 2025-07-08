@@ -224,6 +224,7 @@ drop index if exists "public"."post_likes_user_id_idx";
 
 drop index if exists "public"."unique_accreditation_per_year";
 
+
 alter table "public"."comments" drop column "comment_text";
 
 alter table "public"."comments" add column "comment" text;
@@ -291,84 +292,3 @@ BEGIN
 END;
 $function$
 ;
-
-create policy "Allow read for all"
-on "public"."eventattendance"
-as permissive
-for select
-to public
-using (true);
-
-
-create policy "Allow select for all"
-on "public"."events"
-as permissive
-for select
-to public
-using (true);
-
-
-create policy "Authenticated users can view active events in their university."
-on "public"."events"
-as permissive
-for select
-to authenticated
-using (((status = 'active'::text) AND (EXISTS ( SELECT 1
-   FROM organizations o
-  WHERE ((o.orgid = events.orgid) AND (o.universityid IN ( SELECT s.universityid
-           FROM student s
-          WHERE (s.user_id = auth.uid()))))))));
-
-
-create policy "Deny all deletes from users."
-on "public"."events"
-as permissive
-for delete
-to authenticated
-using (false);
-
-
-create policy "Allow public read"
-on "public"."organizations"
-as permissive
-for select
-to public
-using (true);
-
-
-create policy "Allow read for all"
-on "public"."orgmember"
-as permissive
-for select
-to public
-using (true);
-
-
-create policy "Allow read access to posts"
-on "public"."post"
-as permissive
-for select
-to public
-using ((auth.role() = 'authenticated'::text));
-
-
-create policy "Enable read access for authenticated users"
-on "public"."student"
-as permissive
-for select
-to authenticated
-using ((auth.uid() = user_id));
-
-
-create policy "Org admins can create events for their organization."
-on "public"."events"
-as permissive
-for insert
-to authenticated
-with check ((EXISTS ( SELECT 1
-   FROM (orgmember om
-     JOIN student s ON ((om.studentid = s.studentid)))
-  WHERE ((s.user_id = auth.uid()) AND (om.orgid = events.orgid) AND (om."position" = ANY (ARRAY['Admin'::text, 'President'::text, 'Event Coordinator'::text]))))));
-
-
-
