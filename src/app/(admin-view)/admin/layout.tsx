@@ -5,12 +5,14 @@ import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import { NewsfeedIcon } from "@/app/components/icons/NewsfeedIcon";
 import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
 import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
-import { LogOutIcon as SettingsIcon } from "@/app/components/icons/LogOutIcon";
+import { LogOutIcon } from "@/app/components/icons/LogOutIcon";
 import Image from "next/image";
 import { AdminUserProvider } from "./AdminUserContext";
 import { AddIcon } from "@/app/components/icons/AddIcon";
 import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { NavigationButtonIcon } from "@/app/components/icons/NavigationButtonIcon";
+import { useRouter } from "next/navigation";
 
 // A simple hamburger icon component for clarity
 const HamburgerIcon = ({ className }: { className?: string }) => (
@@ -74,9 +76,15 @@ const navButtons: ButtonConfig[] = [
     href: "/admin/create-org",
   },
   {
+    id: "change-password",
+    children: "Change Password",
+    icon: <NavigationButtonIcon className="w-5 h-5" />,
+    href: "/admin/change-password",
+  },
+  {
     id: "settings",
     children: "Settings",
-    icon: <SettingsIcon />,
+    icon: <LogOutIcon />,
     href: "/admin/settings",
   },
 ];
@@ -88,6 +96,7 @@ export default function AdminLayout({
 }) {
   const [selected, setSelected] = useState("dashboard");
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const router = useRouter();
 
   // Debug state for university info
   const [univInfo, setUnivInfo] = useState<{
@@ -97,10 +106,31 @@ export default function AdminLayout({
   } | null>(null);
   const [loadingUniv, setLoadingUniv] = useState(false);
 
-  const handleSelect = (id: string) => {
+  // Add logout handler
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
+  // Add logout button to navButtons (after settings)
+  const navButtonsWithLogout = [
+    ...navButtons,
+    {
+      id: "logout",
+      children: "Logout",
+      icon: <LogOutIcon className="w-5 h-5" />,
+      href: "#logout", // Use a dummy href to trigger selection
+    },
+  ];
+
+  // Modified handleSelect to handle logout
+  const handleSelect = async (id: string) => {
     setSelected(id);
-    // Only close navigation on mobile
     setIsNavOpen(false);
+    if (id === "logout") {
+      await handleLogout();
+    }
   };
 
   // Debug button handler
@@ -164,7 +194,7 @@ export default function AdminLayout({
           `}
         >
           <SideNavBar
-            myButtons={navButtons}
+            myButtons={navButtonsWithLogout}
             selectedButtonId={selected}
             onButtonSelect={handleSelect}
             isOpen={isNavOpen}
