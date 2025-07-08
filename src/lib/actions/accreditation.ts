@@ -67,8 +67,7 @@ export async function submitAccreditationFile(orgId: string, academicYear: strin
             .from('accreditations')
             .update({
                 submission_status: 'Pending Review',
-                file_path: filePath,
-                submitted_at: new Date().toISOString()
+                file_path: filePath
             })
             .eq('id', existingRecord.id); // Update by primary key
         dbError = error;
@@ -89,8 +88,7 @@ export async function submitAccreditationFile(orgId: string, academicYear: strin
                 universityid: orgData.universityid,
                 academic_year: academicYear,
                 submission_status: 'Pending Review',
-                file_path: filePath,
-                submitted_at: new Date().toISOString()
+                file_path: filePath
             });
         dbError = error;
     }
@@ -178,7 +176,6 @@ export async function updateOrganizationAccreditationStatus(
     .update({
       submission_status: newStatus,
       reviewer_notes: reviewerNotes || null,
-      submitted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
     .eq("orgid", orgid);
