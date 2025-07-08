@@ -137,22 +137,31 @@ const PostPage = ({
     console.log("PostPage received currentUserID:", currentUserID);
     return (
         <div className="mt-3">
-            <div className="mb-3">
-                <DropDownRole
-                    options={orgFilterOptions}
-                    placeholder={filterPlaceholder}
-                    width="w-64"
-                    onSelect={onOrgFilterChange}
-                />
-                {/* --- SORTING DROPDOWN --- */}
-                <DropDownRole
-                    options={options}
-                    placeholder={options.find(o => o.value === sortOption)?.label || "Most Recent"}
-                    width="w-xs"
-                    onSelect={onSortChange}
-                />
+
+            <div className="flex items-center gap-4 mb-4 p-4 bg-gray-50 rounded-lg border">
+                {/* Organization Filter Dropdown */}
+                <div className="flex-1">
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Filter by Organization</label>
+                    <DropDownRole
+                        options={orgFilterOptions}
+                        placeholder={filterPlaceholder}
+                        width="w-full"
+                        onSelect={onOrgFilterChange}
+                    />
+                </div>
+                
+                {/* Sorting Dropdown */}
+                <div className="w-48">
+                     <label className="block text-xs font-medium text-gray-500 mb-1">Sort by</label>
+                    <DropDownRole
+                        options={options}
+                        placeholder={options.find(o => o.value === sortOption)?.label || "Most Recent"}
+                        width="w-full"
+                        onSelect={onSortChange}
+                    />
+                </div>
             </div>
-            {posts.length === 0 ? (<p>No posts found for this user.</p>) : ( // Use 'posts' here
+            {posts.length === 0 ? (<p className="text-center text-gray-500 py-8">No posts found for this user.</p>) : ( // Use 'posts' here
                 <ul className="space-y-4">
                     {posts.map((post) => ( // Use 'post' as the iteration variable
                         <DisplayPostComponent
