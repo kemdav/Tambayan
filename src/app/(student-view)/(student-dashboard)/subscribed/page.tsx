@@ -89,7 +89,7 @@ export default async function SubscribedOrgsPage() {
       tagBgColor: org.status === 'active' ? 'bg-green-100' : 'bg-red-100',
       tagTextColor: org.status === 'active' ? 'text-green-800' : 'text-red-800',
       buttons: [
-        { label: "View", bgColor: "bg-blue-500", textColor: "text-white" },
+        { label: "View", bgColor: "bg-action-fresh-green", textColor: "text-black" },
         { label: "Unsubscribe", bgColor: "bg-red-500", textColor: "text-white" },
       ],
     };
