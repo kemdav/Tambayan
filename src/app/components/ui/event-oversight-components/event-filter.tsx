@@ -40,13 +40,7 @@ export default function EventFilter({
         />
       </div>
 
-      <Button
-        onClick={onClickButton}
-        className="animation-button w-full sm:w-auto"
-      >
-        <Plus className="w-5 h-5 mr-2" />
-        Add Event
-      </Button>
+      {/* Removed Add Event button */}
     </div>
   );
 }
