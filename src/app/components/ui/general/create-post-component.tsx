@@ -21,213 +21,149 @@ const postTypeOptions = [
 
 interface CreatePostComponentProps {
   className?: string;
-  postType: string;
-  onPostTypeChange: (type: string) => void;
-  org: string | null;
-  onOrgChange: (org: string | null) => void;
+  postType: 'default' | 'official' | 'event';
+  isOfficialMode?: boolean; // True when creating content FOR an org (as an officer)
+  
+  // State and handlers from parent
+  // Only used for 'default' (community) posts
+  org?: string | null;
+  onOrgChange?: (org: string | null) => void;
+  orgOptions?: OrgOption[];
+  
   title: string;
   onTitleChange: (title: string) => void;
   content: string;
   onContentChange: (content: string) => void;
-  orgOptions?: OrgOption[];
-  onPost: () => void;
-  // Default post fields
-  tags?: string[];
-  tagInput?: string;
-  onTagInputChange?: (input: string) => void;
-  onAddTag?: () => void;
-  onRemoveTag?: (tag: string) => void;
-  photoFile?: File | null;
-  onPhotoChange?: (file: File | null) => void;
-  // Event post fields
+  photoFile: File | null;
+  onPhotoChange: (file: File | null) => void;
+  
+  // Event-specific fields
   eventLocation?: string;
   onEventLocationChange?: (location: string) => void;
-  eventDate?: string;
-  onEventDateChange?: (date: string) => void;
-  registrationStart?: Date;
-  onRegistrationStartChange?: (date: Date | undefined) => void;
-  registrationEnd?: Date;
-  onRegistrationEndChange?: (date: Date | undefined) => void;
-  // Button text (optional)
+  eventDate?: Date | undefined;
+  onEventDateChange?: (date: Date | undefined) => void;
+  
+  // Control props
+  onPost: () => void;
+  isSubmitting: boolean;
   postButtonText?: string;
-  isEditMode?: boolean;
-  isUserPosting?:boolean;
-  isSubmitting?: boolean;
 }
-
 export function CreatePostComponent({
   className = "",
-  postType = "default",
-  onPostTypeChange,
+  postType,
+  isOfficialMode = false,
   org,
-  onOrgChange,
+  onOrgChange = () => {},
+  orgOptions = [],
   title,
   onTitleChange,
   content,
   onContentChange,
   onPost,
-  tags = [],
-  tagInput = "",
-  onTagInputChange,
-  onAddTag,
-  orgOptions = [],
-  isSubmitting = false,
-  onRemoveTag,
-  photoFile = null,
+  photoFile,
   onPhotoChange,
   eventLocation = "",
-  onEventLocationChange,
-  eventDate = "",
-  onEventDateChange,
-  registrationStart,
-  onRegistrationStartChange,
-  registrationEnd,
-  onRegistrationEndChange,
+  onEventLocationChange = () => {},
+  eventDate,
+  onEventDateChange = () => {},
+  isSubmitting,
   postButtonText = "Post",
-  isEditMode = false,
-  isUserPosting = true,
 }: CreatePostComponentProps) {
+
   return (
     <div className={`rounded-2xl border border-gray-200 bg-white p-6 flex flex-col gap-4 shadow-sm w-full mx-auto mb-4 ${className}`}>
-      <div className="flex flex-row gap-4 w-full">
-        {!isEditMode && !isUserPosting  && (
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Create Post:</label>
-            <DropdownRole
-              options={postTypeOptions}
-              placeholder={postTypeOptions.find(o => o.value === postType)?.label || "Select Post Type"}
-              width="w-full"
-              height="h-10"
-              onSelect={onPostTypeChange}
-            />
-          </div>
-        )}
-        {postType === "default" && (
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Select Organization:</label>
-            <DropdownRole
-              options={orgOptions}
-              placeholder={org ? orgOptions.find(o => o.value === org)?.label : "Select Organization"}
-              width="w-full"
-              height="h-10"
-              onSelect={onOrgChange}
-            />
-          </div>
-        )}
+      <h2 className="text-xl font-bold text-gray-800">
+        {postType === 'event' ? 'Create New Event' 
+          : postType === 'official' ? 'Create Official Post' 
+          : 'Create Community Post'}
+      </h2>
+      
+      {/* --- CONDITIONAL UI LOGIC --- */}
+      
+      {/* 1. Show "Select Organization" dropdown ONLY for community posts (not official mode) */}
+      {!isOfficialMode && postType === 'default' && (
+        <div>
+          <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Post to Organization:</label>
+          <DropdownRole
+            options={orgOptions}
+            placeholder={org ? orgOptions.find(o => o.value === org)?.label : "Select Organization"}
+            width="w-full"
+            height="h-10"
+            onSelect={onOrgChange}
+          />
+        </div>
+      )}
+
+      {/* 2. Common Fields for All Types (Posts and Events) */}
+      <div>
+        <label className="block text-sm font-medium text-neutral-muted-olive mb-1">
+          {postType === 'event' ? "Event Title" : "Title"}
+        </label>
+        <Input
+          type="text"
+          placeholder={postType === 'event' ? "e.g., Annual Tech Summit" : "e.g., Important Announcement"}
+          value={title}
+          onChange={e => onTitleChange(e.target.value)}
+        />
       </div>
-      {postType === "default" && (
+
+      <div>
+        <label className="block text-sm font-medium text-neutral-muted-olive mb-1">
+            {postType === 'event' ? "Description" : "Content"}
+        </label>
+        <FormattableInput
+          value={content}
+          onChange={val => onContentChange(val as string)}
+          placeholder="Share details here..."
+          isFormattable={true}
+          multiline={true}
+        />
+      </div>
+      
+      {/* 3. Fields ONLY for Events */}
+      {postType === 'event' && (
         <>
-          <label className="text-sm font-medium text-neutral-muted-olive">Post Title</label>
-          <Input
-            type="text"
-            placeholder="Post Title"
-            value={title}
-            onChange={e => onTitleChange(e.target.value ?? "")}
-            className="mb-2"
-          />
-          <label className="text-sm font-medium text-neutral-muted-olive">Post Content</label>
-          <div className="relative mb-2">
-            <FormattableInput
-              value={content}
-              onChange={val => onContentChange(val as string)}
-              isFormattable={true}
-              multiline={true}
-              placeholder="What's happening in your organizaticfbcbcbon?"
-              className="mb-2"
+          <div>
+            <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Location</label>
+            <Input
+              type="text"
+              placeholder="e.g., University Auditorium"
+              value={eventLocation}
+              onChange={e => onEventLocationChange(e.target.value)}
             />
-            {!isEditMode && (
-              <div className="mt-10">
-                <button
-                  type="button"
-                  className="px-3 py-1 rounded bg-gray-100 hover:bg-secondary-light-moss hover:text-white text-sm font-medium transition-colors"
-                  onClick={() => document.getElementById('photo-upload-input')?.click()}
-                  tabIndex={-1}
-                  aria-label="Attach photo"
-                >
-                  Attach Image
-                </button>
-                <input
-                  id="photo-upload-input"
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={e => {
-                    onPhotoChange && onPhotoChange(e.target.files?.[0] || null);
-                    e.target.value = "";
-                  }}
-                />
-                {photoFile && <span className="text-xs ml-2">{photoFile.name}</span>}
-              </div>
-            )}
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Event Date & Time</label>
+            <DateTimePicker date={eventDate} setDate={onEventDateChange} />
           </div>
         </>
       )}
-      {postType === "event" && (
-        <>
-          <label className="text-sm font-medium text-neutral-muted-olive">Event Title</label>
-          <Input
-            type="text"
-            placeholder="Event Title"
-            value={title}
-            onChange={e => onTitleChange(e.target.value)}
-            className="mb-2"
-          />
-          <label className="text-sm font-medium text-neutral-muted-olive">Description</label>
-          <FormattableInput
-            value={content}
-            onChange={val => onContentChange(val as string)}
-            isFormattable={true}
-            multiline={true}
-            placeholder="What's happening in your organization?"
-            className="mb-2"
-          />
-          {!isEditMode && (
-            <div className="mt-10">
-              <button
-                type="button"
-                className="px-3 py-1 rounded bg-gray-100 hover:bg-secondary-light-moss hover:text-white text-sm font-medium transition-colors"
-                onClick={() => document.getElementById('photo-upload-input')?.click()}
-                tabIndex={-1}
-                aria-label="Attach photo"
-              >
-                Attach Image
-              </button>
-              <input
-                id="photo-upload-input"
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={e => {
-                  onPhotoChange && onPhotoChange(e.target.files?.[0] || null);
-                  e.target.value = "";
-                }}
-              />
-              {photoFile && <span className="text-xs ml-2">{photoFile.name}</span>}
-            </div>
-          )}
-          <label className="text-sm font-medium text-neutral-muted-olive">Location</label>
-          <Input
-            type="text"
-            placeholder="Location"
-            value={eventLocation}
-            onChange={e => onEventLocationChange && onEventLocationChange(e.target.value)}
-            className="mb-2"
-          />
-          <div className="flex flex-col gap-2 mb-2 sm:flex-row sm:gap-4">
-            <div className="flex-1">
-              <label className="text-sm font-medium text-neutral-muted-olive">Registration Start</label>
-              <DateTimePicker date={registrationStart} setDate={onRegistrationStartChange} />
-            </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium text-neutral-muted-olive">Registration End</label>
-              <DateTimePicker date={registrationEnd} setDate={onRegistrationEndChange} />
-            </div>
-          </div>
-        </>
-      )}
+
+      {/* 4. "Attach Image" button for all post/event types */}
+      <div className="mt-2">
+        <button
+          type="button"
+          className="px-3 py-1 rounded bg-gray-100 hover:bg-green-100 text-sm font-medium text-gray-700 transition-colors"
+          onClick={() => document.getElementById('photo-upload-input')?.click()}
+        >
+          Attach Image
+        </button>
+        <input
+          id="photo-upload-input"
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={e => onPhotoChange(e.target.files?.[0] || null)}
+        />
+        {photoFile && <span className="text-xs ml-2 text-gray-500 italic">{photoFile.name}</span>}
+      </div>
+
+      {/* 5. Submit Button */}
       <div className="flex justify-end mt-2">
-        <Button onClick={onPost} disabled={isSubmitting}>{isSubmitting ? "Posting..." : postButtonText}</Button>
+        <Button onClick={onPost} disabled={isSubmitting}>
+            {isSubmitting ? "Posting..." : postButtonText}
+        </Button>
       </div>
     </div>
   );
-} 
+}
