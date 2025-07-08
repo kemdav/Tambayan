@@ -1,6 +1,6 @@
 "use client";
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import { NewsfeedIcon } from "@/app/components/icons/NewsfeedIcon";
 import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
@@ -9,7 +9,6 @@ import { LogOutIcon } from "@/app/components/icons/LogOutIcon";
 import Image from "next/image";
 import { AdminUserProvider } from "./AdminUserContext";
 import { AddIcon } from "@/app/components/icons/AddIcon";
-import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { NavigationButtonIcon } from "@/app/components/icons/NavigationButtonIcon";
 import { useRouter } from "next/navigation";
@@ -105,6 +104,27 @@ export default function AdminLayout({
     uname: string;
   } | null>(null);
   const [loadingUniv, setLoadingUniv] = useState(false);
+
+  useEffect(() => {
+    // Fetch university info on mount
+    (async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setUnivInfo(null);
+        return;
+      }
+      // Adjust this query to your actual admin/university mapping
+      const { data: universityProfile } = await supabase
+        .from("university")
+        .select("universityid, universityemail, uname")
+        .eq("universityemail", user.email)
+        .single();
+      setUnivInfo(universityProfile || null);
+    })();
+  }, []);
 
   // Add logout handler
   const handleLogout = async () => {
@@ -202,7 +222,15 @@ export default function AdminLayout({
           />
         </div>
 
-        <main className="flex-1 bg-neutral-mint-white p-4">{children}</main>
+        <main className="flex-1 bg-neutral-mint-white p-4">
+          {univInfo && (
+            <div className="p-2 bg-green-100 text-green-900 rounded mb-2 text-sm">
+              Current University: <b>{univInfo.universityid}</b>
+              {univInfo.uname && <> — {univInfo.uname}</>}
+            </div>
+          )}
+          {children}
+        </main>
       </div>
     </AdminUserProvider>
   );
