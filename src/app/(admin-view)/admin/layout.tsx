@@ -82,6 +82,12 @@ const navButtons: ButtonConfig[] = [
     href: "/admin/change-password",
   },
   {
+    id: "staff",
+    children: "Staff",
+    icon: <StudentProfileIcon />,
+    href: "/admin/staff",
+  },
+  {
     id: "settings",
     children: "Settings",
     icon: <LogOutIcon />,
