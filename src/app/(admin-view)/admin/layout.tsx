@@ -64,6 +64,12 @@ const navButtons: ButtonConfig[] = [
     href: "/admin/accreditation",
   },
   {
+    id: "students",
+    children: "Students",
+    icon: <StudentProfileIcon />,
+    href: "/admin/students",
+  },
+  {
     id: "settings",
     children: "Settings",
     icon: <SettingsIcon />,
