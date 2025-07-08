@@ -26,6 +26,8 @@ export default function OrganizationProfileHeader({
     const supabase = createClient();
     const [user, setUser] = useState<User | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+     const [isAvatarUploading, setIsAvatarUploading] = useState(false);
+    const [isCoverUploading, setIsCoverUploading] = useState(false);
 
     // Get the user once to know if they can edit (you might expand this with RLS checks)
     React.useEffect(() => {
@@ -42,13 +44,17 @@ export default function OrganizationProfileHeader({
             return;
         }
 
-        const bucketName = 'avatars'; // Assuming you use the same bucket
+        const bucketName = 'organization-assets'; // Assuming you use the same bucket
         const oldUrl = initialProfile[columnToUpdate];
 
         try {
-            setIsUploading(true);
+             if (columnToUpdate === 'picture') {
+                setIsAvatarUploading(true);
+            } else {
+                setIsCoverUploading(true);
+            }
             const fileExtension = file.name.split('.').pop();
-            const fileName = `orgs/${initialProfile.orgid}/${columnToUpdate}-${Date.now()}.${fileExtension}`;
+            const fileName = `${initialProfile.orgid}/${columnToUpdate}-${Date.now()}.${fileExtension}`;
 
             // 1. Upload new image
             const { data: uploadData, error: uploadError } = await supabase.storage
@@ -83,13 +89,17 @@ export default function OrganizationProfileHeader({
             console.error(`Error updating ${columnToUpdate}:`, error);
             alert("Failed to update image.");
         } finally {
-            setIsUploading(false);
+             if (columnToUpdate === 'picture') {
+                setIsAvatarUploading(false);
+            } else {
+                setIsCoverUploading(false);
+            }
         }
     };
 
     return (
         <header className="bg-white relative w-full h-73">
-            {isUploading && (
+            {(isAvatarUploading || isCoverUploading) && (
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-50 rounded-2xl">
                     <div className="text-white text-lg font-bold">Uploading...</div>
                 </div>
@@ -102,7 +112,7 @@ export default function OrganizationProfileHeader({
                         onImageChange={(file) => handleImageUpdate(file, 'cover_photo_path')}
                         isEditable={isEditable}
                         src={initialProfile.cover_photo_path}
-                        isLoading={isUploading}
+                        isLoading={isCoverUploading}
                     />
                 </div>
                 {/* Profile Info Area */}
@@ -121,7 +131,7 @@ export default function OrganizationProfileHeader({
                         isEditable={isEditable}
                         onImageChange={(file) => handleImageUpdate(file, 'picture')}
                         src={initialProfile.picture}
-                        isLoading={isUploading}
+                        isLoading={isAvatarUploading}
                     />
                 </div>
             </div>
