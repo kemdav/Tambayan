@@ -88,9 +88,29 @@ export default function RegisterPage() {
     formData.append('yearlevel', year);
 
     // Call the server action with the complete FormData
-    await signup(formData);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          fname: firstName,
+          lname: lastName,
+          mname: middleName,
+          universityid: university,
+          course,
+          yearlevel: year,
+          role: 'student',
+        },
+      },
+    });
 
-    setLoading(false);
+    if (error) {
+      setError(error.message);
+    } else {
+      setLoading(false);
+      router.push("/login");
+    }
   }
   // --- MODIFICATION END ---
 

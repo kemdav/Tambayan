@@ -49,6 +49,11 @@ export default function SchoolAdminRegisterPage() {
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email: universityEmail,
       password,
+      options: {
+        data: {
+          role: 'admin',
+        },
+      },
     });
 
     if (signUpError) {
