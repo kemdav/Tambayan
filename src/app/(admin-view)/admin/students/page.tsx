@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useAdminUser } from "../AdminUserContext";
 
 // Minimal StudentCard component with menu
 function StudentCard({ student }: { student: any }) {
@@ -41,20 +42,25 @@ function StudentCard({ student }: { student: any }) {
 }
 
 export default function AdminStudentsPage() {
+  const { user, loading } = useAdminUser();
   const [students, setStudents] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const studentsPerPage = 10;
 
   useEffect(() => {
+    if (!user || loading) return;
     const supabase = createClient();
+    const universityid = user.user_metadata?.universityid;
+    if (!universityid) return;
     supabase
       .from("student")
       .select("*")
+      .eq("universityid", universityid)
       .then(({ data, error }) => {
         if (!error) setStudents(data || []);
       });
-  }, []);
+  }, [user, loading]);
 
   const filteredStudents = students.filter(
     s =>
@@ -70,6 +76,9 @@ export default function AdminStudentsPage() {
 
   const handlePrev = () => setPage((p) => Math.max(1, p - 1));
   const handleNext = () => setPage((p) => Math.min(totalPages, p + 1));
+
+  if (loading) return <div className="text-gray-500">Loading...</div>;
+  if (!user?.user_metadata?.universityid) return <div className="text-red-500">You do not have access to view students.</div>;
 
   return (
     <div className="min-h-screen px-4 py-6 bg-gray-50">

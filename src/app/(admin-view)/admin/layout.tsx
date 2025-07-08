@@ -7,6 +7,7 @@ import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
 import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
 import { LogOutIcon as SettingsIcon } from "@/app/components/icons/LogOutIcon";
 import Image from "next/image";
+import { AdminUserProvider } from "./AdminUserContext";
 import { AddIcon } from "@/app/components/icons/AddIcon";
 
 // A simple hamburger icon component for clarity
@@ -93,42 +94,44 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="relative min-h-screen md:flex">
-      <div className="p-4 md:hidden">
-        <div className="flex justify-between items-center bg-tint-forest-fern text-white p-4 rounded-[20px] shadow-lg">
-          <div className="font-bold text-xl">Admin Panel</div>
-          <button onClick={() => setIsNavOpen(true)} className="cursor-pointer">
-            <HamburgerIcon className="h-6 w-6" />
-          </button>
+    <AdminUserProvider>
+      <div className="relative min-h-screen md:flex">
+        <div className="p-4 md:hidden">
+          <div className="flex justify-between items-center bg-tint-forest-fern text-white p-4 rounded-[20px] shadow-lg">
+            <div className="font-bold text-xl">Admin Panel</div>
+            <button onClick={() => setIsNavOpen(true)} className="cursor-pointer">
+              <HamburgerIcon className="h-6 w-6" />
+            </button>
+          </div>
         </div>
-      </div>
 
-      {isNavOpen && (
+        {isNavOpen && (
+          <div
+            className="fixed inset-0 bg-black opacity-50 z-20 md:hidden"
+            onClick={() => setIsNavOpen(false)}
+          ></div>
+        )}
+
         <div
-          className="fixed inset-0 bg-black opacity-50 z-20 md:hidden"
-          onClick={() => setIsNavOpen(false)}
-        ></div>
-      )}
+          className={`
+            fixed top-0 left-0 h-full z-30
+            transform transition-transform duration-300 ease-in-out
+            ${isNavOpen ? "translate-x-0" : "-translate-x-full"}
+            
+            md:relative md:translate-x-0 md:z-auto md:h-auto
+          `}
+        >
+          <SideNavBar
+            myButtons={navButtons}
+            selectedButtonId={selected}
+            onButtonSelect={handleSelect}
+            isOpen={isNavOpen}
+            onToggle={() => setIsNavOpen(!isNavOpen)}
+          />
+        </div>
 
-      <div
-        className={`
-          fixed top-0 left-0 h-full z-30
-          transform transition-transform duration-300 ease-in-out
-          ${isNavOpen ? "translate-x-0" : "-translate-x-full"}
-          
-          md:relative md:translate-x-0 md:z-auto md:h-auto
-        `}
-      >
-        <SideNavBar
-          myButtons={navButtons}
-          selectedButtonId={selected}
-          onButtonSelect={handleSelect}
-          isOpen={isNavOpen}
-          onToggle={() => setIsNavOpen(!isNavOpen)}
-        />
+        <main className="flex-1 bg-neutral-mint-white p-4">{children}</main>
       </div>
-
-      <main className="flex-1 bg-neutral-mint-white p-4">{children}</main>
-    </div>
+    </AdminUserProvider>
   );
 }

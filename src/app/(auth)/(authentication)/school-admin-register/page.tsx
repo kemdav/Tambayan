@@ -45,19 +45,7 @@ export default function SchoolAdminRegisterPage() {
 
     const supabase = createClient();
 
-    // 1. Register admin in Supabase Auth
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email: universityEmail,
-      password,
-    });
-
-    if (signUpError) {
-      setError(signUpError.message);
-      setLoading(false);
-      return;
-    }
-
-    // 2. Upsert university into university table (if not exists)
+    // 1. Upsert university into university table (if not exists)
     const { data: university, error: universityError } = await supabase
       .from("university")
       .upsert([
@@ -72,6 +60,24 @@ export default function SchoolAdminRegisterPage() {
 
     if (universityError) {
       setError(universityError.message);
+      setLoading(false);
+      return;
+    }
+
+    // 2. Register admin in Supabase Auth, now with universityid in metadata
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email: universityEmail,
+      password,
+      options: {
+        data: {
+          role: 'admin',
+          universityid: university.universityid,
+        },
+      },
+    });
+
+    if (signUpError) {
+      setError(signUpError.message);
       setLoading(false);
       return;
     }
