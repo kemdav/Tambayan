@@ -1,6 +1,6 @@
 "use client";
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import { NewsfeedIcon } from "@/app/components/icons/NewsfeedIcon";
 import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
@@ -85,50 +85,67 @@ export default function AdminLayout({
 }) {
   const [selected, setSelected] = useState("dashboard");
   const [isNavOpen, setIsNavOpen] = useState(false);
-
+  const [hasMounted, setHasMounted] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+    const checkScreenSize = () => setIsDesktop(window.innerWidth >= 768);
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
   const handleSelect = (id: string) => {
     setSelected(id);
-    // Only close navigation on mobile
-    setIsNavOpen(false);
+    setIsNavOpen(false); // Close mobile nav on selection
   };
 
+  const isSidebarExpanded = isNavOpen || isDesktop;
+    if (!hasMounted) {
+    return null; 
+  }
   return (
-    <div className="relative min-h-screen md:flex">
-      <div className="p-4 md:hidden">
-        <div className="flex justify-between items-center bg-tint-forest-fern text-white p-4 rounded-[20px] shadow-lg">
-          <div className="font-bold text-xl">Admin Panel</div>
-          <button onClick={() => setIsNavOpen(true)} className="cursor-pointer">
-            <HamburgerIcon className="h-6 w-6" />
-          </button>
+    <div className="flex h-screen bg-neutral-mint-white">
+
+       {isNavOpen && (
+            <div 
+                className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden" 
+                onClick={() => setIsNavOpen(false)}
+            ></div>
+        )}
+
+         <div
+          className={`
+            flex-shrink-0 z-30 bg-white shadow-xl
+            transform transition-transform duration-300 ease-in-out
+            md:relative md:shadow-none md:translate-x-0
+            fixed top-0 left-0 h-full
+            ${isNavOpen ? "translate-x-0" : "-translate-x-full"}
+          `}
+        >
+          {/* We only need one instance of SideNavBar */}
+          <SideNavBar
+            myButtons={navButtons}
+            selectedButtonId={selected}
+            onButtonSelect={handleSelect}
+            isExpanded={isSidebarExpanded}
+          />
         </div>
+
+
+      <div className="flex flex-col flex-1 w-0 overflow-y-auto">
+        {/* Mobile Header */}
+        <div className="p-4 md:hidden">
+          <div className="flex justify-between items-center bg-tint-forest-fern text-white p-4 rounded-lg shadow-lg">
+            <div className="font-bold text-xl">Admin Panel</div>
+            <button onClick={() => setIsNavOpen(true)} className="cursor-pointer">
+              <HamburgerIcon className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+
+        {/* The actual page content, now inside the scrollable area */}
+        <main className="flex-1 p-4 md:p-8">{children}</main>
       </div>
-
-      {isNavOpen && (
-        <div
-          className="fixed inset-0 bg-black opacity-50 z-20 md:hidden"
-          onClick={() => setIsNavOpen(false)}
-        ></div>
-      )}
-
-      <div
-        className={`
-          fixed top-0 left-0 h-full z-30
-          transform transition-transform duration-300 ease-in-out
-          ${isNavOpen ? "translate-x-0" : "-translate-x-full"}
-          
-          md:relative md:translate-x-0 md:z-auto md:h-auto
-        `}
-      >
-        <SideNavBar
-          myButtons={navButtons}
-          selectedButtonId={selected}
-          onButtonSelect={handleSelect}
-          isOpen={isNavOpen}
-          onToggle={() => setIsNavOpen(!isNavOpen)}
-        />
-      </div>
-
-      <main className="flex-1 bg-neutral-mint-white p-4">{children}</main>
     </div>
   );
 }

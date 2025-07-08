@@ -137,7 +137,6 @@ const PostPage = ({
     console.log("PostPage received currentUserID:", currentUserID);
     return (
         <div className="mt-3">
-
             <div className="flex items-center gap-4 mb-4 p-4 bg-gray-50 rounded-lg border">
                 {/* Organization Filter Dropdown */}
                 <div className="flex-1">
@@ -162,9 +161,9 @@ const PostPage = ({
                 </div>
             </div>
             {posts.length === 0 ? (<p className="text-center text-gray-500 py-8">No posts found for this user.</p>) : ( // Use 'posts' here
-                <ul className="space-y-4">
+                (<ul className="space-y-4">
                     {posts.map((post) => ( // Use 'post' as the iteration variable
-                        <DisplayPostComponent
+                        (<DisplayPostComponent
                             key={post.postID}
                             postID={post.postID}
                             posterName={post.posterName}
@@ -180,9 +179,9 @@ const PostPage = ({
                             initialHasLiked={post.initialHasLiked}
                             currentUserID={currentUserID}
                             posterID="might_remove"
-                        />
+                        />)
                     ))}
-                </ul>
+                </ul>)
             )}
         </div>
     );
@@ -314,7 +313,7 @@ export default function StudentProfileCard({
                 <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect} />
                 {selectedButtonId === "about" && (
                     // 3. Update the call to AboutPage, passing props from the 'profile' object
-                    <AboutPage
+                    (<AboutPage
                         studentId={profile.studentid.toString()}
                         studentCourse={profile.course}
                         studentEmail={profile.email}
@@ -326,7 +325,7 @@ export default function StudentProfileCard({
                         studentEventsJoined={studentStats?.events_joined_count.toString()}
                     studentTotalOrg={studentStats?.organizations_joined_count.toString()}
                         isOwnProfile={isOwnProfile}
-                    />
+                    />)
                 )}
                  {selectedButtonId === "post" && (
                     <PostPage 

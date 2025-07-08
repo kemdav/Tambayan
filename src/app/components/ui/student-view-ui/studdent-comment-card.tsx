@@ -29,10 +29,8 @@ export default function StudentCommentCard({ comment }: StudentCommentCardProps)
         <div className="bg-white p-4 rounded-lg shadow-sm border">
             <p className="text-sm text-gray-500 mb-2">
                 You commented on the post:
-                <Link href={searchUrl} legacyBehavior>
-                    <a className="font-semibold text-blue-600 hover:underline ml-1">
-                        "{comment.post.subject}"
-                    </a>
+                <Link href={searchUrl} className="font-semibold text-blue-600 hover:underline ml-1">
+                    "{comment.post.subject}"
                 </Link>
             </p>
             <div className="border-l-4 border-gray-200 pl-4">
