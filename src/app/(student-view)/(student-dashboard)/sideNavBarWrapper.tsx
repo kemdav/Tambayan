@@ -40,6 +40,15 @@ export const myButtons: ButtonConfig[] = [
     icon: <StudentProfileIcon className="size-10" />,
   },
   {
+    id: "searchPosts",
+    children: "Search Posts",
+    href: "/search-posts",
+    variant: "sideNavigation",
+    className:
+      "sideNavBarButtonText",
+    icon: <StudentProfileIcon className="size-10" />,
+  },
+  {
     id: "newsfeed",
     children: "Newsfeed",
     variant: "sideNavigation",
