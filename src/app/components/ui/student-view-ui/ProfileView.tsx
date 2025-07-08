@@ -11,16 +11,21 @@ import { createClient } from "@/lib/supabase/client";
 import { type Poster } from "@/lib/types/types";
 import { StudentComment } from '@/lib/actions/comment';
 
+type StudentStats = {
+  organizations_joined_count: number;
+  events_joined_count: number;
+} | null;
 // Define the props that this component will receive
 interface ProfileViewProps {
   initialProfile: StudentProfile;
   initialPosts: Poster[];
   currentUserID: string;
   initialComments: StudentComment[];
+   studentStats: StudentStats;
   isOwnProfile: boolean;
 }
 
-export default function ProfileView({ initialProfile, initialPosts, currentUserID, initialComments,  isOwnProfile }: ProfileViewProps) {
+export default function ProfileView({ initialProfile, initialPosts, currentUserID, initialComments,  isOwnProfile, studentStats }: ProfileViewProps) {
   // console.log("ProfileView received initialPosts:", initialPosts);
   //   console.log("ProfileView received currentUserID:", currentUserID);
   //   console.log("COMMENT PAGE COMMENT 2=", initialComments);
@@ -68,11 +73,10 @@ export default function ProfileView({ initialProfile, initialPosts, currentUserI
             currentUserID={currentUserID}
             isOwnProfile={isOwnProfile}
             posts={initialPosts}
-            initialComments={initialComments} // Changed from 'comments' to 'initialComments' to match the prop name
-            // Pass the entire profile object
+            initialComments={initialComments}
             profile={profile}
-            // Pass the update handler down
             onProfileUpdate={handleProfileUpdate}
+            studentStats={studentStats} 
           />
         </div>
       </main>
