@@ -20,7 +20,7 @@ interface DisplayPostComponentProps {
   posterName: string;
   postID: string; // <-- ADD THIS
   currentUserID?: string;
-   canAdministerPost?: boolean; 
+  canAdministerPost?: boolean;
   event?: string;
   posterUserID?: string | null;
   avatarSrc?: string | null;
@@ -81,7 +81,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   eventLocation,
   eventDate,
   likes: initialLikes,
-    initialHasLiked = false,
+  initialHasLiked = false,
   registrationPeriod,
   onAvatarClicked,
 }) => {
@@ -120,11 +120,11 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   const [editImagePreview, setEditImagePreview] = useState(initialImageSrc || "");
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const [likeCount, setLikeCount] = useState(initialLikes);
-    const [hasLiked, setHasLiked] = useState(initialHasLiked);
-    const [isLikeSubmitting, setIsLikeSubmitting] = useState(false);
- const [editPostType, setEditPostType] = useState<'default' | 'official' | 'event'>(
-        initialEvent ? "event" : "default"
-    );
+  const [hasLiked, setHasLiked] = useState(initialHasLiked);
+  const [isLikeSubmitting, setIsLikeSubmitting] = useState(false);
+  const [editPostType, setEditPostType] = useState<'default' | 'official' | 'event'>(
+    initialEvent ? "event" : "default"
+  );
 
 
   //console.log(`--- Post ID: ${postID} ---`);
@@ -162,23 +162,23 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   };
 
   const handleLike = async () => {
-        if (isLikeSubmitting) return;
-        setIsLikeSubmitting(true);
+    if (isLikeSubmitting) return;
+    setIsLikeSubmitting(true);
 
-        // Optimistic UI Update: Update the UI immediately for a snappy feel
-        setHasLiked(!hasLiked);
-        setLikeCount(hasLiked ? likeCount - 1 : likeCount + 1);
+    // Optimistic UI Update: Update the UI immediately for a snappy feel
+    setHasLiked(!hasLiked);
+    setLikeCount(hasLiked ? likeCount - 1 : likeCount + 1);
 
-        const result = await togglePostLike(Number(postID), hasLiked);
+    const result = await togglePostLike(Number(postID), hasLiked);
 
-        // If the server fails, revert the optimistic update
-        if (result.error) {
-            alert(result.error);
-            setHasLiked(hasLiked); // Revert to original state
-            setLikeCount(likeCount); // Revert to original count
-        }
-        setIsLikeSubmitting(false);
-    };
+    // If the server fails, revert the optimistic update
+    if (result.error) {
+      alert(result.error);
+      setHasLiked(hasLiked); // Revert to original state
+      setLikeCount(likeCount); // Revert to original count
+    }
+    setIsLikeSubmitting(false);
+  };
 
   const handleSaveChanges = async () => {
     setIsSubmitting(true);
@@ -310,8 +310,8 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
         )}
         <div className="flex items-center gap-4 mt-2">
           <Button className="flex items-center gap-1 px-2 py-1 text-xs"
-                onClick={handleLike}
-                disabled={isLikeSubmitting}>
+            onClick={handleLike}
+            disabled={isLikeSubmitting}>
             <LikeIcon className="w-4 h-4" /> {likeCount}
           </Button>
           <Button className="flex items-center gap-1 px-2 py-1 text-xs" onClick={() => setShowComment(true)}>
@@ -327,7 +327,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
         avatarSrc={avatarSrc}
         daysSincePosted={daysSincePosted}
         content={displayContent}
-         initialComments={comments}
+        initialComments={comments}
         imageSrc={displayImage ?? ""}
       />
       {showEdit && (
@@ -342,19 +342,29 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
             </button>
             <h2 className="text-2xl font-bold mb-4">Edit Post</h2>
             <CreatePostComponent
-              postType={editPostType}
-              org={editOrg}
-              onOrgChange={setEditOrg}
-              title={editTitle}
-              onTitleChange={setEditTitle}
-              content={editContent}
-              onContentChange={setEditContent}
-              eventLocation={editEventLocation}
-              onEventLocationChange={setEditEventLocation}
-              postButtonText="Save Changes"
-              onPost={handleSaveChanges}
-                onPhotoChange={setEditPhoto} 
-              isSubmitting={isSubmitting} photoFile={null}/>
+                            postType={editPostType}
+                            title={editTitle}
+                            onTitleChange={setEditTitle}
+                            content={editContent}
+                            onContentChange={setEditContent}
+                            onPost={handleSaveChanges}
+                            isSubmitting={isSubmitting}
+                            postButtonText="Save Changes"
+                            
+                            // Provide the newly required props
+                            isOfficialMode={true} // Edit mode is always "official" in context
+                            photoFile={editPhoto}
+                            onPhotoChange={setEditPhoto}
+                            
+                            // Provide dummy props for things not used in edit mode
+                            org={null}
+                            onOrgChange={() => {}}
+                            orgOptions={[]}
+                            eventLocation={editEventLocation}
+                            onEventLocationChange={setEditEventLocation}
+                            eventDate={editRegistrationStart} // Assuming you might want to edit the date
+                            onEventDateChange={setEditRegistrationStart}
+                        />
             <div className="mt-4">
               <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Edit Image</label>
               <input
@@ -369,7 +379,7 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
                 }}
               />
               {(initialImageSrc || editImagePreview) && ( // Show checkbox if there's an initial image or a new one selected
-                <label className="flex items-center mt-2 text-sm text-gray-700">
+                (<label className="flex items-center mt-2 text-sm text-gray-700">
                   <input
                     type="checkbox"
                     checked={removeExistingImage}
@@ -383,9 +393,8 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
                       }
                     }}
                     className="mr-2"
-                  />
-                  Remove current image
-                </label>
+                  />Remove current image
+                </label>)
               )}
               {editImagePreview && (
                 <img src={editImagePreview} alt="edit preview" className="rounded-lg max-h-40 mt-2 mx-auto" />

@@ -5,7 +5,9 @@
 INSERT INTO storage.buckets (id, name, public)
 VALUES
     ('post-attachments', 'post-attachments', true),
-    ('avatars', 'avatars', true)
+    ('avatars', 'avatars', true),
+    ('organization-assets', 'organization-assets', true),
+    ('accreditation-files', 'accreditation-files', false)
 ON CONFLICT (id) DO NOTHING;
 
 
