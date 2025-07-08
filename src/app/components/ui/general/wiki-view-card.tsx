@@ -66,7 +66,7 @@ export default function WikiViewCard({
           <div className="prose prose-sm max-w-none">
             {isEditing ? (
               // --- EDITING VIEW ---
-              <div className="flex flex-col gap-2">
+              (<div className="flex flex-col gap-2">
                 <input
                   className="w-full border rounded p-2 text-gray-800 font-semibold"
                   value={title} // Value comes from props
@@ -92,12 +92,12 @@ export default function WikiViewCard({
                     Cancel
                   </button>
                 </div>
-              </div>
+              </div>)
             ) : (
               // --- VIEWING VIEW ---
-              <ReactMarkdown>
+              (<ReactMarkdown>
                 {description?.trim() || DEFAULT_DESCRIPTION}
-              </ReactMarkdown>
+              </ReactMarkdown>)
             )}
           </div>
         </div>

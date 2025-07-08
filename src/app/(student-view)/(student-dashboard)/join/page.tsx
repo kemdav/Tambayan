@@ -79,8 +79,10 @@ export default async function JoinOrganizationPage() {
   });
 
   return (
-    <div className="container mx-auto py-8">
-      <JoinOrgCard initialOrgs={transformedOrgs} />
+    <div className='w-full grid place-items-center items-start'>
+      <div className="mainContentCard">
+        <JoinOrgCard initialOrgs={transformedOrgs} />
+      </div>
     </div>
   );
 }

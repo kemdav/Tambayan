@@ -32,10 +32,13 @@ export default async function ProfilePage() {
     // If no profile found for the user, redirect them to a profile creation page
     redirect("/register");
   }
+  
 
-  const [initialPosts, initialComments] = await Promise.all([
+  const [initialPosts, initialComments, { data: studentStats }] = await Promise.all([
     getPostsByStudent(initialProfile.studentid),
-    getCommentsByStudent(initialProfile.studentid)
+    getCommentsByStudent(initialProfile.studentid),
+    // Call the new RPC function
+    supabase.rpc('get_student_stats', { p_studentid: initialProfile.studentid }).single()
   ]);
   console.log("ProfilePage (Server): Value of initialPosts after fetching:", initialPosts);
   console.log("ProfilePage (Server): user.id (currentUserID source) =", user.id);
@@ -50,6 +53,7 @@ console.log("ProfilePage (Server): initialComments =", initialComments);
       currentUserID={user.id}
       isOwnProfile={true}
       initialComments={initialComments} // Pass comments if fetched
+      studentStats={studentStats}
     />
   );
 }
