@@ -8,6 +8,8 @@ import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
 import { LogOutIcon as SettingsIcon } from "@/app/components/icons/LogOutIcon";
 import Image from "next/image";
 import { AddIcon } from "@/app/components/icons/AddIcon";
+import { useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 // A simple hamburger icon component for clarity
 const HamburgerIcon = ({ className }: { className?: string }) => (
@@ -86,14 +88,60 @@ export default function AdminLayout({
   const [selected, setSelected] = useState("dashboard");
   const [isNavOpen, setIsNavOpen] = useState(false);
 
+  // Debug state for university info
+  const [univInfo, setUnivInfo] = useState<{
+    universityid: string;
+    universityemail: string;
+    uname: string;
+  } | null>(null);
+  const [loadingUniv, setLoadingUniv] = useState(false);
+
   const handleSelect = (id: string) => {
     setSelected(id);
     // Only close navigation on mobile
     setIsNavOpen(false);
   };
 
+  // Debug button handler
+  const handleCheckUniversity = async () => {
+    setLoadingUniv(true);
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      alert("No authenticated user found");
+      setLoadingUniv(false);
+      return;
+    }
+    const { data: universityProfile, error } = await supabase
+      .from("university")
+      .select("universityid, universityemail, uname")
+      .eq("universityemail", user.email)
+      .single();
+    if (error || !universityProfile) {
+      alert("No university found for this email: " + user.email);
+      setUnivInfo(null);
+    } else {
+      setUnivInfo(universityProfile);
+      alert(
+        `University ID: ${universityProfile.universityid}\nUniversity Email: ${universityProfile.universityemail}\nUniversity Name: ${universityProfile.uname}`
+      );
+    }
+    setLoadingUniv(false);
+  };
+
   return (
     <div className="relative min-h-screen md:flex">
+      {/* Debug Button */}
+      <button
+        onClick={handleCheckUniversity}
+        className="fixed top-4 right-4 z-50 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
+        disabled={loadingUniv}
+        type="button"
+      >
+        {loadingUniv ? "Checking..." : "Check University Info"}
+      </button>
       <div className="p-4 md:hidden">
         <div className="flex justify-between items-center bg-tint-forest-fern text-white p-4 rounded-[20px] shadow-lg">
           <div className="font-bold text-xl">Admin Panel</div>

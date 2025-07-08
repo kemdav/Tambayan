@@ -1,3 +1,5 @@
+"use server";
+
 import { TablesInsert } from "@/lib/database.types";
 
 export interface Broadcast {
@@ -98,38 +100,52 @@ export const addBroadcastToDatabase = async (
   imageData?: string
 ): Promise<Broadcast> => {
   try {
-    // Get current user's university ID
-    const universityId = await getCurrentUserUniversityId();
+    // Use server-side Supabase client
+    const supabase = await createClientServer();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("No authenticated user found");
 
-    // Prepare recipient string
-    const recipientString =
-      Object.entries(recipients)
-        .filter(([k, v]) => v)
-        .map(([k]) =>
-          k
-            .replace(/([A-Z])/g, " $1")
-            .replace(/^./, (str) => str.toUpperCase())
-        )
-        .join(", ") || "All Students";
+    if (!user.email) throw new Error("Authenticated user has no email");
+    // Fetch universityid from university table using admin's email
+    const { data: universityProfile } = await supabase
+      .from("university")
+      .select("universityid")
+      .eq("universityemail", user.email)
+      .single();
+
+    if (!universityProfile || !universityProfile.universityid) {
+      throw new Error("No universityid found for this admin user");
+    }
+    const universityid: string = universityProfile.universityid;
+    console.log("[DEBUG] Inserting broadcast with universityid:", universityid);
+
+    // Prepare recipient string: only 'students' or 'organizations'
+    let recipientString = "students";
+    if (recipients.allOrganizations || recipients.specificOrganizations) {
+      recipientString = "organizations";
+    }
+    if (
+      (recipients.allStudents || recipients.specificSchools) &&
+      (recipients.allOrganizations || recipients.specificOrganizations)
+    ) {
+      recipientString = "students";
+    }
 
     // Prepare broadcast data for database
-    const broadcastData: TablesInsert<"broadcast"> = {
-      title: title,
-      message: message,
+    const broadcastData = {
+      title,
+      message,
       date: new Date().toISOString(),
       recipient: recipientString,
-      universityid: universityId,
+      universityid: universityid,
     };
 
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
       .from("broadcast")
       .insert(broadcastData)
       .select();
 
-    if (error) {
-      console.error("Error inserting broadcast:", error);
-      throw error;
-    }
+    if (error) throw error;
 
     // Return transformed broadcast data
     const newBroadcast: Broadcast = {
@@ -200,7 +216,7 @@ export const updateBroadcast = async (
 };
 
 // --- SERVER-SIDE FUNCTION ---
-"use server";
+
 import { createClient as createClientServer } from "@/lib/supabase/server";
 
 export async function getBroadcastsFor(context: 'student' | 'organization') {
