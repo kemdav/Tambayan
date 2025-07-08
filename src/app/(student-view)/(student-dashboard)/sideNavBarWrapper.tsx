@@ -85,13 +85,21 @@ export const myButtons: ButtonConfig[] = [
     icon: <AddIcon className="size-10" />,
   },
   {
+    id: "broadcast",
+    variant: "sideNavigation",
+    href: "/broadcast",
+    children: "Broadcasts",
+    className: "sideNavBarButtonText",
+    icon: <AddIcon className="size-10" />,
+  },
+  {
     id: "logout",
     variant: "sideNavigation",
     href: "/login",
     children: "Logout",
     className: "sideNavBarButtonText",
     icon: <LogOutIcon className="size-10" />,
-  }
+  },
 ];
 
 const SideBar = () => {
