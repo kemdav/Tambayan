@@ -2,14 +2,15 @@
 "use client";
 import AuthRegCard from "@/app/components/ui/auth-page-ui/auth-registration-card";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 // We only need the `signup` action here
 import { signup } from '../action'
 
-const universityOptions = [
-  { value: "u1", label: "Cebu Institute of Technology University" },
-  { value: "u2", label: "Cebu Technological University" },
-];
+// const universityOptions = [
+//   { value: "u1", label: "Cebu Institute of Technology University" },
+//   { value: "u2", label: "Cebu Technological University" },
+// ];
 const courseOptions = [
   { value: "bscpe", label: "Bachelors of Science in Computer Engineering" },
   { value: "bsce", label: "Bachelors of Science in Civil Engineering" },
@@ -35,7 +36,21 @@ export default function RegisterPage() {
   const [year, setYear] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [universityOptions, setUniversityOptions] = useState<{ value: string; label: string }[]>([]);
   const router = useRouter();
+  
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase.from("university").select("universityid, uname");
+      if (!error && data) {
+        setUniversityOptions(
+          data.map((u: any) => ({ value: u.universityid, label: u.uname }))
+        );
+      }
+    };
+    fetchUniversities();
+  }, []);
   
   // --- MODIFICATION START ---
   // Create a handler to bridge the client state and the server action
@@ -73,9 +88,29 @@ export default function RegisterPage() {
     formData.append('yearlevel', year);
 
     // Call the server action with the complete FormData
-    await signup(formData);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          fname: firstName,
+          lname: lastName,
+          mname: middleName,
+          universityid: university,
+          course,
+          yearlevel: year,
+          role: 'student',
+        },
+      },
+    });
 
-    setLoading(false);
+    if (error) {
+      setError(error.message);
+    } else {
+      setLoading(false);
+      router.push("/login");
+    }
   }
   // --- MODIFICATION END ---
 
