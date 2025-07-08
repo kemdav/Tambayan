@@ -3,6 +3,7 @@ import { Input } from "../input/input";
 import { Button } from "../button";
 
 interface RecipientOptions {
+  all: boolean;
   allStudents: boolean;
   allOrganizations: boolean;
   specificOrganizations: boolean;
@@ -54,12 +55,31 @@ export function CreateNewBroadcast({
       <div className="flex flex-col gap-1 mb-2">
         <label>
           <input
-            type="checkbox"
-            checked={recipients.allStudents}
-            onChange={(e) =>
+            type="radio"
+            name="recipient"
+            checked={recipients.all}
+            onChange={() =>
               onRecipientsChange({
                 ...recipients,
-                allStudents: e.target.checked,
+                all: true,
+                allStudents: false,
+                allOrganizations: false,
+              })
+            }
+          />{" "}
+          All
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="recipient"
+            checked={recipients.allStudents}
+            onChange={() =>
+              onRecipientsChange({
+                ...recipients,
+                all: false,
+                allStudents: true,
+                allOrganizations: false,
               })
             }
           />{" "}
@@ -67,12 +87,15 @@ export function CreateNewBroadcast({
         </label>
         <label>
           <input
-            type="checkbox"
+            type="radio"
+            name="recipient"
             checked={recipients.allOrganizations}
-            onChange={(e) =>
+            onChange={() =>
               onRecipientsChange({
                 ...recipients,
-                allOrganizations: e.target.checked,
+                all: false,
+                allStudents: false,
+                allOrganizations: true,
               })
             }
           />{" "}

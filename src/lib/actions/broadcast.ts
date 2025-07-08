@@ -12,6 +12,7 @@ export interface Broadcast {
 }
 
 export interface RecipientOptions {
+  all: boolean;
   allStudents: boolean;
   allOrganizations: boolean;
   specificOrganizations: boolean;
@@ -136,12 +137,13 @@ export const addBroadcastToDatabase = async (
     const universityid: string = universityProfile.universityid;
     console.log("[DEBUG] Inserting broadcast with universityid:", universityid);
 
-    // Prepare recipient string: only 'students' or 'organizations'
+    // Prepare recipient string: 'all', 'students', or 'organizations'
     let recipientString = "students";
-    if (recipients.allOrganizations || recipients.specificOrganizations) {
+    if (recipients.all) {
+      recipientString = "all";
+    } else if (recipients.allOrganizations || recipients.specificOrganizations) {
       recipientString = "organizations";
-    }
-    if (
+    } else if (
       (recipients.allStudents || recipients.specificSchools) &&
       (recipients.allOrganizations || recipients.specificOrganizations)
     ) {

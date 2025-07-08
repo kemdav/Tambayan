@@ -12,6 +12,7 @@ export function BroadcastComponentTool() {
   const [title, setTitle] = React.useState("");
   const [message, setMessage] = React.useState("");
   const [recipients, setRecipients] = React.useState<RecipientOptions>({
+    all: false,
     allStudents: true,
     allOrganizations: false,
     specificOrganizations: false,
