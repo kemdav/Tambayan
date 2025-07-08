@@ -115,7 +115,7 @@ export function CreatePostComponent({
           value={content}
           onChange={val => onContentChange(val as string)}
           placeholder="Share details here..."
-          isFormattable={true}
+          isFormattable={false}
           multiline={true}
         />
       </div>
@@ -140,14 +140,17 @@ export function CreatePostComponent({
       )}
 
       {/* 4. "Attach Image" button for all post/event types */}
+    
       <div className="mt-2">
-        <button
-          type="button"
-          className="px-3 py-1 rounded bg-gray-100 hover:bg-green-100 text-sm font-medium text-gray-700 transition-colors"
-          onClick={() => document.getElementById('photo-upload-input')?.click()}
-        >
-          Attach Image
-        </button>
+        {postType !== 'event' && (
+          <button
+            type="button"
+            className="px-3 py-1 rounded bg-gray-100 hover:bg-green-100 text-sm font-medium text-gray-700 transition-colors"
+            onClick={() => document.getElementById('photo-upload-input')?.click()}
+          >
+            Attach Image
+          </button>
+      )}
         <input
           id="photo-upload-input"
           type="file"
