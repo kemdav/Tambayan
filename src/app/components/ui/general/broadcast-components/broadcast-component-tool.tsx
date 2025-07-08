@@ -17,16 +17,11 @@ export function BroadcastComponentTool() {
     specificOrganizations: false,
     specificSchools: false,
   });
-  const [attachment, setAttachment] = React.useState<File | null>(null);
-  const [attachmentPreview, setAttachmentPreview] = React.useState<
-    string | null
-  >(null);
   const [history, setHistory] = React.useState<Broadcast[]>([]);
   const [filter, setFilter] = React.useState("all");
   const [isSending, setIsSending] = React.useState(false);
   const [selectedBroadcast, setSelectedBroadcast] =
     React.useState<Broadcast | null>(null);
-  const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
 
   // Load broadcast history from database
@@ -46,16 +41,6 @@ export function BroadcastComponentTool() {
     }
   };
 
-  React.useEffect(() => {
-    if (attachment && attachment.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (e) => setAttachmentPreview(e.target?.result as string);
-      reader.readAsDataURL(attachment);
-    } else {
-      setAttachmentPreview(null);
-    }
-  }, [attachment]);
-
   const handleSaveDraft = async () => {
     try {
       await saveDraftBroadcast();
@@ -70,18 +55,7 @@ export function BroadcastComponentTool() {
     setIsSending(true);
 
     try {
-      let imageData: string | undefined = undefined;
-
-      if (attachment && attachment.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          imageData = e.target?.result as string;
-          await addBroadcastFromActions(imageData);
-        };
-        reader.readAsDataURL(attachment);
-      } else {
-        await addBroadcastFromActions(undefined);
-      }
+      await addBroadcastFromActions();
     } catch (error) {
       console.error("Error sending broadcast:", error);
       alert("Failed to send broadcast. Please try again.");
@@ -90,14 +64,12 @@ export function BroadcastComponentTool() {
     }
   };
 
-  const addBroadcastFromActions = async (imageData?: string) => {
+  const addBroadcastFromActions = async () => {
     try {
       const newBroadcast = await addBroadcastToDatabase(
         title,
         message,
-        recipients,
-        attachment,
-        imageData
+        recipients
       );
 
       // Add to local state
@@ -106,8 +78,6 @@ export function BroadcastComponentTool() {
       // Reset form
       setTitle("");
       setMessage("");
-      setAttachment(null);
-      setAttachmentPreview(null);
 
       alert("Broadcast sent successfully!");
     } catch (error) {
@@ -129,7 +99,7 @@ export function BroadcastComponentTool() {
 
   const handleBroadcastClick = (b: Broadcast) => {
     setSelectedBroadcast(b);
-    setSelectedImage(b.attachmentImage || null);
+    // No attachment image
   };
 
   if (isLoading) {
@@ -165,8 +135,6 @@ export function BroadcastComponentTool() {
         onMessageChange={setMessage}
         recipients={recipients}
         onRecipientsChange={setRecipients}
-        attachment={attachment}
-        onAttachmentChange={setAttachment}
         onSaveDraft={handleSaveDraft}
         onSendBroadcast={handleSendBroadcast}
         isSending={isSending}
@@ -185,7 +153,7 @@ export function BroadcastComponentTool() {
               className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl font-bold"
               onClick={() => {
                 setSelectedBroadcast(null);
-                setSelectedImage(null);
+                // No attachment image
               }}
               aria-label="Close"
             >
@@ -203,20 +171,7 @@ export function BroadcastComponentTool() {
             <div className="mb-1 text-xs text-gray-500">
               Date: {selectedBroadcast.date}
             </div>
-            {selectedBroadcast.attachmentName && (
-              <div className="mb-1 text-xs text-gray-500">
-                Attachment: {selectedBroadcast.attachmentName}
-              </div>
-            )}
-            {selectedImage && (
-              <div className="mt-2 flex justify-center">
-                <img
-                  src={selectedImage}
-                  alt="attachment"
-                  className="max-h-48 rounded shadow"
-                />
-              </div>
-            )}
+            {/* No attachment UI */}
           </div>
         </div>
       )}

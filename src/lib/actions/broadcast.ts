@@ -8,8 +8,6 @@ export interface Broadcast {
   date: string;
   recipients: string;
   preview: string;
-  attachmentName?: string;
-  attachmentImage?: string;
 }
 
 export interface RecipientOptions {
@@ -79,8 +77,6 @@ export const loadBroadcastHistory = async (): Promise<Broadcast[]> => {
       preview:
         (item.message || "").slice(0, 60) +
         ((item.message || "").length > 60 ? "..." : ""),
-      attachmentName: item.attachment ? "Attachment" : undefined,
-      attachmentImage: item.attachment || undefined,
     }));
 
     return transformedBroadcasts;
@@ -121,7 +117,6 @@ export const addBroadcastToDatabase = async (
       message: message,
       date: new Date().toISOString(),
       recipient: recipientString,
-      attachment: imageData || null,
       universityid: universityId,
     };
 
@@ -143,8 +138,6 @@ export const addBroadcastToDatabase = async (
       date: new Date().toLocaleDateString(),
       recipients: recipientString,
       preview: message.slice(0, 60) + (message.length > 60 ? "..." : ""),
-      attachmentName: attachment?.name,
-      attachmentImage: imageData,
     };
 
     return newBroadcast;
