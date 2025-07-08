@@ -1,16 +1,17 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 // Minimal StudentCard component with menu
-function StudentCard({ student }: { student: { name: string; email: string; course: string; year: string } }) {
+function StudentCard({ student }: { student: any }) {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="border rounded-lg p-4 shadow-sm mb-4 bg-white relative">
       <div className="flex justify-between items-start">
         <div>
-          <div className="font-semibold text-lg">{student.name}</div>
+          <div className="font-semibold text-lg">{student.fname} {student.lname}</div>
           <div className="text-gray-600 text-sm">{student.email}</div>
-          <div className="text-gray-500 text-sm">{student.course} &middot; Year {student.year}</div>
+          <div className="text-gray-500 text-sm">{student.course} &middot; Year {student.yearlevel}</div>
         </div>
         <div className="relative">
           <button
@@ -26,7 +27,7 @@ function StudentCard({ student }: { student: { name: string; email: string; cour
                 className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                 onClick={() => {
                   setMenuOpen(false);
-                  alert(`Reset password for ${student.name} to default.`);
+                  alert(`Reset password for ${student.fname} ${student.lname} to default.`);
                 }}
               >
                 Reset Password to Default
@@ -39,33 +40,26 @@ function StudentCard({ student }: { student: { name: string; email: string; cour
   );
 }
 
-// Mock student data
-const mockStudents = [
-  { name: "Alice Johnson", email: "alice@school.edu", course: "BS Computer Science", year: "3" },
-  { name: "Bob Smith", email: "bob@school.edu", course: "BS Mathematics", year: "2" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-  { name: "Carol Lee", email: "carol@school.edu", course: "BS Physics", year: "4" },
-];
-
 export default function AdminStudentsPage() {
+  const [students, setStudents] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const studentsPerPage = 10;
 
-  const filteredStudents = mockStudents.filter(
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("student")
+      .select("*")
+      .then(({ data, error }) => {
+        if (!error) setStudents(data || []);
+      });
+  }, []);
+
+  const filteredStudents = students.filter(
     s =>
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.email.toLowerCase().includes(search.toLowerCase())
+      (`${s.fname} ${s.lname}`.toLowerCase().includes(search.toLowerCase()) ||
+      (s.email || "").toLowerCase().includes(search.toLowerCase()))
   );
 
   const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
@@ -98,7 +92,7 @@ export default function AdminStudentsPage() {
         {paginatedStudents.length === 0 ? (
           <div className="text-gray-500">No students found.</div>
         ) : (
-          paginatedStudents.map((student, idx) => <StudentCard key={idx + (page-1)*studentsPerPage} student={student} />)
+          paginatedStudents.map((student, idx) => <StudentCard key={student.studentid} student={student} />)
         )}
         <div className="flex justify-center items-center mt-6 gap-2">
           <button
