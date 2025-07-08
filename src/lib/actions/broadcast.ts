@@ -58,9 +58,26 @@ export const getCurrentUserUniversityId = async (): Promise<string | null> => {
  */
 export const loadBroadcastHistory = async (): Promise<Broadcast[]> => {
   try {
-    const { data, error } = await supabaseClient
+    // Use server-side Supabase client
+    const supabase = await createClientServer();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("No authenticated user found");
+    if (!user.email) throw new Error("Authenticated user has no email");
+    // Fetch universityid from university table using admin's email
+    const { data: universityProfile } = await supabase
+      .from("university")
+      .select("universityid")
+      .eq("universityemail", user.email)
+      .single();
+    if (!universityProfile || !universityProfile.universityid) {
+      throw new Error("No universityid found for this admin user");
+    }
+    const universityid: string = universityProfile.universityid;
+
+    const { data, error } = await supabase
       .from("broadcast")
       .select("*")
+      .eq("universityid", universityid)
       .order("date", { ascending: false });
 
     if (error) {
