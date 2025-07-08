@@ -24,7 +24,8 @@ import {
   Megaphone,       // For Broadcasts
   Search,          // For Search Posts
   UserSearch,      // For Search Profile
-  LogOut,          // For Logout
+  LogOut,      
+  KeyRound    // For Logout
 } from "lucide-react";
 
 interface Props {
@@ -100,6 +101,14 @@ export const myButtons: ButtonConfig[] = [
     children: "Broadcasts",
     className: "sideNavBarButtonText",
     icon: <Megaphone className="size-5" />,
+  },
+  {
+    id: "change-password",
+    variant: "sideNavigation",
+    href: "/change-password",
+    children: "Change Password",
+    className: "sideNavBarButtonText",
+    icon: <KeyRound className="size-5" />,
   },
   {
     id: "logout",
