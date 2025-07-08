@@ -71,7 +71,7 @@ export function CreatePostComponent({
 }: CreatePostComponentProps) {
 
   return (
-    <div className={`rounded-2xl border border-gray-200 bg-white p-6 flex flex-col gap-4 shadow-sm w-full mx-auto mb-4 ${className}`}>
+     <div className={`w-full max-w-sm md:max-w-2xl rounded-2xl border border-gray-200 bg-white p-6 flex flex-col gap-4 shadow-lg ${className}`}>
       <h2 className="text-xl font-bold text-gray-800">
         {postType === 'event' ? 'Create New Event' 
           : postType === 'official' ? 'Create Official Post' 
@@ -111,20 +111,20 @@ export function CreatePostComponent({
         <label className="block text-sm font-medium text-neutral-muted-olive mb-1">
             {postType === 'event' ? "Description" : "Content"}
         </label>
-        <FormattableInput
-          value={content}
-          onChange={val => onContentChange(val as string)}
-          placeholder="Share details here..."
-          isFormattable={false}
-          multiline={true}
-        />
+        <textarea
+              className="w-full min-h-[120px] md:min-h-[150px] p-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+              value={content}
+              onChange={e => onContentChange(e.target.value)}
+              placeholder="Share details here..."
+            />
       </div>
       
       {/* 3. Fields ONLY for Events */}
       {postType === 'event' && (
-        <>
-          <div>
-            <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Location</label>
+        // Use a grid for better alignment on larger screens
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="md:col-span-2"> {/* Location spans full width */}
+            <label className="block text-sm font-medium ...">Location</label>
             <Input
               type="text"
               placeholder="e.g., University Auditorium"
@@ -132,16 +132,16 @@ export function CreatePostComponent({
               onChange={e => onEventLocationChange(e.target.value)}
             />
           </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Event Date & Time</label>
+          <div className="flex-1"> {/* Date picker takes one column */}
+            <label className="block text-sm font-medium ...">Event Date & Time</label>
             <DateTimePicker date={eventDate} setDate={onEventDateChange} />
           </div>
-        </>
+        </div>
       )}
 
       {/* 4. "Attach Image" button for all post/event types */}
     
-      <div className="mt-2">
+      <div className="flex justify-between items-center mt-4">
         {postType !== 'event' && (
           <button
             type="button"

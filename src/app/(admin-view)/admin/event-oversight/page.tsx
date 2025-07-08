@@ -1,50 +1,51 @@
 "use client";
 
 import AllEventOversights from "@/app/components/ui/event-oversight-components/all-event-oversights";
-
-const sampleOptions = [
-  { value: "cs-society", label: "Computer Science Society" },
-  { value: "math-club", label: "Math Club" },
-  { value: "debate-club", label: "Debate Club" },
-];
-
-const sampleStatuses = [
-  { label: "Upcoming", bgColor: "bg-yellow-100", textColor: "text-yellow-800" },
-  { label: "Ongoing", bgColor: "bg-green-100", textColor: "text-green-800" },
-  { label: "Completed", bgColor: "bg-blue-100", textColor: "text-blue-800" },
-];
-
-const sampleTableData = [
-  {
-    eventName: "Tech Symposium 2024",
-    organization: "Computer Science Society",
-    date: "2024-07-10",
-    location: "Auditorium",
-    status: "Upcoming",
-    onClickView: () => alert("View Tech Symposium 2024"),
-    onClickEdit: () => alert("Edit Tech Symposium 2024"),
-  },
-  {
-    eventName: "Math Olympiad",
-    organization: "Math Club",
-    date: "2024-07-12",
-    location: "Room 101",
-    status: "Ongoing",
-    onClickView: () => alert("View Math Olympiad"),
-    onClickEdit: () => alert("Edit Math Olympiad"),
-  },
-  {
-    eventName: "Debate Finals",
-    organization: "Debate Club",
-    date: "2024-07-15",
-    location: "Conference Hall",
-    status: "Completed",
-    onClickView: () => alert("View Debate Finals"),
-    onClickEdit: () => alert("Edit Debate Finals"),
-  },
-];
+import {
+  fetchEvents,
+  fetchOrganizationOptions,
+  getSampleStatuses,
+  type EventData,
+  type Option,
+  deleteEvent,
+} from "@/lib/actions/event-oversight";
+import { useEffect, useState } from "react";
 
 export default function EventOversightPage() {
+  const [tableData, setTableData] = useState<EventData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [options, setOptions] = useState<Option[]>([]);
+  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
+  const filteredTableData = selectedOrg
+    ? tableData.filter((event) => event.organization === selectedOrg)
+    : tableData;
+
+  const handleRemoveEvent = async (eventToRemove: EventData) => {
+    await deleteEvent(eventToRemove.eventid);
+    setTableData((prev) =>
+      prev.filter((e) => e.eventid !== eventToRemove.eventid)
+    );
+  };
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      setLoading(true);
+      try {
+        const events = await fetchEvents();
+        setTableData(events);
+        const orgOptions = await fetchOrganizationOptions();
+        setOptions(orgOptions);
+      } catch (error) {
+        console.error("Error loading events:", error);
+        setTableData([]);
+        setOptions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadEvents();
+  }, []);
+
   return (
     <div className="min-h-screen px-4 py-6 bg-gray-50">
       <div className="w-full max-w-[1089px] mx-auto mb-6 bg-white p-6 border rounded-[10px] shadow-sm">
@@ -54,10 +55,13 @@ export default function EventOversightPage() {
       </div>
       <div className="w-full max-w-[1089px] mx-auto bg-white border rounded-[10px] shadow-sm p-6">
         <AllEventOversights
-          options={sampleOptions}
-          statuses={sampleStatuses}
-          tableData={sampleTableData}
+          options={options}
+          statuses={getSampleStatuses()}
+          tableData={filteredTableData}
+          onOrgChange={setSelectedOrg}
+          onRemoveEvent={handleRemoveEvent}
         />
+        {loading && <div className="mt-4 text-gray-500">Loading events...</div>}
       </div>
     </div>
   );
