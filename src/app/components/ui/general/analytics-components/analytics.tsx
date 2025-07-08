@@ -15,6 +15,9 @@ import {
   getOrgActivityForUniversity,
   getStudentEngagement,
   getOrgStatsByUniversity,
+  getTopPerformingOrgs,
+  type Organization,
+  getEventEngagementMetrics,
 } from "@/lib/actions/analytics";
 
 const schoolOptions = [
@@ -23,7 +26,16 @@ const schoolOptions = [
   { label: "University of Cebu", value: "u3" },
 ];
 
+const timePeriodOptions = [
+  { label: "This Week", value: "this_week" },
+  { label: "This Month", value: "this_month" },
+  { label: "Last Month", value: "last_month" },
+  { label: "Last 6 Months", value: "last_6_months" },
+  { label: "Last Year", value: "last_year" },
+];
+
 export default function Analytics() {
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState("this_week");
   const [selectedSchool, setSelectedSchool] = useState("u1");
   const [totalEvents, setTotalEvents] = useState(0);
   const [orgStats, setOrgStats] = useState({ total: 0, active: 0 });
@@ -31,31 +43,46 @@ export default function Analytics() {
   const [orgActivity, setOrgActivity] = useState<
     { date: string; events: number; posts: number }[]
   >([]);
+  const [topPerformingOrgs, setTopPerformingOrgs] = useState<Organization[]>(
+    []
+  );
+  const [eventMetrics, setEventMetrics] = useState({
+    mostAttendedEvent: "Loading...",
+    highestEngagementOrg: "Loading...",
+    averageFeedbackScore: "0",
+  });
 
   useEffect(() => {
     const load = async () => {
-      const [events, orgs, engagement, activity] = await Promise.all([
-        getTotalEvents(selectedSchool),
-        getOrgStatsByUniversity(selectedSchool),
-        getStudentEngagement(selectedSchool),
-        getOrgActivityForUniversity(selectedSchool),
-      ]);
+      const [events, orgs, engagement, activity, topOrgs, metrics] =
+        await Promise.all([
+          getTotalEvents(selectedSchool),
+          getOrgStatsByUniversity(selectedSchool),
+          getStudentEngagement(selectedSchool),
+          getOrgActivityForUniversity(selectedSchool, selectedTimePeriod),
+          getTopPerformingOrgs(selectedSchool),
+          getEventEngagementMetrics(selectedSchool),
+        ]);
 
       setTotalEvents(events);
       setOrgStats(orgs);
       setStudentEngagement(engagement);
       setOrgActivity(activity);
+      setTopPerformingOrgs(topOrgs);
+      setEventMetrics(metrics);
     };
 
     load();
-  }, [selectedSchool]);
+  }, [selectedSchool, selectedTimePeriod]);
 
   return (
     <div className="p-4 max-w-full">
       <FirstHeader />
       <SecondHeader
+        timeperiods={timePeriodOptions}
         filters={schoolOptions}
         onFilterChange={(value) => setSelectedSchool(value)}
+        onTimePeriodChange={(value) => setSelectedTimePeriod(value)} // 👈 Add this
       />
 
       <div className="flex flex-col gap-4 md:flex-row md:justify-between mt-4">
@@ -82,22 +109,14 @@ export default function Analytics() {
       </div>
 
       <div className="mt-4">
-        <TopPerformingOrganizations
-          organizations={[
-            { name: "Computer Science Society", engagement: 89, events: 12 },
-            { name: "Debate Club", engagement: 85, events: 8 },
-            { name: "Student Council", engagement: 82, events: 24 },
-            { name: "Photography Club", engagement: 78, events: 6 },
-            { name: "Math League", engagement: 95, events: 10 },
-          ]}
-        />
+        <TopPerformingOrganizations organizations={topPerformingOrgs} />
       </div>
 
       <div className="mt-4">
         <EventEngagementMetrics
-          mostAttendedEvent="Tech Fest 2023"
-          highestEngagementOrg="Computer Science Society"
-          averageFeedbackScore="4.5"
+          mostAttendedEvent={eventMetrics.mostAttendedEvent}
+          highestEngagementOrg={eventMetrics.highestEngagementOrg}
+          averageFeedbackScore={eventMetrics.averageFeedbackScore}
         />
       </div>
     </div>

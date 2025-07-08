@@ -44,7 +44,14 @@ export default function OrganizationActivity({ data = [] }: Props) {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" angle={-35} textAnchor="end" height={60} />
+            <XAxis
+              dataKey="date"
+              angle={-45}
+              textAnchor="end"
+              height={60}
+              interval={0}
+              style={{ fontSize: "13px", fill: "#6b7280" }}
+            />
 
             <YAxis />
             <Tooltip />

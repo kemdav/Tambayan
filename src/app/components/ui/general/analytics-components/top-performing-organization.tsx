@@ -41,7 +41,7 @@ export default function TopPerformingOrganizations({ organizations }: Props) {
             <div>
               <p className="font-semibold text-sm text-gray-900">{org.name}</p>
               <p className="text-xs text-muted-foreground">
-                Engagement : {org.engagement}% • Events : {org.events}
+                Engagement : {org.engagement}% <br /> Events : {org.events}
               </p>
             </div>
           </div>
