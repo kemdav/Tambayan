@@ -48,6 +48,7 @@ console.log("ProfilePage (Server): initialComments =", initialComments);
       initialProfile={initialProfile}
       initialPosts={initialPosts}
       currentUserID={user.id}
+      isOwnProfile={true}
       initialComments={initialComments} // Pass comments if fetched
     />
   );
