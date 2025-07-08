@@ -10,6 +10,8 @@ import { createClient } from "@/lib/supabase/client";
 import { createPost } from "@/lib/actions/post";
 import { redirect, useRouter } from "next/navigation";
 import { ShowcaseCardProps } from "@/app/components/ui/general/showcase-card-component";
+import {Filter} from 'bad-words'; 
+const profanityFilter = new Filter();
 
 interface Props {
   children: React.ReactNode;
@@ -158,6 +160,10 @@ export default function StudentVerticalNavigation({ children }: Props) {
     if (!content.trim()) {
       alert("Post content cannot be empty.");
       return;
+    }
+    if (profanityFilter.isProfane(title) || profanityFilter.isProfane(content)) {
+        alert("Your post contains inappropriate language. Please revise it.");
+        return; // Stop the submission
     }
 
     setIsSubmitting(true);
