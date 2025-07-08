@@ -31,8 +31,27 @@ export async function login(formData: FormData) {
     return { error: 'Login failed. Please try again.' };
   }
 
+  // Get the logged-in user
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  // Check if user is a student
+  const { data: student } = await supabase
+    .from('student')
+    .select('studentid')
+    .eq('user_id', user.id)
+    .single();
+
   revalidatePath('/', 'layout')
-  redirect('/newsfeed')
+
+  if (student) {
+    redirect('/newsfeed');
+  } else {
+    redirect('/admin/dashboard');
+  }
 }
 
 export async function signup(formData: FormData) {
