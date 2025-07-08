@@ -11,6 +11,7 @@ import { AdminUserProvider } from "./AdminUserContext";
 import { AddIcon } from "@/app/components/icons/AddIcon";
 import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { NavigationButtonIcon } from "@/app/components/icons/NavigationButtonIcon";
 
 // A simple hamburger icon component for clarity
 const HamburgerIcon = ({ className }: { className?: string }) => (
@@ -72,6 +73,12 @@ const navButtons: ButtonConfig[] = [
     children: "Create New Organization",
     icon: <AddIcon className="w-5 h-5" />,
     href: "/admin/create-org",
+  },
+  {
+    id: "change-password",
+    children: "Change Password",
+    icon: <NavigationButtonIcon className="w-5 h-5" />,
+    href: "/admin/change-password",
   },
   {
     id: "settings",
