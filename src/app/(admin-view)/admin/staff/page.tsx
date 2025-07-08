@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
-// import { createClient } from "@/lib/supabase/client";
-// import { useAdminUser } from "../AdminUserContext";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useAdminUser } from "../AdminUserContext";
 
 // Minimal StaffCard component with menu
 function StaffCard({ staff }: { staff: any }) {
@@ -42,29 +42,80 @@ function StaffCard({ staff }: { staff: any }) {
 }
 
 export default function AdminStaffPage() {
-  // const { user, loading } = useAdminUser();
-  // const [staff, setStaff] = useState<any[]>([]);
+  const { user, loading: userLoading } = useAdminUser();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newStaff, setNewStaff] = useState({ name: "", email: "", role: "TSG" });
+  const [staff, setStaff] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const staffPerPage = 10;
 
-  // Placeholder staff data
-  const staff = [
-    { name: "Alice Smith", email: "alice@school.edu", role: "Registrar" },
-    { name: "Bob Johnson", email: "bob@school.edu", role: "Dean" },
-    { name: "Carol Lee", email: "carol@school.edu", role: "HR" },
-    { name: "David Kim", email: "david@school.edu", role: "Finance" },
-    { name: "Eve Turner", email: "eve@school.edu", role: "Registrar" },
-    { name: "Frank Moore", email: "frank@school.edu", role: "Dean" },
-    { name: "Grace Hall", email: "grace@school.edu", role: "HR" },
-    { name: "Henry Young", email: "henry@school.edu", role: "Finance" },
-    { name: "Ivy King", email: "ivy@school.edu", role: "Registrar" },
-    { name: "Jackie Wu", email: "jackie@school.edu", role: "Dean" },
-    { name: "Kathy Lin", email: "kathy@school.edu", role: "HR" },
-    { name: "Leo Park", email: "leo@school.edu", role: "Finance" },
-  ];
+  // Fetch staff from Supabase for this university
+  useEffect(() => {
+    if (!user || userLoading) return;
+    const fetchStaff = async () => {
+      setLoading(true);
+      const supabase = createClient();
+      const universityid = user.user_metadata?.universityid;
+      if (!universityid) return setLoading(false);
+      const { data, error } = await supabase.from("staff").select().eq("universityid", universityid);
+      if (!error && data) {
+        setStaff(data.map((s: any) => ({
+          name: s.name || s.email || "(No Name)",
+          email: s.email,
+          role: s.position || "TSG",
+        })));
+      }
+      setLoading(false);
+    };
+    fetchStaff();
+  }, [user, userLoading]);
+
+  // Add staff to Supabase for this university
+  const handleAddStaff = async () => {
+    if (!newStaff.name || !newStaff.email || !user?.user_metadata?.universityid) return;
+    setLoading(true);
+    const supabase = createClient();
+    const universityid = user.user_metadata.universityid;
+    // 1. Create user in Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: newStaff.email,
+      password: "123456",
+      options: {
+        data: {
+          name: newStaff.name,
+          universityid,
+          role: newStaff.role,
+        },
+      },
+    });
+    if (authError) {
+      setLoading(false);
+      alert("Failed to create staff in Auth: " + authError.message);
+      return;
+    }
+    // 2. Insert into staff table
+    const { error } = await supabase.from("staff").insert({
+      name: newStaff.name,
+      email: newStaff.email,
+      position: newStaff.role,
+      universityid,
+      // Optionally add more fields if needed
+    });
+    setShowAddModal(false);
+    setNewStaff({ name: "", email: "", role: "TSG" });
+    // Refresh staff list
+    const { data } = await supabase.from("staff").select().eq("universityid", universityid);
+    if (data) {
+      setStaff(data.map((s: any) => ({
+        name: s.name || s.email || "(No Name)",
+        email: s.email,
+        role: s.position || "TSG",
+      })));
+    }
+    setLoading(false);
+  };
 
   const filteredStaff = staff.filter(
     s =>
@@ -81,6 +132,9 @@ export default function AdminStaffPage() {
   const handlePrev = () => setPage((p) => Math.max(1, p - 1));
   const handleNext = () => setPage((p) => Math.min(totalPages, p + 1));
 
+  if (userLoading) return <div className="text-gray-500">Loading...</div>;
+  if (!user?.user_metadata?.universityid) return <div className="text-red-500">You do not have access to view staff.</div>;
+
   return (
     <div className="min-h-screen px-4 py-6 bg-gray-50 relative">
       {/* Add Staff Modal */}
@@ -95,7 +149,7 @@ export default function AdminStaffPage() {
               &times;
             </button>
             <h2 className="text-2xl font-bold mb-6 text-center">Add Staff</h2>
-            <form className="flex flex-col gap-4">
+            <form className="flex flex-col gap-4" onSubmit={e => { e.preventDefault(); handleAddStaff(); }}>
               <div>
                 <label className="block mb-1 font-medium">Name</label>
                 <input
@@ -127,11 +181,11 @@ export default function AdminStaffPage() {
                 </select>
               </div>
               <button
-                type="button"
+                type="submit"
                 className="mt-4 bg-action-moss-green text-white font-bold py-2 rounded hover:bg-action-forest-green transition"
-                onClick={() => setShowAddModal(false)}
+                disabled={loading}
               >
-                Add Staff
+                {loading ? "Adding..." : "Add Staff"}
               </button>
             </form>
           </div>
@@ -157,7 +211,9 @@ export default function AdminStaffPage() {
             setPage(1); // Reset to first page on search
           }}
         />
-        {paginatedStaff.length === 0 ? (
+        {loading ? (
+          <div className="text-gray-500">Loading...</div>
+        ) : paginatedStaff.length === 0 ? (
           <div className="text-gray-500">No staff found.</div>
         ) : (
           paginatedStaff.map((staff, idx) => <StaffCard key={staff.email} staff={staff} />)
