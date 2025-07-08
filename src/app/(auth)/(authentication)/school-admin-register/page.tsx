@@ -2,6 +2,7 @@
 import AuthRegistrationAdminCard from "@/app/components/ui/auth-page-ui/auth-registration-admin-card";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 const departmentOptions = [
   { value: "student-affairs", label: "Student Affairs" },
@@ -42,12 +43,47 @@ export default function SchoolAdminRegisterPage() {
       return;
     }
 
-    // TODO: Implement actual admin registration logic here (e.g., call a server action)
-    // For now, just simulate success and redirect
-    setTimeout(() => {
+    const supabase = createClient();
+
+    // 1. Upsert university into university table (if not exists)
+    const { data: university, error: universityError } = await supabase
+      .from("university")
+      .upsert([
+        {
+          uname: universityName,
+          universityemail: universityEmail,
+          unicontact: universityContact,
+        }
+      ], { onConflict: 'universityemail' })
+      .select()
+      .single();
+
+    if (universityError) {
+      setError(universityError.message);
       setLoading(false);
-      router.push("/login?message=Admin registration successful. Please log in.");
-    }, 1000);
+      return;
+    }
+
+    // 2. Register admin in Supabase Auth, now with universityid in metadata
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email: universityEmail,
+      password,
+      options: {
+        data: {
+          role: 'admin',
+          universityid: university.universityid,
+        },
+      },
+    });
+
+    if (signUpError) {
+      setError(signUpError.message);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+    router.push("/login?message=Admin registration successful. Please log in.");
   };
 
   return (

@@ -7,6 +7,10 @@ import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
 import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
 import { LogOutIcon as SettingsIcon } from "@/app/components/icons/LogOutIcon";
 import Image from "next/image";
+import { AdminUserProvider } from "./AdminUserContext";
+import { AddIcon } from "@/app/components/icons/AddIcon";
+import { useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 // A simple hamburger icon component for clarity
 const HamburgerIcon = ({ className }: { className?: string }) => (
@@ -64,6 +68,12 @@ const navButtons: ButtonConfig[] = [
     href: "/admin/accreditation",
   },
   {
+    id: "create-org",
+    children: "Create New Organization",
+    icon: <AddIcon className="w-5 h-5" />,
+    href: "/admin/create-org",
+  },
+  {
     id: "settings",
     children: "Settings",
     icon: <SettingsIcon />,
@@ -79,49 +89,91 @@ export default function AdminLayout({
   const [selected, setSelected] = useState("dashboard");
   const [isNavOpen, setIsNavOpen] = useState(false);
 
+  // Debug state for university info
+  const [univInfo, setUnivInfo] = useState<{
+    universityid: string;
+    universityemail: string;
+    uname: string;
+  } | null>(null);
+  const [loadingUniv, setLoadingUniv] = useState(false);
+
   const handleSelect = (id: string) => {
     setSelected(id);
     // Only close navigation on mobile
     setIsNavOpen(false);
   };
 
+  // Debug button handler
+  const handleCheckUniversity = async () => {
+    setLoadingUniv(true);
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      alert("No authenticated user found");
+      setLoadingUniv(false);
+      return;
+    }
+    const { data: universityProfile, error } = await supabase
+      .from("university")
+      .select("universityid, universityemail, uname")
+      .eq("universityemail", user.email)
+      .single();
+    if (error || !universityProfile) {
+      alert("No university found for this email: " + user.email);
+      setUnivInfo(null);
+    } else {
+      setUnivInfo(universityProfile);
+      alert(
+        `University ID: ${universityProfile.universityid}\nUniversity Email: ${universityProfile.universityemail}\nUniversity Name: ${universityProfile.uname}`
+      );
+    }
+    setLoadingUniv(false);
+  };
+
   return (
-    <div className="relative min-h-screen md:flex">
-      <div className="p-4 md:hidden">
-        <div className="flex justify-between items-center bg-tint-forest-fern text-white p-4 rounded-[20px] shadow-lg">
-          <div className="font-bold text-xl">Admin Panel</div>
-          <button onClick={() => setIsNavOpen(true)} className="cursor-pointer">
-            <HamburgerIcon className="h-6 w-6" />
-          </button>
+    <AdminUserProvider>
+      <div className="relative min-h-screen md:flex">
+        <div className="p-4 md:hidden">
+          <div className="flex justify-between items-center bg-tint-forest-fern text-white p-4 rounded-[20px] shadow-lg">
+            <div className="font-bold text-xl">Admin Panel</div>
+            <button
+              onClick={() => setIsNavOpen(true)}
+              className="cursor-pointer"
+            >
+              <HamburgerIcon className="h-6 w-6" />
+            </button>
+          </div>
         </div>
-      </div>
 
-      {isNavOpen && (
+        {isNavOpen && (
+          <div
+            className="fixed inset-0 bg-black opacity-50 z-20 md:hidden"
+            onClick={() => setIsNavOpen(false)}
+          ></div>
+        )}
+
         <div
-          className="fixed inset-0 bg-black opacity-50 z-20 md:hidden"
-          onClick={() => setIsNavOpen(false)}
-        ></div>
-      )}
+          className={`
+            fixed top-0 left-0 h-full z-30
+            transform transition-transform duration-300 ease-in-out
+            ${isNavOpen ? "translate-x-0" : "-translate-x-full"}
+            
+            md:relative md:translate-x-0 md:z-auto md:h-auto
+          `}
+        >
+          <SideNavBar
+            myButtons={navButtons}
+            selectedButtonId={selected}
+            onButtonSelect={handleSelect}
+            isOpen={isNavOpen}
+            onToggle={() => setIsNavOpen(!isNavOpen)}
+          />
+        </div>
 
-      <div
-        className={`
-          fixed top-0 left-0 h-full z-30
-          transform transition-transform duration-300 ease-in-out
-          ${isNavOpen ? "translate-x-0" : "-translate-x-full"}
-          
-          md:relative md:translate-x-0 md:z-auto md:h-auto
-        `}
-      >
-        <SideNavBar
-          myButtons={navButtons}
-          selectedButtonId={selected}
-          onButtonSelect={handleSelect}
-          isOpen={isNavOpen}
-          onToggle={() => setIsNavOpen(!isNavOpen)}
-        />
+        <main className="flex-1 bg-neutral-mint-white p-4">{children}</main>
       </div>
-
-      <main className="flex-1 bg-neutral-mint-white p-4">{children}</main>
-    </div>
+    </AdminUserProvider>
   );
 }
