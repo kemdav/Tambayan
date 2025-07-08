@@ -10,6 +10,8 @@ import { createClient } from "@/lib/supabase/client";
 import { createPost } from "@/lib/actions/post";
 import { redirect, useRouter } from "next/navigation";
 import { ShowcaseCardProps } from "@/app/components/ui/general/showcase-card-component";
+import {Filter} from 'bad-words'; 
+const profanityFilter = new Filter();
 
 interface Props {
   children: React.ReactNode;
@@ -40,6 +42,15 @@ export const myButtons: ButtonConfig[] = [
     icon: <StudentProfileIcon className="size-10" />,
   },
   {
+    id: "searchPosts",
+    children: "Search Posts",
+    href: "/search-posts",
+    variant: "sideNavigation",
+    className:
+      "sideNavBarButtonText",
+    icon: <StudentProfileIcon className="size-10" />,
+  },
+  {
     id: "newsfeed",
     children: "Newsfeed",
     variant: "sideNavigation",
@@ -58,10 +69,26 @@ export const myButtons: ButtonConfig[] = [
     icon: <SubscribedOrgIcon className="size-10" />,
   },
   {
+    id: "joined-org",
+    variant: "sideNavigation",
+    href: "/joined",
+    children: "Joined Organization",
+    className: "sideNavBarButtonText",
+    icon: <AddIcon className="size-10" />,
+  },
+  {
     id: "join-org",
     variant: "sideNavigation",
     href: "/join",
     children: "Join Organization",
+    className: "sideNavBarButtonText",
+    icon: <AddIcon className="size-10" />,
+  },
+  {
+    id: "broadcast",
+    variant: "sideNavigation",
+    href: "/broadcast",
+    children: "Broadcasts",
     className: "sideNavBarButtonText",
     icon: <AddIcon className="size-10" />,
   },
@@ -72,7 +99,7 @@ export const myButtons: ButtonConfig[] = [
     children: "Logout",
     className: "sideNavBarButtonText",
     icon: <LogOutIcon className="size-10" />,
-  }
+  },
 ];
 
 const SideBar = () => {
@@ -149,6 +176,10 @@ export default function StudentVerticalNavigation({ children }: Props) {
     if (!content.trim()) {
       alert("Post content cannot be empty.");
       return;
+    }
+    if (profanityFilter.isProfane(title) || profanityFilter.isProfane(content)) {
+        alert("Your post contains inappropriate language. Please revise it.");
+        return; // Stop the submission
     }
 
     setIsSubmitting(true);
