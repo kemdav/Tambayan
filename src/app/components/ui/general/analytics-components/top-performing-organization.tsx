@@ -35,7 +35,7 @@ export default function TopPerformingOrganizations({ organizations }: Props) {
         {topFour.map((org, idx) => (
           <div
             key={idx}
-            className="flex items-center gap-4 bg-muted px-3 py-2 border rounded-md min-w-[220px] h-[70px] shrink-0"
+            className="flex items-center gap-4 bg-muted px-2 py-2 border rounded-md min-w-[220px] h-[70px] shrink-0"
           >
             <AvatarIcon className="h-[29px] w-[29px]" />
             <div>

@@ -8,18 +8,22 @@ interface TimePeriod {
   label: string;
   value: string;
 }
+
 interface Filter {
   label: string;
   value: string;
 }
+
 interface Props {
   timeperiods?: TimePeriod[];
   filters?: Filter[];
+  onFilterChange?: (value: string) => void; // 💡 Add this
 }
 
 export default function SecondHeader({
   timeperiods = [],
   filters = [],
+  onFilterChange,
 }: Props) {
   return (
     <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border rounded-[10px] p-4 bg-white shadow-md mt-4">
@@ -30,7 +34,11 @@ export default function SecondHeader({
 
       <div className="flex items-center gap-2 text-sm">
         <span>School:</span>
-        <DropDownRole placeholder="All Schools" options={filters} />
+        <DropDownRole
+          placeholder="Cebu Institute of Technology"
+          options={filters}
+          onSelect={onFilterChange} // 💡 Pass it down
+        />
       </div>
 
       <Button
