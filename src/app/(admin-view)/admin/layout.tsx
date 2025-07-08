@@ -2,10 +2,16 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
-import { AdminUserProvider } from "./AdminUserContext";
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
+import { useState, useEffect } from "react";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
+import { NewsfeedIcon } from "@/app/components/icons/NewsfeedIcon";
+import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
+import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
+import { LogOutIcon } from "@/app/components/icons/LogOutIcon";
+import Image from "next/image";
+import { AdminUserProvider } from "./AdminUserContext";
+import { AddIcon } from "@/app/components/icons/AddIcon";
 import { createClient } from "@/lib/supabase/client";
 
 // Import your icons from a consistent library like Lucide React
@@ -21,6 +27,8 @@ import {
   LogOut,
   Menu, // A better hamburger icon
 } from "lucide-react";
+import router from "next/navigation";
+import { signOut } from "@/lib/actions/auth";
 
 // Define the nav buttons directly in the layout for clarity
 export const adminNavButtons: ButtonConfig[] = [
@@ -91,6 +99,32 @@ export default function AdminLayout({
     universityemail?: string;
     uname?: string;
   } | null>(null);
+
+  useEffect(() => {
+    // Fetch university info on mount
+    (async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setUnivInfo(null);
+        return;
+      }
+      // Adjust this query to your actual admin/university mapping
+      const { data: universityProfile } = await supabase
+        .from("university")
+        .select("universityid, universityemail, uname")
+        .eq("universityemail", user.email)
+        .single();
+      setUnivInfo(universityProfile || null);
+    })();
+  }, []);
+
+  // Add logout handler
+  const handleLogout = async () => {
+    signOut();
+  };
 
   useEffect(() => {
     setHasMounted(true);
