@@ -9,10 +9,10 @@ import OrganizationActivity from "@/app/components/ui/general/analytics-componen
 import ViewApplicationAndOrg from "@/app/components/ui/general/accreditation-components/view-application-and-org";
 
 import {
-  getAllThisMonthEventsAndPosts,
-  getAllOrgStats,
-  getAllStudentEngagement,
-  getAllTotalEvents,
+  getOrgActivity,
+  getOrgStats,
+  getStudentEngagement,
+  getTotalEvents,
 } from "@/lib/actions/analytics";
 
 export default function DashboardCombined() {
@@ -26,10 +26,10 @@ export default function DashboardCombined() {
   useEffect(() => {
     async function fetchData() {
       const [activity, stats, engagement, total] = await Promise.all([
-        getAllThisMonthEventsAndPosts(),
-        getAllOrgStats(),
-        getAllStudentEngagement(),
-        getAllTotalEvents(),
+        getOrgActivity("this_month"), // 👈 fixed here
+        getOrgStats(),
+        getStudentEngagement(),
+        getTotalEvents(),
       ]);
 
       setOrgData(activity);

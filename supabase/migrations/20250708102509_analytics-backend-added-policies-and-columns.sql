@@ -224,12 +224,6 @@ drop index if exists "public"."post_likes_user_id_idx";
 
 drop index if exists "public"."unique_accreditation_per_year";
 
-drop table "public"."accreditations";
-
-drop table "public"."eventregistrations";
-
-drop table "public"."post_likes";
-
 alter table "public"."comments" drop column "comment_text";
 
 alter table "public"."comments" add column "comment" text;
