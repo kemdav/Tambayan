@@ -39,7 +39,7 @@ export async function login(formData: FormData) {
   }
 
   // Check if user is a student
-  const { data: student } = await supabase
+  const { data: student, error: studentError } = await supabase
     .from('student')
     .select('studentid')
     .eq('user_id', user.id)
@@ -47,7 +47,7 @@ export async function login(formData: FormData) {
 
   revalidatePath('/', 'layout')
 
-  if (student) {
+  if (student && student.studentid) {
     redirect('/newsfeed');
   } else {
     redirect('/admin/dashboard');
