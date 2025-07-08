@@ -5,6 +5,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { Tables } from "@/lib/database.types"; // Import the generated types
 import { revalidatePath } from "next/cache";
+import { createClient as createAdminClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceRoleKey);
 
 export async function getStudentProfile(studentId: number): Promise<Tables<'student'> | null> {
     const supabase = await createClient();
@@ -46,4 +51,12 @@ export async function updateStudentAbout(aboutText: string) {
     revalidatePath('/profile');
 
     return { success: true, newAboutText: aboutText };
+}
+
+export async function resetStudentPasswordToDefault(user_id: string) {
+  // This uses the Supabase Admin API to update another user's password
+  const { data, error } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
+    password: '123456',
+  });
+  return { data, error };
 }

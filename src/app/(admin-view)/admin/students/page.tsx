@@ -6,6 +6,30 @@ import { useAdminUser } from "../AdminUserContext";
 // Minimal StudentCard component with menu
 function StudentCard({ student }: { student: any }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  async function handleResetPassword() {
+    setResetting(true);
+    try {
+      const res = await fetch('/api/reset-student-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: student.user_id }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert(`Password for ${student.fname} ${student.lname} has been reset to default (123456).`);
+      } else {
+        alert(`Failed to reset password: ${result.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      alert('An error occurred while resetting the password.');
+    } finally {
+      setResetting(false);
+      setMenuOpen(false);
+    }
+  }
+
   return (
     <div className="border rounded-lg p-4 shadow-sm mb-4 bg-white relative">
       <div className="flex justify-between items-start">
@@ -25,13 +49,11 @@ function StudentCard({ student }: { student: any }) {
           {menuOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-10">
               <button
-                className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                onClick={() => {
-                  setMenuOpen(false);
-                  alert(`Reset password for ${student.fname} ${student.lname} to default.`);
-                }}
+                className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 disabled:opacity-50"
+                onClick={handleResetPassword}
+                disabled={resetting}
               >
-                Reset Password to Default
+                {resetting ? 'Resetting...' : 'Reset Password to Default'}
               </button>
             </div>
           )}
