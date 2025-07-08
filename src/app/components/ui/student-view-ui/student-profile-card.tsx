@@ -6,7 +6,6 @@ import { DisplayPostComponent } from "../general/display-post-component";
 import type { Poster, Commenter } from '@/lib/types/types';
 import { CommentComponent } from "../general/comment-component";
 import CommentToOrgCard from "../general/comment-toOrg-card";
-import { useState } from "react";
 import { UpcomingEventComponent } from "../general/upcoming-event-component";
 import UpcomingorgEventComponent from "../general/upcomingorg-event-component";
 import DropDownRole from "../general/dropdown/dropdown-role";
@@ -14,6 +13,7 @@ import { StudentComment } from "@/lib/actions/comment";
 import StudentCommentCard from "./studdent-comment-card";
 import { StudentProfile } from "@/lib/types/database";
 import EditAboutModal from "./edit-about-modal";
+import { useState, useMemo } from "react"; 
 
 
 interface AboutPageProps {
@@ -84,13 +84,41 @@ const options = [
     { value: "mostLikedMonth", label: "Most Liked Month" },
     { value: "mostLikedWeek", label: "Most Liked Week" }
 ];
-const PostPage = ({ posts, currentUserID }: { posts: Poster[], currentUserID: string }) => {
+const PostPage = ({ 
+    posts, 
+    currentUserID, 
+    sortOption, 
+    onSortChange,
+    orgFilterOptions,
+    onOrgFilterChange,
+    filterPlaceholder
+}: { 
+    posts: Poster[], 
+    currentUserID: string,
+    sortOption: string,
+    onSortChange: (option: string) => void,
+    orgFilterOptions: { value: string, label: string }[],
+    onOrgFilterChange: (orgName: string) => void,
+    filterPlaceholder: string
+}) => {
     console.log("PostPage received posts:", posts);
     console.log("PostPage received currentUserID:", currentUserID);
     return (
         <div className="mt-3">
             <div className="mb-3">
-                <DropDownRole options={options} placeholder="Filtering" width="w-xs"></DropDownRole>
+                <DropDownRole
+                    options={orgFilterOptions}
+                    placeholder={filterPlaceholder}
+                    width="w-64"
+                    onSelect={onOrgFilterChange}
+                />
+                {/* --- SORTING DROPDOWN --- */}
+                <DropDownRole
+                    options={options}
+                    placeholder={options.find(o => o.value === sortOption)?.label || "Most Recent"}
+                    width="w-xs"
+                    onSelect={onSortChange}
+                />
             </div>
             {posts.length === 0 ? (<p>No posts found for this user.</p>) : ( // Use 'posts' here
                 <ul className="space-y-4">
@@ -167,10 +195,63 @@ export default function StudentProfileCard({
 }: Props) {
     const combinedClassName = `flex flex-col ${className || ''}`;
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [sortOption, setSortOption] = useState("recent")
+     const [filterOrgName, setFilterOrgName] = useState<string | null>(null); // null = "All Posts"
 
     const handleSaveAbout = (newAboutText: string) => {
         onProfileUpdate({ about: newAboutText });
     };
+
+    const sortedPosts = useMemo(() => {
+        const postsCopy = [...posts]; // Create a copy to avoid mutating the original prop
+        switch (sortOption) {
+            case 'oldest':
+                // The 'posted' field would be best for this, assuming it exists
+                // For now, we'll sort by daysSincePosted
+                return postsCopy.sort((a, b) => b.daysSincePosted - a.daysSincePosted);
+            case 'mostLikedAllTime':
+                return postsCopy.sort((a, b) => b.likes - a.likes);
+            case 'recent':
+            default:
+                // Default sort is recent
+                return postsCopy.sort((a, b) => a.daysSincePosted - b.daysSincePosted);
+        }
+    }, [posts, sortOption]);
+
+    const orgFilterOptions = useMemo(() => {
+        const orgs = new Map<string, string>();
+        posts.forEach(p => {
+            // Only add if the post has a recipient (organization name)
+            if (p.recipient && p.recipient !== 'Direct Post') {
+                orgs.set(p.recipient, p.recipient);
+            }
+        });
+        const options = Array.from(orgs.keys()).map(orgName => ({
+            value: orgName,
+            label: orgName
+        }));
+        // Add the "All" option to the start of the list
+        return [{ value: 'all', label: 'All My Posts' }, ...options];
+    }, [posts]);
+
+    const processedPosts = useMemo(() => {
+        // 1. Filter first
+        const filtered = filterOrgName 
+            ? posts.filter(p => p.recipient === filterOrgName)
+            : posts;
+
+        // 2. Then sort the filtered results
+        const sorted = [...filtered]; // Create a mutable copy
+        switch (sortOption) {
+            case 'oldest':
+                return sorted.sort((a, b) => b.daysSincePosted - a.daysSincePosted);
+            case 'mostLikedAllTime':
+                return sorted.sort((a, b) => b.likes - a.likes);
+            case 'recent':
+            default:
+                return sorted.sort((a, b) => a.daysSincePosted - b.daysSincePosted);
+        }
+    }, [posts, sortOption, filterOrgName]);
 
     return (
         <>
@@ -198,7 +279,18 @@ export default function StudentProfileCard({
                         isOwnProfile={isOwnProfile}
                     />
                 )}
-                {selectedButtonId === "post" && <PostPage posts={posts} currentUserID={currentUserID} />}
+                 {selectedButtonId === "post" && (
+                    <PostPage 
+                        posts={processedPosts} // <-- Pass the final processed list
+                        currentUserID={currentUserID}
+                        sortOption={sortOption}
+                        onSortChange={setSortOption}
+                        // Pass down the org filter props
+                        orgFilterOptions={orgFilterOptions}
+                        onOrgFilterChange={(value) => setFilterOrgName(value === 'all' ? null : value)}
+                        filterPlaceholder={filterOrgName || 'All My Posts'}
+                    />
+                )}
                 {selectedButtonId === "comment" && <CommentPage comments={initialComments} />}
             </div>
         </>

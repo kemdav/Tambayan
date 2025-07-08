@@ -98,7 +98,6 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   const [editContent, setEditContent] = useState(initialContent);
   const [editOrg, setEditOrg] = useState(orgOptions.find(o => o.label === initialOrgLabel)?.value || null);
   const [editPhoto, setEditPhoto] = useState<File | null>(null);
-  const [editPostType, setEditPostType] = useState(initialEvent ? "event" : "default");
   const [editRegistrationStart, setEditRegistrationStart] = useState<Date | undefined>(undefined);
   const [editRegistrationEnd, setEditRegistrationEnd] = useState<Date | undefined>(undefined);
   const [editEventLocation, setEditEventLocation] = useState(eventLocation || "");
@@ -123,7 +122,9 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
   const [likeCount, setLikeCount] = useState(initialLikes);
     const [hasLiked, setHasLiked] = useState(initialHasLiked);
     const [isLikeSubmitting, setIsLikeSubmitting] = useState(false);
-
+ const [editPostType, setEditPostType] = useState<'default' | 'official' | 'event'>(
+        initialEvent ? "event" : "default"
+    );
 
 
   //console.log(`--- Post ID: ${postID} ---`);
@@ -342,35 +343,18 @@ export const DisplayPostComponent: React.FC<DisplayPostComponentProps> = ({
             <h2 className="text-2xl font-bold mb-4">Edit Post</h2>
             <CreatePostComponent
               postType={editPostType}
-              onPostTypeChange={setEditPostType}
               org={editOrg}
               onOrgChange={setEditOrg}
               title={editTitle}
               onTitleChange={setEditTitle}
               content={editContent}
               onContentChange={setEditContent}
-              tags={editTags}
-              tagInput={editTagInput}
-              onTagInputChange={setEditTagInput}
-              onAddTag={() => {
-                const trimmed = editTagInput.trim();
-                if (trimmed && !editTags.includes(trimmed)) {
-                  setEditTags([...editTags, trimmed]);
-                }
-                setEditTagInput("");
-              }}
-              onRemoveTag={tag => setEditTags(editTags.filter(t => t !== tag))}
               eventLocation={editEventLocation}
               onEventLocationChange={setEditEventLocation}
-              registrationStart={editRegistrationStart}
-              onRegistrationStartChange={setEditRegistrationStart}
-              registrationEnd={editRegistrationEnd}
-              onRegistrationEndChange={setEditRegistrationEnd}
               postButtonText="Save Changes"
-              isEditMode={true}
               onPost={handleSaveChanges}
-              isSubmitting={isSubmitting}
-            />
+                onPhotoChange={setEditPhoto} 
+              isSubmitting={isSubmitting} photoFile={null}/>
             <div className="mt-4">
               <label className="block text-sm font-medium text-neutral-muted-olive mb-1">Edit Image</label>
               <input
