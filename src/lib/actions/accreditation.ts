@@ -121,14 +121,24 @@ export type AccreditationData = {
 // Get accreditation statistics for admin dashboard
 export async function getAccreditationStats() {
   const supabase = await createClient();
-  // Count by status
+  const universityid = await getCurrentAdminUniversityId();
+  if (!universityid) {
+    return {
+      pending_count: 0,
+      approved_count: 0,
+      revision_count: 0,
+      rejected_count: 0,
+    };
+  }
+  // Count by status, filtered by universityid
   const statuses = ["Pending", "Approved", "Revision", "Rejected"];
   const counts: Record<string, number> = {};
   for (const status of statuses) {
     const { count } = await supabase
       .from("accreditations")
       .select("id", { count: "exact", head: true })
-      .eq("submission_status", status);
+      .eq("submission_status", status)
+      .eq("universityid", universityid);
     counts[status] = count || 0;
   }
   return {
@@ -139,14 +149,30 @@ export async function getAccreditationStats() {
   };
 }
 
+// Helper to get the current admin's universityid
+const getCurrentAdminUniversityId = async (): Promise<string | null> => {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || !user.email) return null;
+  const { data: universityProfile } = await supabase
+    .from("university")
+    .select("universityid")
+    .eq("universityemail", user.email)
+    .single();
+  return universityProfile?.universityid || null;
+};
+
 // Get organizations by accreditation status for admin view
 export async function getOrganizationsByStatus(status: AccreditationStatus): Promise<AccreditationData[]> {
   const supabase = await createClient();
   // Join accreditations with organizations and university
+  const universityid = await getCurrentAdminUniversityId();
+  if (!universityid) return [];
   const { data, error } = await supabase
     .from("accreditations")
     .select(`orgid, created_at, submission_status, organizations:orgid (orgname, universityid, created, university:universityid (uname)), file_path`)
     .eq("submission_status", status)
+    .eq("universityid", universityid)
     .order("created_at", { ascending: false });
 
   if (error) {
