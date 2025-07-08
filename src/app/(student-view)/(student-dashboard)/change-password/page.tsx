@@ -38,6 +38,11 @@ export default function ChangePasswordPage() {
         setIsSubmitting(false);
         return;
       }
+      if (!user.email) {
+        setError("Your account does not have an email address. Cannot change password.");
+        setIsSubmitting(false);
+        return;
+      }
       // 1. Re-authenticate with current password
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: user.email,
