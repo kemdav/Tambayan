@@ -46,7 +46,7 @@ export default function SideNavBar({
           {myButtons.map((button) => {
             // Check if the current button's href matches the start of the pathname
             // This makes 'newsfeed' active even if the URL is '/organization/org_1/newsfeed'
-            const isActive = button.href ? pathname.includes(button.href) : false;
+           const isActive = pathname === button.href;
 
             const buttonContent = (
               <>
