@@ -1,15 +1,14 @@
 "use client";
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import { NewsfeedIcon } from "@/app/components/icons/NewsfeedIcon";
 import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
 import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
 import { LogOutIcon } from "@/app/components/icons/LogOutIcon";
 import Image from "next/image";
-import { AdminUserProvider } from "./AdminUserContext";
+import { AdminUserProvider, useAdminUser } from "./AdminUserContext";
 import { AddIcon } from "@/app/components/icons/AddIcon";
-import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { NavigationButtonIcon } from "@/app/components/icons/NavigationButtonIcon";
 import { useRouter } from "next/navigation";
@@ -103,6 +102,7 @@ export default function AdminLayout({
   const [selected, setSelected] = useState("dashboard");
   const [isNavOpen, setIsNavOpen] = useState(false);
   const router = useRouter();
+  const { user, loading } = useAdminUser();
 
   // Debug state for university info
   const [univInfo, setUnivInfo] = useState<{
@@ -110,7 +110,6 @@ export default function AdminLayout({
     universityemail: string;
     uname: string;
   } | null>(null);
-  const [loadingUniv, setLoadingUniv] = useState(false);
 
   // Add logout handler
   const handleLogout = async () => {
@@ -141,14 +140,12 @@ export default function AdminLayout({
 
   // Debug button handler
   const handleCheckUniversity = async () => {
-    setLoadingUniv(true);
     const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
       alert("No authenticated user found");
-      setLoadingUniv(false);
       return;
     }
     const { data: universityProfile, error } = await supabase
@@ -165,8 +162,21 @@ export default function AdminLayout({
         `University ID: ${universityProfile.universityid}\nUniversity Email: ${universityProfile.universityemail}\nUniversity Name: ${universityProfile.uname}`
       );
     }
-    setLoadingUniv(false);
   };
+
+  // Restrict staff from accessing /admin/staff
+  const isStaff = user?.user_metadata?.role === "TSG" || user?.user_metadata?.role === "staff";
+  const isStaffPage = typeof window !== "undefined" && window.location.pathname === "/admin/staff";
+  if (!loading && isStaff && isStaffPage) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="bg-white p-8 rounded shadow text-center">
+          <h1 className="text-2xl font-bold mb-4 text-red-600">Access Denied</h1>
+          <p className="text-gray-700">You do not have permission to view this page.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AdminUserProvider>
