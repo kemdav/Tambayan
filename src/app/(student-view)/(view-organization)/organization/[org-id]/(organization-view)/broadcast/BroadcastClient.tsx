@@ -40,11 +40,6 @@ export default function BroadcastClient({ initialBroadcasts, title, description 
                             </div>
                              <p className="text-xs text-gray-500 mb-4 capitalize">For: {broadcast.recipient}</p>
                             <p className="text-gray-700 whitespace-pre-line mb-4">{broadcast.message}</p>
-                            {broadcast.attachment && (
-                                <a href={broadcast.attachment} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium text-sm">
-                                    View Attachment
-                                </a>
-                            )}
                         </div>
                     ))}
                 </div>

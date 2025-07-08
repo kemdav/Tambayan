@@ -46,36 +46,68 @@ const AboutPage = ({
 }: AboutPageProps) => {
 
     return (
-        <div className="flex flex-col sm:flex-row">
-            <div className="flex flex-col">
-                <div className="flex flex-col sm:flex-row sm:gap-10">
-                    <div>
-                        <p><strong>Student ID:</strong> {studentId}</p>
-                        <p><strong>Major:</strong> {studentCourse || 'N/A'}</p>
-                        <p><strong>Email:</strong> {studentEmail || 'N/A'}</p>
-                        <p><strong>Year:</strong> {studentYear || 'N/A'}</p>
+        <div className="mt-6 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                
+                {/* Section 1: Core Academic Info */}
+                <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Academic Information</h3>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Student ID:</span>
+                        <span className="text-gray-800">{studentId}</span>
                     </div>
-                    <div>
-                        {/* These are likely placeholders, can be removed if not in your profile object */}
-                        <p><strong>Joined:</strong> {studentJoinDate || 'N/A'}</p>
-                        <p><strong>Events Joined:</strong> {studentEventsJoined || 'N/A'} events</p>
-                        <p><strong>Joined Organizations:</strong> {studentTotalOrg || 'N/A'}</p>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Major:</span>
+                        <span className="text-gray-800">{studentCourse || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Year Level:</span>
+                        <span className="text-gray-800">{studentYear || 'N/A'}</span>
+                    </div>
+                     <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Email:</span>
+                        <span className="text-gray-800">{studentEmail || 'N/A'}</span>
                     </div>
                 </div>
-                <div>
-                    <p className="text-action-forest-green">
-                        <strong>Description </strong>
-                        {isOwnProfile && <Button onClick={onEditClick}>Edit Description</Button>}
-                    </p>
-                    <p className="max-w-250 text-action-forest-green whitespace-pre-line">
-                        {aboutText || "No description provided."}
+
+                {/* Section 2: Community & Activity Stats */}
+                <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Community Stats</h3>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Joined Tambayan:</span>
+                        <span className="text-gray-800">{studentJoinDate || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Events Joined:</span>
+                        <span className="text-gray-800">{studentEventsJoined || '0'} events</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="font-medium text-gray-600">Organizations Joined:</span>
+                        <span className="text-gray-800">{studentTotalOrg || '0'}</span>
+                    </div>
+                </div>
+
+                {/* Section 3: Description (Spans full width) */}
+                <div className="md:col-span-2 mt-4">
+                    <div className="flex items-center justify-between border-b pb-2 mb-4">
+                         <h3 className="text-lg font-semibold text-gray-800">Description</h3>
+                         {isOwnProfile && (
+                             <Button 
+                                 onClick={onEditClick} 
+                                 className="bg-green-100 text-green-800 hover:bg-green-200 text-sm font-medium py-1 px-3 rounded-md"
+                             >
+                                 Edit
+                             </Button>
+                         )}
+                    </div>
+                    <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+                        {aboutText || "This user hasn't added a description yet."}
                     </p>
                 </div>
             </div>
         </div>
     );
 }
-
 
 const options = [
     { value: "recent", label: "Most Recent" },
@@ -105,25 +137,33 @@ const PostPage = ({
     console.log("PostPage received currentUserID:", currentUserID);
     return (
         <div className="mt-3">
-            <div className="mb-3">
-                <DropDownRole
-                    options={orgFilterOptions}
-                    placeholder={filterPlaceholder}
-                    width="w-64"
-                    onSelect={onOrgFilterChange}
-                />
-                {/* --- SORTING DROPDOWN --- */}
-                <DropDownRole
-                    options={options}
-                    placeholder={options.find(o => o.value === sortOption)?.label || "Most Recent"}
-                    width="w-xs"
-                    onSelect={onSortChange}
-                />
+            <div className="flex items-center gap-4 mb-4 p-4 bg-gray-50 rounded-lg border">
+                {/* Organization Filter Dropdown */}
+                <div className="flex-1">
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Filter by Organization</label>
+                    <DropDownRole
+                        options={orgFilterOptions}
+                        placeholder={filterPlaceholder}
+                        width="w-full"
+                        onSelect={onOrgFilterChange}
+                    />
+                </div>
+                
+                {/* Sorting Dropdown */}
+                <div className="w-48">
+                     <label className="block text-xs font-medium text-gray-500 mb-1">Sort by</label>
+                    <DropDownRole
+                        options={options}
+                        placeholder={options.find(o => o.value === sortOption)?.label || "Most Recent"}
+                        width="w-full"
+                        onSelect={onSortChange}
+                    />
+                </div>
             </div>
-            {posts.length === 0 ? (<p>No posts found for this user.</p>) : ( // Use 'posts' here
-                <ul className="space-y-4">
+            {posts.length === 0 ? (<p className="text-center text-gray-500 py-8">No posts found for this user.</p>) : ( // Use 'posts' here
+                (<ul className="space-y-4">
                     {posts.map((post) => ( // Use 'post' as the iteration variable
-                        <DisplayPostComponent
+                        (<DisplayPostComponent
                             key={post.postID}
                             postID={post.postID}
                             posterName={post.posterName}
@@ -139,9 +179,9 @@ const PostPage = ({
                             initialHasLiked={post.initialHasLiked}
                             currentUserID={currentUserID}
                             posterID="might_remove"
-                        />
+                        />)
                     ))}
-                </ul>
+                </ul>)
             )}
         </div>
     );
@@ -165,7 +205,10 @@ const CommentPage = ({ comments }: { comments: StudentComment[] }) => {
         </div>
     );
 }
-
+type StudentStats = {
+  organizations_joined_count: number;
+  events_joined_count: number;
+} | null;
 
 interface Props {
     className?: string;
@@ -174,6 +217,7 @@ interface Props {
     onButtonSelect: (id: string) => void;
     currentUserID: string;
     posts: Poster[];
+     studentStats: StudentStats;
     initialComments: StudentComment[];
     profile: StudentProfile;
     onProfileUpdate: (updatedData: Partial<StudentProfile>) => void;
@@ -187,6 +231,7 @@ export default function StudentProfileCard({
     initialComments,
     profile,
     onProfileUpdate,
+    studentStats,
     currentUserID,
     selectedButtonId,
     posts,
@@ -253,6 +298,9 @@ export default function StudentProfileCard({
         }
     }, [posts, sortOption, filterOrgName]);
 
+
+    console.log("STUDENT STATS ", studentStats);
+
     return (
         <>
             <EditAboutModal 
@@ -265,7 +313,7 @@ export default function StudentProfileCard({
                 <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect} />
                 {selectedButtonId === "about" && (
                     // 3. Update the call to AboutPage, passing props from the 'profile' object
-                    <AboutPage
+                    (<AboutPage
                         studentId={profile.studentid.toString()}
                         studentCourse={profile.course}
                         studentEmail={profile.email}
@@ -274,10 +322,10 @@ export default function StudentProfileCard({
                         onEditClick={() => setIsEditModalOpen(true)}
                         // Pass placeholders or remove if not needed
                         studentJoinDate="Sep 2024" 
-                        studentEventsJoined="0"
-                        studentTotalOrg="0"
+                        studentEventsJoined={studentStats?.events_joined_count.toString()}
+                    studentTotalOrg={studentStats?.organizations_joined_count.toString()}
                         isOwnProfile={isOwnProfile}
-                    />
+                    />)
                 )}
                  {selectedButtonId === "post" && (
                     <PostPage 

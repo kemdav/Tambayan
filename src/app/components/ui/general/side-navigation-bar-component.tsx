@@ -1,91 +1,97 @@
+// app/components/ui/general/side-navigation-bar-component.tsx
 "use client";
-import { ButtonList } from "@/app/components/ui/general/button-list";
-import { ButtonConfig } from "@/app/components/ui/general/button-type";
-import {
-  AddIcon,
-  NewsfeedIcon,
-  StudentProfileIcon,
-  SubscribedOrgIcon,
-  UserPofileLoginIcon,
-  TambayanTextIcon,
-  TambayanIcon,
-  NavigationButtonIcon,
-} from "@/app/components/icons";
-import { Button } from "./button";
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import React from "react";
 
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { signOut } from "@/lib/actions/auth";
+
+import { ButtonConfig } from "./button-type";
+import { TambayanIcon, TambayanTextIcon } from "@/app/components/icons"; // Assuming you want the logo inside
+
+// The Props interface is simpler now
 interface Props {
   myButtons: ButtonConfig[];
   selectedButtonId: string;
   onButtonSelect: (id: string) => void;
-  isOpen?: boolean; // For mobile control
-  onToggle?: () => void; // For mobile control
+  isExpanded: boolean; // This is the only prop needed to control the view
 }
 
 export default function SideNavBar({
   myButtons,
   selectedButtonId,
   onButtonSelect,
-  isOpen,
-  onToggle,
+  isExpanded, // We will use this directly
 }: Props) {
-  const pathname = usePathname();
-  const [isNavOpen, setIsNavOpen] = useState(false);
-
-  // Use external control for mobile, internal state for desktop
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
-
-  const isExpanded = isMobile && isOpen !== undefined ? isOpen : isNavOpen;
-  const handleToggle =
-    isMobile && onToggle ? onToggle : () => setIsNavOpen(!isNavOpen);
-
-  const navButtons = myButtons.map((btn) => ({
-    ...btn,
-    variant: "sideNavigation" as const,
-    icon: btn.icon ? (
-      <span className="text-white w-6 h-6 flex items-center">{btn.icon}</span>
-    ) : undefined,
-  }));
+  const pathname = usePathname(); // Good for setting the 'active' state
 
   return (
-    <main
-      className={`h-full transition-all duration-500 ease-in-out ${
-        isExpanded
-          ? "bg-tint-forest-fern w-70"
-          : "w-15 bg-action-forest-green/0"
-      }`}
+    // Use the isExpanded prop to control the width and padding
+    <aside
+      className={`sticky top-0 h-screen bg-tint-forest-fern flex flex-col transition-all duration-300 ease-in-out ${isExpanded ? "w-64 p-4" : "w-20 p-2"}`}
     >
-      <div className="flex items-center">
-        <TambayanIcon className="size-20"></TambayanIcon>
-        <TambayanTextIcon className=""></TambayanTextIcon>
-        <Button className="bg-white/0 hover:bg-white/0" onClick={handleToggle}>
-          <NavigationButtonIcon className="size-10 text-secondary-light-moss"></NavigationButtonIcon>
-        </Button>
+      {/* Header section with logo */}
+      <div className={`flex items-center mb-8 h-12 ${isExpanded ? "px-2" : "justify-center"}`}>
+        <TambayanIcon className="h-10 w-10 flex-shrink-0" />
+        {/* Conditionally render the text with a fade effect */}
+        {isExpanded && (
+            <div className="ml-2 overflow-hidden">
+                <TambayanTextIcon className="h-6" />
+            </div>
+        )}
       </div>
 
-      <div>
-        <ButtonList
-          buttons={navButtons}
-          className={`flex flex-col ${
-            isExpanded ? "duration-1000" : "-translate-x-100"
-          }`}
-          selectedId={selectedButtonId}
-          onButtonClick={onButtonSelect}
-        />
-      </div>
-    </main>
+      {/* Navigation List */}
+      <nav className="flex-1">
+        <ul className="space-y-2">
+          {myButtons.map((button) => {
+            // Check if the current button's href matches the start of the pathname
+            // This makes 'newsfeed' active even if the URL is '/organization/org_1/newsfeed'
+           const isActive = pathname === button.href;
+
+            const buttonContent = (
+              <>
+                <div className="w-6 h-6 flex-shrink-0 text-white">{button.icon}</div>
+                {/* Conditionally render the label based on the isExpanded prop */}
+                {isExpanded && (
+                  <span className={`ml-4 ${button.className}`}>
+                    {button.children}
+                  </span>
+                )}
+              </>
+            );
+
+            const buttonClasses = `w-full flex items-center p-3 rounded-lg text-white transition-colors duration-200 ${
+              isActive
+                ? 'bg-action-forest-green font-semibold'
+                : 'hover:bg-action-forest-green/50'
+            } ${isExpanded ? '' : 'justify-center'}`; // Center icon when collapsed
+
+            if (button.id === "logout") {
+              return (
+                <li key={button.id} className="mt-auto pt-4 border-t border-white/20">
+                  <form action={signOut} className="w-full">
+                    <button type="submit" className={buttonClasses}>
+                      {buttonContent}
+                    </button>
+                  </form>
+                </li>
+              );
+            }
+
+            return (
+              <li key={button.id}>
+                <Link
+                  href={button.href || "#"}
+                  onClick={() => onButtonSelect(button.id)}
+                  className={buttonClasses}
+                >
+                  {buttonContent}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </aside>
   );
 }

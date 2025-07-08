@@ -48,7 +48,7 @@ export default function SearchPage() {
         setIsLoading(true);
         setResults([]); // Clear previous results
         const supabase = createClient();
-        
+
         // Build the query
         const query = supabase
             .from('student')
@@ -91,11 +91,13 @@ export default function SearchPage() {
                     {isLoading ? 'Searching...' : 'Search'}
                 </button>
             </form>
-
             <div className="space-y-3">
                 {results.map(student => (
-                    <Link href={`/student/${student.studentid}`} key={student.studentid}>
-                        <div className="flex items-center gap-4 p-3 bg-white border rounded-lg hover:bg-gray-50 transition-colors">
+                    <Link
+                        href={`/student/${student.studentid}`}
+                        key={student.studentid}
+                    >
+                        <div className="flex items-center gap-4 p-3 bg-white border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                             <AvatarIcon src={student.picture} alt={student.fname || ''} className="h-12 w-12" />
                             <div>
                                 <p className="font-semibold">{`${student.fname} ${student.lname}`}</p>
