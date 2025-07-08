@@ -10,21 +10,29 @@ import { Poster } from "@/lib/types/types";
 import { Tables } from "@/lib/database.types"; 
 
 type OrganizationProfile = Tables<'organizations'>;
+type EventWithOrg = Tables<'events'> & {
+    organizations: Pick<Tables<'organizations'>, 'orgname' | 'picture'> | null;
+};
 
 interface OrganizationNewsfeedPageClientProps {
   initialOrganizationProfile: OrganizationProfile; // Renamed for clarity
   officialPosts: Poster[];
   communityPosts: Poster[];
+  currentUserId?: string;
   // You might want a prop to determine if the current user can edit
   // This would typically be checked on the server and passed down
-  canEdit: boolean;
+  canManageOrg: boolean;
+  upcomingEvents: EventWithOrg[];
 }
 
 export default function OrganizationNewsfeedPageClient({
   initialOrganizationProfile,
   officialPosts,
   communityPosts,
-  canEdit
+  currentUserId,
+  canManageOrg,
+   upcomingEvents,
+  canManageOrg: canEdit
 }: OrganizationNewsfeedPageClientProps) {
   const [selectedNavId, setSelectedNavId] = useState<string>("official");
   // Manage the profile state here, so the header can update it
@@ -38,11 +46,13 @@ export default function OrganizationNewsfeedPageClient({
     }));
   };
 
+  console.log("UPCOMING EVENTS CLIENT", upcomingEvents);
+
   return (
     <main className="w-full grid place-items-center items-start mt-10 md:mt-0">
         <div className="h-auto w-full max-w-3xl shadow-lg/100 p-4">
             <OrganizationProfileHeader
-              isEditable={canEdit}
+              isEditable={canManageOrg}
               initialProfile={organizationProfile}
               onProfileUpdate={handleProfileUpdate}
             />
@@ -53,6 +63,9 @@ export default function OrganizationNewsfeedPageClient({
                 onButtonSelect={setSelectedNavId}
                 officialPosts={officialPosts}
                 communityPosts={communityPosts}
+                canManageOrg={canManageOrg} // <-- Pass it down
+                currentUserID={currentUserId} // <-- Pass it down
+                upcomingEvents={upcomingEvents}
             />
         </div>
     </main>

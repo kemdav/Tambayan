@@ -6,58 +6,73 @@ import { DisplayPostComponent } from "../general/display-post-component";
 import type { Poster, Commenter } from '@/lib/types/types';
 import { CommentComponent } from "../general/comment-component";
 import CommentToOrgCard from "../general/comment-toOrg-card";
-import { useState } from "react";
 import { UpcomingEventComponent } from "../general/upcoming-event-component";
 import UpcomingorgEventComponent from "../general/upcomingorg-event-component";
 import DropDownRole from "../general/dropdown/dropdown-role";
+import { StudentComment } from "@/lib/actions/comment";
+import StudentCommentCard from "./studdent-comment-card";
+import { StudentProfile } from "@/lib/types/database";
+import EditAboutModal from "./edit-about-modal";
+import { useState, useMemo } from "react"; 
 
 
-interface Props extends studentProps {
-    className?: string;
-    myButtons: ButtonConfig[];
-    selectedButtonId: string;
-    posts: Poster[];
-    onButtonSelect: (id: string) => void;
-    currentUserID: string;
-}
-
-interface studentProps {
+interface AboutPageProps {
     studentId: string;
-    studentCourse: string;
-    studentEmail: string;
-    studentYear: string;
-    studentJoinDate: string;
-    studentEventsJoined: string;
-    studentTotalOrg: string;
+    studentCourse: string | null;
+    studentEmail: string | null;
+    studentYear: string | null;
+    // These seem like placeholder data, so let's make them optional
+    studentJoinDate?: string;
+    studentEventsJoined?: string;
+    studentTotalOrg?: string;
+    // Add the new props
+    aboutText: string | null;
+    onEditClick: () => void;
+    isOwnProfile: boolean;
 }
 
-const AboutPage = ({ studentId, studentCourse, studentEmail, studentYear, studentJoinDate, studentEventsJoined, studentTotalOrg }: studentProps) => {
+// 2. Fix the AboutPage component to accept ONE props object
+const AboutPage = ({
+    studentId,
+    studentCourse,
+    studentEmail,
+    studentYear,
+    studentJoinDate,
+    studentEventsJoined,
+    studentTotalOrg,
+    aboutText,
+    onEditClick,
+    isOwnProfile
+}: AboutPageProps) => {
 
-    return (<div className="flex flex-col sm:flex-row">
-        <div className="flex flex-col">
-
-            <div className="flex flex-col sm:flex-row sm:gap-10">
-                <div>
-                    <p className="text-action-forest-green"><strong>Student ID:</strong> {studentId}</p>
-                    <p className="text-action-forest-green"><strong>Major:</strong> {studentCourse}</p>
-                    <p className="text-action-forest-green"><strong>Email:</strong> {studentEmail}</p>
-                    <p className="text-action-forest-green"><strong>Year:</strong> {studentYear}</p>
+    return (
+        <div className="flex flex-col sm:flex-row">
+            <div className="flex flex-col">
+                <div className="flex flex-col sm:flex-row sm:gap-10">
+                    <div>
+                        <p><strong>Student ID:</strong> {studentId}</p>
+                        <p><strong>Major:</strong> {studentCourse || 'N/A'}</p>
+                        <p><strong>Email:</strong> {studentEmail || 'N/A'}</p>
+                        <p><strong>Year:</strong> {studentYear || 'N/A'}</p>
+                    </div>
+                    <div>
+                        {/* These are likely placeholders, can be removed if not in your profile object */}
+                        <p><strong>Joined:</strong> {studentJoinDate || 'N/A'}</p>
+                        <p><strong>Events Joined:</strong> {studentEventsJoined || 'N/A'} events</p>
+                        <p><strong>Joined Organizations:</strong> {studentTotalOrg || 'N/A'}</p>
+                    </div>
                 </div>
                 <div>
-                    <p className="text-action-forest-green"><strong>Joined:</strong> {studentJoinDate}</p>
-                    <p className="text-action-forest-green"><strong>Events Joined:</strong> {studentEventsJoined} events</p>
-                    <p className="text-action-forest-green"><strong>Joined Organizations:</strong> {studentTotalOrg}</p>
+                    <p className="text-action-forest-green">
+                        <strong>Description </strong>
+                        {isOwnProfile && <Button onClick={onEditClick}>Edit Description</Button>}
+                    </p>
+                    <p className="max-w-250 text-action-forest-green whitespace-pre-line">
+                        {aboutText || "No description provided."}
+                    </p>
                 </div>
             </div>
-
-            <div>
-                <p className="text-action-forest-green"><strong>Description </strong><Button>Edit Description</Button></p>
-                <p className="max-w-250 text-action-forest-green">This is a placeholder description for the student profile. You can edit this description to provide more details about the student.</p>
-            </div>
-
         </div>
-
-    </div>
     );
 }
 
@@ -69,13 +84,41 @@ const options = [
     { value: "mostLikedMonth", label: "Most Liked Month" },
     { value: "mostLikedWeek", label: "Most Liked Week" }
 ];
-const PostPage = ({ posts, currentUserID }: { posts: Poster[], currentUserID: string }) => {
+const PostPage = ({ 
+    posts, 
+    currentUserID, 
+    sortOption, 
+    onSortChange,
+    orgFilterOptions,
+    onOrgFilterChange,
+    filterPlaceholder
+}: { 
+    posts: Poster[], 
+    currentUserID: string,
+    sortOption: string,
+    onSortChange: (option: string) => void,
+    orgFilterOptions: { value: string, label: string }[],
+    onOrgFilterChange: (orgName: string) => void,
+    filterPlaceholder: string
+}) => {
     console.log("PostPage received posts:", posts);
     console.log("PostPage received currentUserID:", currentUserID);
     return (
         <div className="mt-3">
             <div className="mb-3">
-                <DropDownRole options={options} placeholder="Filtering" width="w-xs"></DropDownRole>
+                <DropDownRole
+                    options={orgFilterOptions}
+                    placeholder={filterPlaceholder}
+                    width="w-64"
+                    onSelect={onOrgFilterChange}
+                />
+                {/* --- SORTING DROPDOWN --- */}
+                <DropDownRole
+                    options={options}
+                    placeholder={options.find(o => o.value === sortOption)?.label || "Most Recent"}
+                    width="w-xs"
+                    onSelect={onSortChange}
+                />
             </div>
             {posts.length === 0 ? (<p>No posts found for this user.</p>) : ( // Use 'posts' here
                 <ul className="space-y-4">
@@ -93,6 +136,7 @@ const PostPage = ({ posts, currentUserID }: { posts: Poster[], currentUserID: st
                             likes={post.likes}
                             comments={post.comments}
                             recipient={post.recipient} 
+                            initialHasLiked={post.initialHasLiked}
                             currentUserID={currentUserID}
                             posterID="might_remove"
                         />
@@ -103,74 +147,152 @@ const PostPage = ({ posts, currentUserID }: { posts: Poster[], currentUserID: st
     );
 }
 
-export const Comments: Commenter[] = [
-    {
-        commentID: "1942",
-        postTitle: "This is a test.",
-        organizationPosted: "ICPEP",
-        commenterName: "Excel Duran",
-        daysSinceCommented: 3,
-        content: "This is my fifth comment",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        commentID: "2343",
-        postTitle: "This is a test.",
-        organizationPosted: "ICPEP",
-        commenterName: "Excel Duran",
-        daysSinceCommented: 4,
-        content: "This is my fourth comment",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        commentID: "5742",
-        postTitle: "This is a test.",
-        organizationPosted: "ICPEP",
-        commenterName: "Excel Duran",
-        daysSinceCommented: 6,
-        content: "This is my third comment",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        commentID: "2341",
-        postTitle: "This is a test.",
-        organizationPosted: "ICPEP",
-        commenterName: "Excel Duran",
-        daysSinceCommented: 8,
-        content: "This is my second comment",
-        likes: 3,
-        comments: 3,
-    },
-    {
-        commentID: "572142",
-        postTitle: "This is a test.",
-        organizationPosted: "ICPEP",
-        commenterName: "Excel Duran",
-        daysSinceCommented: 10,
-        content: "This is my first comment",
-        likes: 3,
-        comments: 3,
-    }
-];
-
-const CommentPage = () => {
-
+const CommentPage = ({ comments }: { comments: StudentComment[] }) => {
+    
+    return (
+        <div className="mt-3">
+            {comments.length === 0 ? (
+                <p>You have not made any comments yet.</p>
+            ) : (
+                <ul className="space-y-4">
+                    {comments.map((comment, i) => (
+                        <li key={i}>
+                            <StudentCommentCard comment={comment} />
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
 }
 
 
-export default function StudentProfileCard({ className, myButtons, currentUserID, selectedButtonId, posts, onButtonSelect, studentId, studentCourse, studentEmail, studentYear, studentJoinDate, studentEventsJoined, studentTotalOrg }: Props) {
+interface Props {
+    className?: string;
+    myButtons: ButtonConfig[];
+    selectedButtonId: string;
+    onButtonSelect: (id: string) => void;
+    currentUserID: string;
+    posts: Poster[];
+    initialComments: StudentComment[];
+    profile: StudentProfile;
+    onProfileUpdate: (updatedData: Partial<StudentProfile>) => void;
+    isOwnProfile: boolean;
+}
+
+
+export default function StudentProfileCard({
+    className,
+    myButtons,
+    initialComments,
+    profile,
+    onProfileUpdate,
+    currentUserID,
+    selectedButtonId,
+    posts,
+    onButtonSelect,
+    isOwnProfile
+}: Props) {
     const combinedClassName = `flex flex-col ${className || ''}`;
-    console.log("StudentProfileCard received posts:", posts);
-    
-    console.log("StudentProfileCard received currentUserID:", currentUserID);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [sortOption, setSortOption] = useState("recent")
+     const [filterOrgName, setFilterOrgName] = useState<string | null>(null); // null = "All Posts"
+
+    const handleSaveAbout = (newAboutText: string) => {
+        onProfileUpdate({ about: newAboutText });
+    };
+
+    const sortedPosts = useMemo(() => {
+        const postsCopy = [...posts]; // Create a copy to avoid mutating the original prop
+        switch (sortOption) {
+            case 'oldest':
+                // The 'posted' field would be best for this, assuming it exists
+                // For now, we'll sort by daysSincePosted
+                return postsCopy.sort((a, b) => b.daysSincePosted - a.daysSincePosted);
+            case 'mostLikedAllTime':
+                return postsCopy.sort((a, b) => b.likes - a.likes);
+            case 'recent':
+            default:
+                // Default sort is recent
+                return postsCopy.sort((a, b) => a.daysSincePosted - b.daysSincePosted);
+        }
+    }, [posts, sortOption]);
+
+    const orgFilterOptions = useMemo(() => {
+        const orgs = new Map<string, string>();
+        posts.forEach(p => {
+            // Only add if the post has a recipient (organization name)
+            if (p.recipient && p.recipient !== 'Direct Post') {
+                orgs.set(p.recipient, p.recipient);
+            }
+        });
+        const options = Array.from(orgs.keys()).map(orgName => ({
+            value: orgName,
+            label: orgName
+        }));
+        // Add the "All" option to the start of the list
+        return [{ value: 'all', label: 'All My Posts' }, ...options];
+    }, [posts]);
+
+    const processedPosts = useMemo(() => {
+        // 1. Filter first
+        const filtered = filterOrgName 
+            ? posts.filter(p => p.recipient === filterOrgName)
+            : posts;
+
+        // 2. Then sort the filtered results
+        const sorted = [...filtered]; // Create a mutable copy
+        switch (sortOption) {
+            case 'oldest':
+                return sorted.sort((a, b) => b.daysSincePosted - a.daysSincePosted);
+            case 'mostLikedAllTime':
+                return sorted.sort((a, b) => b.likes - a.likes);
+            case 'recent':
+            default:
+                return sorted.sort((a, b) => a.daysSincePosted - b.daysSincePosted);
+        }
+    }, [posts, sortOption, filterOrgName]);
+
     return (
-        <div className={combinedClassName}>
-            <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect}></HorizontalNavBar>
-            {selectedButtonId === "about" && <AboutPage studentId={studentId} studentCourse={studentCourse} studentEmail={studentEmail} studentYear={studentYear} studentJoinDate={studentJoinDate} studentEventsJoined={studentEventsJoined} studentTotalOrg={studentTotalOrg} />}
-            {selectedButtonId === "post" && <PostPage posts={posts} currentUserID={currentUserID}></PostPage>}
-        </div>
+        <>
+            <EditAboutModal 
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                currentAbout={profile.about}
+                onSave={handleSaveAbout}
+            />
+            <div className={combinedClassName}>
+                <HorizontalNavBar myButtons={myButtons} selectedButtonId={selectedButtonId} onButtonSelect={onButtonSelect} />
+                {selectedButtonId === "about" && (
+                    // 3. Update the call to AboutPage, passing props from the 'profile' object
+                    <AboutPage
+                        studentId={profile.studentid.toString()}
+                        studentCourse={profile.course}
+                        studentEmail={profile.email}
+                        studentYear={profile.yearlevel}
+                        aboutText={profile.about}
+                        onEditClick={() => setIsEditModalOpen(true)}
+                        // Pass placeholders or remove if not needed
+                        studentJoinDate="Sep 2024" 
+                        studentEventsJoined="0"
+                        studentTotalOrg="0"
+                        isOwnProfile={isOwnProfile}
+                    />
+                )}
+                 {selectedButtonId === "post" && (
+                    <PostPage 
+                        posts={processedPosts} // <-- Pass the final processed list
+                        currentUserID={currentUserID}
+                        sortOption={sortOption}
+                        onSortChange={setSortOption}
+                        // Pass down the org filter props
+                        orgFilterOptions={orgFilterOptions}
+                        onOrgFilterChange={(value) => setFilterOrgName(value === 'all' ? null : value)}
+                        filterPlaceholder={filterOrgName || 'All My Posts'}
+                    />
+                )}
+                {selectedButtonId === "comment" && <CommentPage comments={initialComments} />}
+            </div>
+        </>
     );
 }

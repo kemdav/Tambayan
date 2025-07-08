@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 import { v4 as uuidv4 } from 'uuid';
 import type { TablesUpdate } from "@/lib/database.types";
 import { Tables } from "@/lib/database.types";
-
+import type { CommentType } from "@/lib/types/types";
 import { differenceInDays } from 'date-fns';
 
 type OrgPostQueryResult = Tables<'post'> & {
@@ -16,82 +16,171 @@ type OrgPostQueryResult = Tables<'post'> & {
     organizations: Pick<Tables<'organizations'>, 'orgname'> | null;
 };
 
+export type PostWithLikesResult = Tables<'post'> & {
+    student: {
+        fname: string | null;
+        lname: string | null;
+        picture: string | null;
+        user_id: string | null;
+        studentid: number;
+    } | null;
+    organizations: {
+        orgid: string;
+        orgname: string | null;
+        picture: string | null;
+    } | null;
+    post_likes: { user_id: string }[];
+    comments: CommentType[];
+};
+
+export async function createEvent(formData: FormData) {
+    const supabase = await createClient();
+
+    const orgId = formData.get('orgId') as string;
+    // ... get other form fields: title, content (as description), location, date
+
+    const { data: orgData } = await supabase.from('organizations').select('universityid').eq('orgid', orgId).single();
+    if (!orgData) return { error: "Organization not found." };
+
+    // RLS on the 'events' table will enforce permissions
+    const { error } = await supabase.from('events').insert({
+        orgid: orgId,
+        universityid: orgData.universityid,
+        title: formData.get('title') as string,
+        description: formData.get('content') as string,
+        location: formData.get('location') as string,
+        date: formData.get('date') as string,
+        status: 'Upcoming'
+    });
+
+    if (error) return { error: `Failed to create event: ${error.message}` };
+    revalidatePath(`/organization/${orgId}/newsfeed`);
+    return { success: "Event created successfully!" };
+}
+
+export async function createOfficialPost(formData: FormData) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Not authenticated." };
+
+    const orgId = formData.get('orgId') as string;
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const photoFile = formData.get('photoFile') as File | null;
+    let attachmentUrl: string | null = null;
+
+    if (photoFile) {
+        const filePath = `${orgId}/${user.id}/${Date.now()}`;
+        const { data, error: uploadError } = await supabase.storage.from('post-attachments').upload(filePath, photoFile);
+        if (uploadError) return { error: "File upload failed." };
+        attachmentUrl = supabase.storage.from('post-attachments').getPublicUrl(data.path).data.publicUrl;
+    }
+
+    // RLS will enforce permissions for this insert
+    const { error } = await supabase
+        .from('post')
+        .insert({
+            orgid: orgId,
+            studentid: null, // Official posts are not linked to a student
+            subject: title,
+            body: content,
+            attachment: attachmentUrl,
+            isofficial: true, // Key flag for official posts
+             posted: new Date().toISOString(), // <-- ADD THIS LINE
+            ispinned: false
+        });
+
+    if (error) return { error: `Failed to create official post: ${error.message}` };
+    revalidatePath(`/organization/${orgId}/newsfeed`);
+    return { success: "Official post created successfully!" };
+}
+
 export async function getOrgPosts(orgId: string, isOfficial: boolean): Promise<Poster[]> {
     console.log(`[getOrgPosts] START: Called for orgId: ${orgId}, isOfficial: ${isOfficial}`);
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
+
+
+    // The base query with the corrected select statement
     const { data, error } = await supabase
         .from("post")
         .select(`
-            postid,
-            subject,
-            body,
-            likes,
-            comments,
-            posted,
-            attachment,
+            *,
             student:studentid (
                 fname,
                 lname,
                 picture,
-                user_id
+                user_id,
+                studentid
             ),
             organizations:orgid (
-                orgname
-            )
+                orgid,
+                orgname,
+                picture
+            ),
+            post_likes ( user_id ),
+            comments ( *, author:student(fname, lname, picture) )
         `)
-        .eq("orgid", orgId)       // Filter by organization ID
-        .eq("isofficial", isOfficial) // Filter by official status
+        .eq("orgid", orgId)
+        .eq("isofficial", isOfficial)
         .order("posted", { ascending: false });
 
     if (error) {
-        console.error(`[getOrgPosts] ERROR fetching posts for org ${orgId} (official: ${isOfficial}):`, error.message);
+        console.error(`[getOrgPosts] ERROR fetching posts for org ${orgId}:`, error.message);
         return [];
     }
 
     if (!data || data.length === 0) {
-        console.log(`[getOrgPosts] INFO: No posts found for org ${orgId} (official: ${isOfficial}).`);
+        console.log(`[getOrgPosts] INFO: No posts found for org ${orgId}.`);
         return [];
     }
 
-    console.log(`[getOrgPosts] INFO: Raw data fetched for org ${orgId} (official: ${isOfficial}):`, data);
+     console.log('[getOrgPosts] Raw data from Supabase (should be sorted):');
+    // Log just the 'posted' timestamp and subject for each post
+    data?.forEach(post => {
+        console.log(`  - Posted: ${post.posted}, Subject: ${post.subject}`);
+    });
 
-    const typedData: OrgPostQueryResult[] = data as OrgPostQueryResult[];
+    // Use our new, more specific type for the cast
+    const typedData: PostWithLikesResult[] = data as any; // Using 'any' here is a pragmatic step if typing the query perfectly is complex
 
     const formattedPosts: Poster[] = typedData.map((post) => {
+        // ... (your existing mapping logic for student, organization, posterName, etc.)
         const student = post.student;
         const organization = post.organizations;
+        const currentPosterName = isOfficial ? (organization?.orgname ?? "Official Post") : (student ? `${student.fname} ${student.lname}` : "Unknown User");
+        const currentPosterID = isOfficial ? orgId : (student?.studentid?.toString() || "unknown");
+        const currentPosterPictureUrl = isOfficial ? null : (student?.picture ?? null);
+        const currentPosterUserID = isOfficial ? null : (student?.user_id ?? null);
 
-        // Adjust posterName and posterID logic for official posts
-        const currentPosterName = isOfficial
-            ? organization?.orgname ?? "Official Post"
-            : (student ? `${student.fname} ${student.lname}` : "Unknown User");
+        // --- NEW LIKE LOGIC ---
+        // Get the total like count from the post_likes relation
+        const likeCount = post.post_likes.length;
 
-        const currentPosterID = isOfficial
-            ? orgId
-            : (student?.studentid?.toString() || "unknown"); // Use studentid if student, else orgId
+        // Check if the user_has_liked array has any items. If so, the user has liked the post.
+        const hasLiked = user ? post.post_likes.some(like => like.user_id === user.id) : false;
+        // --- END NEW LIKE LOGIC ---
 
-        const currentPosterPictureUrl = isOfficial
-            ? null // Assuming official posts don't have a student picture, or you'd get org logo
-            : (student?.picture ?? null);
-        
-        const currentPosterUserID = isOfficial
-            ? null // Official posts aren't tied to a specific user
-            : (student?.user_id ?? null);
+        const isOfficialPost = post.isofficial;
+        const posterName = isOfficialPost ? (organization?.orgname ?? 'Official Post') : `${student?.fname} ${student?.lname}`;
+        const posterPictureUrl = isOfficialPost ? organization?.picture : student?.picture;
+        const posterID = isOfficialPost ? (organization?.orgid ?? 'org_unknown') : (student?.studentid.toString() ?? 'unknown');
 
         return {
             postID: post.postid.toString(),
-            posterName: currentPosterName,
-            posterID: currentPosterID,
-            posterPictureUrl: currentPosterPictureUrl,
+            posterName: posterName,
+            posterID: posterID,
+            posterPictureUrl: posterPictureUrl,
             title: post.subject,
             posterUserID: currentPosterUserID,
             imageSrc: post.attachment ?? null,
             content: post.body ?? 'No content',
-            likes: post.likes ?? 0,
-            comments: post.comments ?? 0,
+            likes: likeCount, // Use the new, accurate count
+            comments: post.comments ?? [],
             daysSincePosted: post.posted ? differenceInDays(new Date(), new Date(post.posted)) : 0,
-            recipient: organization?.orgname ?? 'Direct Post' // This should be the target org, which is the current org
+            recipient: organization?.orgname ?? 'Direct Post',
+            initialHasLiked: hasLiked, // Pass this new property to the client
         };
     });
 
@@ -101,27 +190,26 @@ export async function getOrgPosts(orgId: string, isOfficial: boolean): Promise<P
 export async function getPostsByStudent(studentId: number): Promise<Poster[]> {
     console.log(`[getPostsByStudent] START: Called for studentId: ${studentId}`);
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
+    // The base query with the corrected select statement
     const { data, error } = await supabase
         .from("post")
         .select(`
-        postid,
-        subject,
-        body,
-        likes,
-        comments,
-        posted,
-        attachment,
-        student:post_studentid_fkey (
-            fname,
-            lname,
-            picture,
-            user_id
-        ),
-        organizations (
-            orgname
-        )
-    `)
+            *,
+            student:studentid (
+                fname,
+                lname,
+                picture,
+                user_id,
+                studentid
+            ),
+            organizations:orgid (
+                orgname
+            ),
+            post_likes ( user_id ),
+            comments ( *, author:student(fname, lname, picture) )
+        `)
         .eq("studentid", studentId)
         .order("posted", { ascending: false });
 
@@ -142,21 +230,20 @@ export async function getPostsByStudent(studentId: number): Promise<Poster[]> {
         console.log(`[getPostsByStudent] INFO: Raw data fetched for student ${studentId}:`, data);
     }
 
-    console.log(`[getPostsByStudent] Raw 'attachment' values for student ${studentId}:`);
+    //console.log(`[getPostsByStudent] Raw 'attachment' values for student ${studentId}:`);
     data.forEach((post, index) => {
         console.log(`  Post ${post.postid} attachment:`, post.attachment);
     });
 
+    const typedData: PostWithLikesResult[] = data as any;
+
     // The 'data' is an array of posts. We'll map over it.
-    const formattedPosts: Poster[] = data.map((post) => {
+    const formattedPosts: Poster[] = typedData.map((post) => {
+        const student = post.student;
+        const organization = post.organizations;
 
-        // ================= FIX STARTS HERE =================
-
-        // Check if post.student is an array and has items before accessing it
-        const student = Array.isArray(post.student) ? post.student[0] : post.student;
-
-        // Check if post.organizations is an array and has items
-        const organization = Array.isArray(post.organizations) ? post.organizations[0] : post.organizations;
+        const likeCount = post.post_likes.length;
+        const hasLiked = user ? post.post_likes.some(like => like.user_id === user.id) : false;
 
         return {
             postID: post.postid.toString(),
@@ -168,11 +255,12 @@ export async function getPostsByStudent(studentId: number): Promise<Poster[]> {
             posterUserID: student?.user_id,
             imageSrc: post.attachment ?? null,
             content: post.body ?? 'No content',
-            likes: post.likes ?? 0,
-            comments: post.comments ?? 0,
+            likes: likeCount,
+            comments: post.comments ?? [],
             daysSincePosted: post.posted ? differenceInDays(new Date(), new Date(post.posted)) : 0,
             // Use the 'organization' variable
-            recipient: organization?.orgname ?? 'Direct Post'
+            recipient: organization?.orgname ?? 'Direct Post',
+            initialHasLiked: hasLiked
         };
 
         // ================== FIX ENDS HERE ==================
@@ -251,8 +339,6 @@ export async function createPost(formData: FormData) {
             body: content,
             attachment: attachmentUrl, // The path to the image in Storage
             isofficial: false, // Student posts are not official
-            likes: 0,
-            comments: 0,
             posted: new Date().toISOString(),
             ispinned: false
         });
@@ -264,6 +350,7 @@ export async function createPost(formData: FormData) {
 
     // 5. Tell Next.js to refresh the data on the profile page
     revalidatePath('/profile');
+    revalidatePath('/organization/[org-id]/newsfeed', 'page')
 
     return { success: "Post created successfully!" };
 }
@@ -304,7 +391,7 @@ export async function updatePost(formData: FormData) {
         return { error: "Post ID and content are required." };
     }
 
-     const updatePayload: TablesUpdate<'post'> = {
+    const updatePayload: TablesUpdate<'post'> = {
         subject: title,
         body: content,
     };
@@ -397,5 +484,5 @@ export async function updatePost(formData: FormData) {
     }
 
     revalidatePath('/profile');
-     return { success: true, message: "Post updated." };
+    return { success: true, message: "Post updated." };
 }

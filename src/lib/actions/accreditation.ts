@@ -1,152 +1,107 @@
+// lib/actions/accreditation.ts
 "use server";
+
 import { createClient } from "@/lib/supabase/server";
-import { Tables } from "@/lib/database.types";
+import { revalidatePath } from "next/cache";
 
-export type AccreditationStatus = 'Pending' | 'Approved' | 'Revision' | 'Rejected';
+// Action to get the current accreditation status for an org
+export async function getAccreditationStatus(orgId: string, academicYear: string) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from('accreditations')
+        .select('*')
+        .eq('orgid', orgId)
+        .eq('academic_year', academicYear)
+        .maybeSingle(); // Use maybeSingle as there might not be an entry yet
 
-export interface AccreditationData {
-  orgid: string;
-  orgname: string | null;
-  status: string | null;
-  created: string | null;
-  universityid: string | null;
-  university?: { uname: string | null } | null;
-}
-
-export interface AccreditationStats {
-  pending_count: number;
-  approved_count: number;
-  revision_count: number;
-  rejected_count: number;
-}
-
-// Get all organizations for accreditation review
-export async function getOrganizationsForAccreditation(): Promise<AccreditationData[]> {
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('organizations')
-    .select('orgid, orgname, status, created, universityid, university:universityid(uname)')
-    .order('created', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching organizations for accreditation:', error);
-    return [];
-  }
-
-  return data || [];
-}
-
-// Get organizations by status (using the existing status field)
-export async function getOrganizationsByStatus(status: string): Promise<AccreditationData[]> {
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('organizations')
-    .select('orgid, orgname, status, created, universityid, university:universityid(uname)')
-    .eq('status', status)
-    .order('created', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching organizations by status:', error);
-    return [];
-  }
-
-  return data || [];
-}
-
-// Get accreditation statistics based on organization status
-export async function getAccreditationStats(): Promise<AccreditationStats> {
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('organizations')
-    .select('status');
-
-  if (error) {
-    console.error('Error fetching accreditation stats:', error);
-    return {
-      pending_count: 0,
-      approved_count: 0,
-      revision_count: 0,
-      rejected_count: 0
-    };
-  }
-
-  const stats = {
-    pending_count: 0,
-    approved_count: 0,
-    revision_count: 0,
-    rejected_count: 0
-  };
-
-  data?.forEach(org => {
-    switch (org.status) {
-      case 'Pending':
-        stats.pending_count++;
-        break;
-      case 'Approved':
-        stats.approved_count++;
-        break;
-      case 'Revision':
-        stats.revision_count++;
-        break;
-      case 'Rejected':
-        stats.rejected_count++;
-        break;
+    if (error) {
+        console.error("Error fetching accreditation status:", error.message);
+        return null;
     }
-  });
-
-  return stats;
+    return data;
 }
 
-// Update organization accreditation status
-export async function updateOrganizationAccreditationStatus(
-  orgid: string, 
-  status: AccreditationStatus
-): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
+// Action for the President to submit their file
+export async function submitAccreditationFile(orgId: string, academicYear: string, formData: FormData) {
+    const supabase = await createClient();
+    const file = formData.get('accreditationPdf') as File;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        console.error("No user is logged in. Can't upload file.");
+        return { error: "You must be logged in to upload files." };
+    }
+    if (!file) {
+        return { error: 'No file provided.' };
+    }
 
-  const { error } = await supabase
-    .from('organizations')
-    .update({ status })
-    .eq('orgid', orgid);
+    // Step 1: Upload the file to Storage (this part is likely fine)
+    const filePath = `${orgId}/${academicYear}-${file.name}`;
+    const { error: uploadError } = await supabase.storage
+        .from('accreditation-files')
+        .upload(filePath, file, { upsert: true });
 
-  if (error) {
-    console.error('Error updating organization accreditation status:', error);
-    return { success: false, error: error.message };
-  }
+    if (uploadError) {
+        console.error("Upload error:", uploadError);
+        return { error: `Failed to upload file: ${uploadError.message}` }; // Return the actual error
+    }
 
-  return { success: true };
+    // Step 2: Check if an accreditation record already exists
+    const { data: existingRecord, error: selectError } = await supabase
+        .from('accreditations')
+        .select('id')
+        .eq('orgid', orgId)
+        .eq('academic_year', academicYear)
+        .maybeSingle();
+
+    if (selectError) {
+        console.error("Error checking for existing record:", selectError);
+        return { error: 'Could not verify accreditation status.' };
+    }
+
+    let dbError = null;
+
+    if (existingRecord) {
+        // --- Step 3a: UPDATE the existing record ---
+        console.log("Found existing record. Updating...");
+        const { error } = await supabase
+            .from('accreditations')
+            .update({
+                submission_status: 'Pending Review',
+                file_path: filePath,
+                submitted_at: new Date().toISOString()
+            })
+            .eq('id', existingRecord.id); // Update by primary key
+        dbError = error;
+
+    } else {
+        // --- Step 3b: INSERT a new record ---
+        console.log("No existing record found. Inserting...");
+        // You'll need to fetch the universityid for a new record
+        const { data: orgData } = await supabase.from('organizations').select('universityid').eq('orgid', orgId).single();
+        if (!orgData?.universityid) {
+            return { error: 'Could not find university for this organization.' };
+        }
+
+        const { error } = await supabase
+            .from('accreditations')
+            .insert({
+                orgid: orgId,
+                universityid: orgData.universityid,
+                academic_year: academicYear,
+                submission_status: 'Pending Review',
+                file_path: filePath,
+                submitted_at: new Date().toISOString()
+            });
+        dbError = error;
+    }
+
+    if (dbError) {
+        console.error("Database operation failed:", dbError);
+        // CRITICAL: Log the specific error to see if it's INSERT or UPDATE failing
+        console.error(`Operation that failed: ${existingRecord ? 'UPDATE' : 'INSERT'}`);
+        return { error: `Failed to update database: ${dbError.message}` };
+    }
+
+    revalidatePath(`/organization/${orgId}/manage/accreditation`);
+    return { success: true, filePath: filePath };
 }
-
-// Get organizations with university details
-export async function getOrganizationsWithUniversity(): Promise<AccreditationData[]> {
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('organizations')
-    .select(`
-      orgid,
-      orgname,
-      status,
-      created,
-      universityid,
-      university:universityid(uname)
-    `)
-    .order('created', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching organizations with university:', error);
-    return [];
-  }
-
-  return data?.map(org => ({
-    orgid: org.orgid,
-    orgname: org.orgname,
-    status: org.status,
-    created: org.created,
-    universityid: org.universityid,
-    university: org.university
-  })) || [];
-} 

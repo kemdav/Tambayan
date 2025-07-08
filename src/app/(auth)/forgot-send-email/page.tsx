@@ -1,10 +1,11 @@
 "use client";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/app/components/ui/general/button";
 
 export default function ForgotSendEmailPage() {
+  const supabase = createClient();
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
   const [loading, setLoading] = useState(false);
@@ -15,7 +16,9 @@ export default function ForgotSendEmailPage() {
     setLoading(true);
     setError(null);
     setSuccess(false);
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "http://127.0.0.1:3000/reset-password"
+    });
     setLoading(false);
     if (error) {
       setError(error.message);

@@ -10,6 +10,8 @@ import { createClient } from "@/lib/supabase/client";
 import { createPost } from "@/lib/actions/post";
 import { redirect, useRouter } from "next/navigation";
 import { ShowcaseCardProps } from "@/app/components/ui/general/showcase-card-component";
+import {Filter} from 'bad-words'; 
+const profanityFilter = new Filter();
 
 interface Props {
   children: React.ReactNode;
@@ -25,6 +27,24 @@ export const myButtons: ButtonConfig[] = [
     id: "profile",
     children: "Student Profile",
     href: "/profile",
+    variant: "sideNavigation",
+    className:
+      "sideNavBarButtonText",
+    icon: <StudentProfileIcon className="size-10" />,
+  },
+  {
+    id: "searchProfile",
+    children: "Search Profile",
+    href: "/search",
+    variant: "sideNavigation",
+    className:
+      "sideNavBarButtonText",
+    icon: <StudentProfileIcon className="size-10" />,
+  },
+  {
+    id: "searchPosts",
+    children: "Search Posts",
+    href: "/search-posts",
     variant: "sideNavigation",
     className:
       "sideNavBarButtonText",
@@ -79,13 +99,12 @@ export default function StudentVerticalNavigation({ children }: Props) {
   const [orgOptions, setOrgOptions] = useState<OrgOption[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-
-  const [postType, setPostType] = useState("default");
+  const [postType, setPostType] = useState<'default' | 'official' | 'event'>("default");
   const [org, setOrg] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [eventLocation, setEventLocation] = useState("");
-  const [eventDate, setEventDate] = useState("");
+  const [eventDate, setEventDate] = useState<Date | undefined>();
   const [registrationStart, setRegistrationStart] = useState<Date | undefined>();
   const [registrationEnd, setRegistrationEnd] = useState<Date | undefined>();
   const [submitted, setSubmitted] = useState<any>(null);
@@ -100,7 +119,7 @@ export default function StudentVerticalNavigation({ children }: Props) {
 
       // --- THIS IS THE NEW, SIMPLIFIED LOGIC ---
       // Make a single call to our new RPC function.
-      const { data, error } = await supabase.rpc('get_user_org_options');
+      const { data, error } = await supabase.rpc('get_user_subscribed_org_options');
 
       if (error) {
         console.error("Error fetching organization options:", error);
@@ -142,6 +161,10 @@ export default function StudentVerticalNavigation({ children }: Props) {
       alert("Post content cannot be empty.");
       return;
     }
+    if (profanityFilter.isProfane(title) || profanityFilter.isProfane(content)) {
+        alert("Your post contains inappropriate language. Please revise it.");
+        return; // Stop the submission
+    }
 
     setIsSubmitting(true);
     const formData = new FormData();
@@ -174,7 +197,8 @@ export default function StudentVerticalNavigation({ children }: Props) {
     setTitle("");
     setContent("");
     setPhotoFile(null);
-    // Reset any other form fields here...
+    setEventLocation("");
+    setEventDate(undefined);
   };
 
 
@@ -190,7 +214,6 @@ export default function StudentVerticalNavigation({ children }: Props) {
             <CreatePostComponent
               className="max-w-2xl min-w-1xl md:w-2xl"
               postType={postType}
-              onPostTypeChange={setPostType}
               org={org}
               onOrgChange={setOrg}
               title={title}
@@ -204,16 +227,7 @@ export default function StudentVerticalNavigation({ children }: Props) {
               onEventLocationChange={setEventLocation}
               eventDate={eventDate}
               onEventDateChange={setEventDate}
-              registrationStart={registrationStart}
-              onRegistrationStartChange={setRegistrationStart}
-              registrationEnd={registrationEnd}
-              onRegistrationEndChange={setRegistrationEnd}
-              tags={tags}
-              tagInput={tagInput}
-              onTagInputChange={setTagInput}
-              onAddTag={handleAddTag}
               postButtonText={isSubmitting ? "Posting..." : "Post"}
-              onRemoveTag={handleRemoveTag}
               photoFile={photoFile}
               onPhotoChange={handlePhotoChange}
             />
@@ -226,7 +240,6 @@ export default function StudentVerticalNavigation({ children }: Props) {
           <SideBar></SideBar>
         </div>
         <div className="flex-grow flex flex-col items-center pt-5">
-          <SearchBar className="w-full max-w-4xl"></SearchBar>
           {children}
         </div>
         <div className="z-20 fixed bottom-0 right-0 sm:mx-10 sm:my-10 opacity-50 md:opacity-100">
