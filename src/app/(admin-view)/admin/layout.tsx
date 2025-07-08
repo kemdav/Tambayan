@@ -8,6 +8,7 @@ import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
 import { LogOutIcon as SettingsIcon } from "@/app/components/icons/LogOutIcon";
 import Image from "next/image";
 import { AdminUserProvider } from "./AdminUserContext";
+import { AddIcon } from "@/app/components/icons/AddIcon";
 
 // A simple hamburger icon component for clarity
 const HamburgerIcon = ({ className }: { className?: string }) => (
@@ -65,10 +66,10 @@ const navButtons: ButtonConfig[] = [
     href: "/admin/accreditation",
   },
   {
-    id: "students",
-    children: "Students",
-    icon: <StudentProfileIcon />,
-    href: "/admin/students",
+    id: "create-org",
+    children: "Create New Organization",
+    icon: <AddIcon className="w-5 h-5" />,
+    href: "/admin/create-org",
   },
   {
     id: "settings",
