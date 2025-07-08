@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "../general/button";
+import type { EventData } from "@/lib/actions/event-oversight";
 
 interface StatusStyle {
   label: string;
@@ -8,23 +9,17 @@ interface StatusStyle {
   textColor: string;
 }
 
-interface EventData {
-  eventName: string;
-  organization: string;
-  orgname?: string;
-  date: string;
-  location: string;
-  status?: string; // ✅ just a string like "Upcoming"
-  onClickView: () => void;
-  onClickEdit: () => void;
-}
-
 interface Props {
   tableData?: EventData[];
   statuses?: StatusStyle[]; // ✅ full list of styles to match from
+  onRemove?: (event: EventData) => void;
 }
 
-export default function EventTable({ tableData = [], statuses = [] }: Props) {
+export default function EventTable({
+  tableData = [],
+  statuses = [],
+  onRemove,
+}: Props) {
   return (
     <div className="overflow-x-auto rounded-[10px] border border-green-900 w-full mt-4 max-w-[1066px]">
       <table className="min-w-[600px] w-full border-collapse text-left text-sm sm:text-base">
@@ -70,31 +65,42 @@ export default function EventTable({ tableData = [], statuses = [] }: Props) {
                   {event.location}
                 </td>
                 <td className="border-t border-y-tint-beige-cream px-2 py-2 sm:px-4 whitespace-nowrap">
-                  {style ? (
-                    <span
-                      className={`px-2 py-1 rounded-full text-sm font-medium border border-tint-beige-cream ${style.bgColor} ${style.textColor}`}
-                    >
-                      {style.label}
-                    </span>
-                  ) : (
-                    event.status || "-"
-                  )}
+                  {(() => {
+                    if (event.status === "Upcoming") {
+                      return (
+                        <span className="px-2 py-1 rounded-full text-sm font-medium border border-tint-beige-cream bg-yellow-100 text-yellow-800">
+                          Upcoming
+                        </span>
+                      );
+                    } else if (
+                      event.status === "Finished" ||
+                      event.status === "finished"
+                    ) {
+                      return (
+                        <span className="px-2 py-1 rounded-full text-sm font-medium border border-tint-beige-cream bg-blue-100 text-blue-800">
+                          Finished
+                        </span>
+                      );
+                    } else if (style) {
+                      return (
+                        <span
+                          className={`px-2 py-1 rounded-full text-sm font-medium border border-tint-beige-cream ${style.bgColor} ${style.textColor}`}
+                        >
+                          {style.label}
+                        </span>
+                      );
+                    } else {
+                      return event.status || "-";
+                    }
+                  })()}
                 </td>
                 <td className="border-t border-y-tint-beige-cream px-2 py-2 sm:px-4">
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Button
-                      className="bg-action-forest-green text-white px-3 py-1.5 text-xs sm:text-sm rounded transition-transform duration-150 active:scale-90"
-                      onClick={event.onClickView}
-                    >
-                      View
-                    </Button>
-                    <Button
-                      className="bg-action-fresh-green text-white px-3 py-1.5 text-xs sm:text-sm rounded transition-transform duration-150 active:scale-90"
-                      onClick={event.onClickEdit}
-                    >
-                      Edit
-                    </Button>
-                  </div>
+                  <Button
+                    className="bg-red-500 text-white px-3 py-1.5 text-xs sm:text-sm rounded transition-transform duration-150 active:scale-90"
+                    onClick={() => onRemove && onRemove(event)}
+                  >
+                    Remove
+                  </Button>
                 </td>
               </tr>
             );

@@ -7,6 +7,7 @@ import {
   getSampleStatuses,
   type EventData,
   type Option,
+  deleteEvent,
 } from "@/lib/actions/event-oversight";
 import { useEffect, useState } from "react";
 
@@ -18,6 +19,13 @@ export default function EventOversightPage() {
   const filteredTableData = selectedOrg
     ? tableData.filter((event) => event.organization === selectedOrg)
     : tableData;
+
+  const handleRemoveEvent = async (eventToRemove: EventData) => {
+    await deleteEvent(eventToRemove.eventid);
+    setTableData((prev) =>
+      prev.filter((e) => e.eventid !== eventToRemove.eventid)
+    );
+  };
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -51,6 +59,7 @@ export default function EventOversightPage() {
           statuses={getSampleStatuses()}
           tableData={filteredTableData}
           onOrgChange={setSelectedOrg}
+          onRemoveEvent={handleRemoveEvent}
         />
         {loading && <div className="mt-4 text-gray-500">Loading events...</div>}
       </div>

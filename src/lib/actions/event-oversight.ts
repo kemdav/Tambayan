@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/client";
 
 // Define the EventData type to match the tableData structure
 export interface EventData {
+  eventid: string;
   eventName: string;
   organization: string; // orgid for debugging
   orgname?: string; // joined organization name
@@ -53,6 +54,7 @@ export const fetchEvents = async (): Promise<EventData[]> => {
     const mapped: EventData[] = (data || []).map((event) => {
       const e = event as EventWithOrg;
       return {
+        eventid: e.eventid || "",
         eventName: e.title || "Untitled Event",
         organization: e.orgid || "Unknown Org", // orgid for debugging
         orgname:
@@ -93,6 +95,7 @@ export const fetchEventsByOrganization = async (orgId: string): Promise<EventDat
     const mapped: EventData[] = (data || []).map((event) => {
       const e = event as EventWithOrg;
       return {
+        eventid: e.eventid || "",
         eventName: e.title || "Untitled Event",
         organization: e.orgid || "Unknown Org", // orgid for debugging
         orgname:
@@ -133,6 +136,7 @@ export const fetchEventsByStatus = async (status: string): Promise<EventData[]> 
     const mapped: EventData[] = (data || []).map((event) => {
       const e = event as EventWithOrg;
       return {
+        eventid: e.eventid || "",
         eventName: e.title || "Untitled Event",
         organization: e.orgid || "Unknown Org", // orgid for debugging
         orgname:
@@ -177,6 +181,7 @@ export const fetchEventById = async (eventId: string): Promise<EventData | null>
     // Map event to tableData format
     const e = data as EventWithOrg;
     const mapped: EventData = {
+      eventid: e.eventid || "",
       eventName: e.title || "Untitled Event",
       organization: e.orgid || "Unknown Org", // orgid for debugging
       orgname:
