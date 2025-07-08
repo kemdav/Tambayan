@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/app/components/ui/general/button";
 import { PasswordInput } from "@/app/components/ui/general/input/password-input";
+import { createClient } from "@/lib/supabase/client";
 
 export default function ChangePasswordPage() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -28,14 +29,40 @@ export default function ChangePasswordPage() {
       return;
     }
     setIsSubmitting(true);
-    // TODO: Integrate with backend
-    setTimeout(() => {
+    try {
+      const supabase = createClient();
+      // Fetch the logged-in user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (!user || userError) {
+        setError("You must be logged in to change your password.");
+        setIsSubmitting(false);
+        return;
+      }
+      // 1. Re-authenticate with current password
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+      if (signInError) {
+        setError("Current password is incorrect.");
+        setIsSubmitting(false);
+        return;
+      }
+      // 2. Update password
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+      if (updateError) {
+        setError(updateError.message || "Failed to update password. Please try again.");
+      } else {
+        setSuccess("Password changed successfully!");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      setSuccess("Password changed successfully (mocked).");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    }, 1000);
+    }
   };
 
   return (
