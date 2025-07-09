@@ -3,14 +3,13 @@
 "use client";
 
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
-import { useState, useEffect } from "react";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import { NewsfeedIcon } from "@/app/components/icons/NewsfeedIcon";
 import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
 import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
 import { LogOutIcon } from "@/app/components/icons/LogOutIcon";
 import Image from "next/image";
-import { AdminUserProvider } from "./AdminUserContext";
+import { AdminUserProvider, useAdminUser } from "./AdminUserContext";
 import { AddIcon } from "@/app/components/icons/AddIcon";
 import { createClient } from "@/lib/supabase/client";
 
@@ -27,8 +26,9 @@ import {
   LogOut,
   Menu, // A better hamburger icon
 } from "lucide-react";
-import router from "next/navigation";
+import router, { useRouter } from "next/navigation";
 import { signOut } from "@/lib/actions/auth";
+import { useEffect, useState } from "react";
 
 // Define the nav buttons directly in the layout for clarity
 export const adminNavButtons: ButtonConfig[] = [
@@ -80,7 +80,18 @@ export const adminNavButtons: ButtonConfig[] = [
     children: "Change Password",
     icon: <KeyRound className="size-5" />,
   },
-  // The logout button will be rendered by the SideNavBar's internal logic
+  {
+    id: "staff",
+    children: "Staff",
+    icon: <StudentProfileIcon />,
+    href: "/admin/staff",
+  },
+  {
+    id: "settings",
+    children: "Settings",
+    icon: <LogOutIcon />,
+    href: "/admin/settings",
+  },
   { id: "logout", children: "Logout", icon: <LogOut className="size-5" /> },
 ];
 
@@ -92,6 +103,10 @@ export default function AdminLayout({
   // All hooks must be at the top, before any return or conditional
   const [selected, setSelected] = useState("dashboard");
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const router = useRouter();
+  const { user, loading } = useAdminUser();
+
+  // Debug state for university info
   const [isDesktop, setIsDesktop] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [univInfo, setUnivInfo] = useState<{
@@ -152,13 +167,51 @@ export default function AdminLayout({
       setUnivInfo(universityProfile || null);
     })();
   }, []);
-
+  // Debug button handler
+  const handleCheckUniversity = async () => {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      alert("No authenticated user found");
+      return;
+    }
+    const { data: universityProfile, error } = await supabase
+      .from("university")
+      .select("universityid, universityemail, uname")
+      .eq("universityemail", user.email)
+      .single();
+    if (error || !universityProfile) {
+      alert("No university found for this email: " + user.email);
+      setUnivInfo(null);
+    } else {
+      setUnivInfo(universityProfile);
+      alert(
+        `University ID: ${universityProfile.universityid}\nUniversity Email: ${universityProfile.universityemail}\nUniversity Name: ${universityProfile.uname}`
+      );
+    }
+  };
   if (!hasMounted) {
     return null;
   }
 
   // This is the single source of truth for the sidebar's visual state
   const isSidebarExpanded = isNavOpen || isDesktop;
+
+  // Restrict staff from accessing /admin/staff
+  const isStaff = user?.user_metadata?.role === "TSG" || user?.user_metadata?.role === "staff";
+  const isStaffPage = typeof window !== "undefined" && window.location.pathname === "/admin/staff";
+  if (!loading && isStaff && isStaffPage) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="bg-white p-8 rounded shadow text-center">
+          <h1 className="text-2xl font-bold mb-4 text-red-600">Access Denied</h1>
+          <p className="text-gray-700">You do not have permission to view this page.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AdminUserProvider>
