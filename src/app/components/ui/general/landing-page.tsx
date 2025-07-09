@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/general/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 // --- Carousel Component ---
 const Carousel = () => {
@@ -112,6 +113,8 @@ const Carousel = () => {
 };
 
 export default function LandingPage() {
+  const router = useRouter();
+
   const sectionVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: {
@@ -296,7 +299,11 @@ export default function LandingPage() {
             A platform connecting students & orgs in your school{" "}
           </p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="navigation" size="lg">
+            <Button
+              variant="navigation"
+              size="lg"
+              onClick={() => router.push("/login")}
+            >
               {" "}
               Register{" "}
             </Button>
@@ -377,7 +384,7 @@ export default function LandingPage() {
                   </svg>
                 ),
                 title: "Event Management",
-                desc: "Our membership management software provides a full dashboard and membership approval and payments.",
+                desc: "Organize, create, and manage events for your organization. Students can browse, register, and track upcoming events from all their subscribed organizations in one place.",
               },
               {
                 icon: (
@@ -392,12 +399,12 @@ export default function LandingPage() {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                      d="M9 17v-2a4 4 0 014-4h2a4 4 0 014 4v2M9 17H7a2 2 0 01-2-2v-2a2 2 0 012-2h2m0 0V7a4 4 0 018 0v4m-8 0h8"
                     />
                   </svg>
                 ),
-                title: "Organizations' Merchandise",
-                desc: "These are ordered and sold to SGA, which is then paid to the organization. This helps raise the group and the org can generate funds.",
+                title: "Organization Accreditation",
+                desc: "Streamline the process of accrediting student organizations. Admins can review, approve, or request revisions for organization applications, ensuring only qualified groups are recognized.",
               },
               {
                 icon: (
@@ -515,7 +522,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 text-center relative z-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-2">Meet the Team</h2>
           <p className="text-gray-500 mb-10">
-            A glimpse into our vibrant community activities.
+            The people who bring our vision to life.
           </p>
           <Carousel />
         </div>
@@ -629,26 +636,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 text-sm">
-            <div className="font-bold mb-2 text-white">Stay up to date</div>
-            <div className="flex gap-1 bg-white/20 p-1 rounded-md">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="bg-transparent rounded px-3 py-1.5 text-white placeholder-gray-400 focus:outline-none w-full"
-              />
-              <button className="bg-[#435153] hover:bg-white/20 text-white p-2 rounded-md font-semibold transition-colors flex-shrink-0">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                </svg>
-              </button>
-            </div>
-          </div>
+          <div className="flex flex-col gap-2 text-sm"></div>
         </div>
       </motion.footer>
     </div>
