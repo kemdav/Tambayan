@@ -2,10 +2,16 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
-import { AdminUserProvider } from "./AdminUserContext";
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
+import { NewsfeedIcon } from "@/app/components/icons/NewsfeedIcon";
+import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
+import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
+import { LogOutIcon } from "@/app/components/icons/LogOutIcon";
+import Image from "next/image";
+import { AdminUserProvider, useAdminUser } from "./AdminUserContext";
+import { AddIcon } from "@/app/components/icons/AddIcon";
+import { createClient } from "@/lib/supabase/client";
 
 // Import your icons from a consistent library like Lucide React
 import {
@@ -20,28 +26,120 @@ import {
   LogOut,
   Menu, // A better hamburger icon
 } from "lucide-react";
+import router, { useRouter } from "next/navigation";
+import { signOut } from "@/lib/actions/auth";
+import { useEffect, useState } from "react";
 
 // Define the nav buttons directly in the layout for clarity
 export const adminNavButtons: ButtonConfig[] = [
-  { id: "dashboard", href: "/admin/dashboard", children: "Dashboard", icon: <LayoutDashboard className="size-5" /> },
-  { id: "org-oversight", href: "/admin/org-oversight", children: "Organization Oversight", icon: <Users className="size-5" /> },
-  { id: "analytics", href: "/admin/analytics", children: "Campus Analytics", icon: <BarChart2 className="size-5" /> },
-  { id: "event-oversight", href: "/admin/event-oversight", children: "Event Oversight", icon: <Calendar className="size-5" /> },
-  { id: "broadcast-tool", href: "/admin/broadcast-tool", children: "Broadcast Tool", icon: <Megaphone className="size-5" /> },
-  { id: "accreditation", href: "/admin/accreditation", children: "Accreditation", icon: <FileCheck2 className="size-5" /> },
-  { id: "create-org", href: "/admin/create-org", children: "Create New Organization", icon: <PlusCircle className="size-5" /> },
-  { id: "change-password", href: "/admin/change-password", children: "Change Password", icon: <KeyRound className="size-5" /> },
-  // The logout button will be rendered by the SideNavBar's internal logic
+  {
+    id: "dashboard",
+    href: "/admin/dashboard",
+    children: "Dashboard",
+    icon: <LayoutDashboard className="size-5" />,
+  },
+  {
+    id: "org-oversight",
+    href: "/admin/org-oversight",
+    children: "Organization Oversight",
+    icon: <Users className="size-5" />,
+  },
+  {
+    id: "analytics",
+    href: "/admin/analytics",
+    children: "Campus Analytics",
+    icon: <BarChart2 className="size-5" />,
+  },
+  {
+    id: "event-oversight",
+    href: "/admin/event-oversight",
+    children: "Event Oversight",
+    icon: <Calendar className="size-5" />,
+  },
+  {
+    id: "broadcast-tool",
+    href: "/admin/broadcast-tool",
+    children: "Broadcast Tool",
+    icon: <Megaphone className="size-5" />,
+  },
+  {
+    id: "accreditation",
+    href: "/admin/accreditation",
+    children: "Accreditation",
+    icon: <FileCheck2 className="size-5" />,
+  },
+  {
+    id: "create-org",
+    href: "/admin/create-org",
+    children: "Create New Organization",
+    icon: <PlusCircle className="size-5" />,
+  },
+  {
+    id: "change-password",
+    href: "/admin/change-password",
+    children: "Change Password",
+    icon: <KeyRound className="size-5" />,
+  },
+  {
+    id: "staff",
+    children: "Staff",
+    icon: <StudentProfileIcon />,
+    href: "/admin/staff",
+  },
+  {
+    id: "settings",
+    children: "Settings",
+    icon: <LogOutIcon />,
+    href: "/admin/settings",
+  },
   { id: "logout", children: "Logout", icon: <LogOut className="size-5" /> },
 ];
 
-
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  // --- STATE MANAGEMENT - COPIED DIRECTLY FROM STUDENT VIEW ---
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // All hooks must be at the top, before any return or conditional
   const [selected, setSelected] = useState("dashboard");
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const router = useRouter();
+  const { user, loading } = useAdminUser();
+
+  // Debug state for university info
   const [isDesktop, setIsDesktop] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [univInfo, setUnivInfo] = useState<{
+    universityid: string;
+    universityemail?: string;
+    uname?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    // Fetch university info on mount
+    (async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setUnivInfo(null);
+        return;
+      }
+      // Adjust this query to your actual admin/university mapping
+      const { data: universityProfile } = await supabase
+        .from("university")
+        .select("universityid, universityemail, uname")
+        .eq("universityemail", user.email)
+        .single();
+      setUnivInfo(universityProfile || null);
+    })();
+  }, []);
+
+  // Add logout handler
+  const handleLogout = async () => {
+    signOut();
+  };
 
   useEffect(() => {
     setHasMounted(true);
@@ -51,18 +149,73 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  // This guard clause prevents hydration errors
+  useEffect(() => {
+    (async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setUnivInfo(null);
+        return;
+      }
+      const { data: universityProfile } = await supabase
+        .from("university")
+        .select("universityid, universityemail, uname")
+        .eq("universityemail", user.email)
+        .single();
+      setUnivInfo(universityProfile || null);
+    })();
+  }, []);
+  // Debug button handler
+  const handleCheckUniversity = async () => {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      alert("No authenticated user found");
+      return;
+    }
+    const { data: universityProfile, error } = await supabase
+      .from("university")
+      .select("universityid, universityemail, uname")
+      .eq("universityemail", user.email)
+      .single();
+    if (error || !universityProfile) {
+      alert("No university found for this email: " + user.email);
+      setUnivInfo(null);
+    } else {
+      setUnivInfo(universityProfile);
+      alert(
+        `University ID: ${universityProfile.universityid}\nUniversity Email: ${universityProfile.universityemail}\nUniversity Name: ${universityProfile.uname}`
+      );
+    }
+  };
   if (!hasMounted) {
     return null;
   }
-  
+
   // This is the single source of truth for the sidebar's visual state
   const isSidebarExpanded = isNavOpen || isDesktop;
+
+  // Restrict staff from accessing /admin/staff
+  const isStaff = user?.user_metadata?.role === "TSG" || user?.user_metadata?.role === "staff";
+  const isStaffPage = typeof window !== "undefined" && window.location.pathname === "/admin/staff";
+  if (!loading && isStaff && isStaffPage) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="bg-white p-8 rounded shadow text-center">
+          <h1 className="text-2xl font-bold mb-4 text-red-600">Access Denied</h1>
+          <p className="text-gray-700">You do not have permission to view this page.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AdminUserProvider>
       <div className="flex h-screen bg-gray-100">
-        
         {/* Mobile overlay */}
         {isNavOpen && (
           <div
@@ -70,7 +223,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             onClick={() => setIsNavOpen(false)}
           ></div>
         )}
-        
+
         {/* Sidebar Wrapper for positioning */}
         <div
           className={`
@@ -96,7 +249,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* --- MAIN CONTENT WRAPPER --- */}
         <div className="flex flex-col flex-1 w-0 overflow-y-auto">
-          
           {/* Mobile Header */}
           <header className="p-4 md:hidden">
             <div className="flex justify-between items-center bg-white text-gray-800 p-2 rounded-lg shadow-md">
@@ -108,9 +260,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </header>
 
           {/* The Page Content */}
-          <main className="flex-1 p-4 md:p-8">
-            {children}
-          </main>
+          <main className="flex-1 p-4 md:p-8">{children}</main>
         </div>
       </div>
     </AdminUserProvider>
