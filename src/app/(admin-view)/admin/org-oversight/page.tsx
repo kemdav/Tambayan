@@ -8,11 +8,11 @@ import {
   fetchOrganizations,
   deleteOrganization,
 } from "@/lib/actions/orgoversight";
+import { getUniversityIdFromSession } from "@/lib/actions/orgoversight"; // adjust path if needed
 
 interface Org {
   orgid: string;
   orgname: string;
-  school: string;
   category: string;
   picture?: string | null;
   cover_photo_path?: string | null;
@@ -25,13 +25,19 @@ export default function OrgOversightPage() {
   useEffect(() => {
     async function load() {
       try {
-        const universityId = "1"; // Hardcoded for testing
+        const universityId = await getUniversityIdFromSession();
+        if (!universityId) {
+          console.error("❌ No university ID found");
+          return;
+        }
+
         const data = await fetchOrganizations(universityId);
         setOrgs(data);
       } catch (err) {
         console.error("❌ Failed to fetch organizations:", err);
       }
     }
+
     load();
   }, []);
 
@@ -54,7 +60,7 @@ export default function OrgOversightPage() {
     return orgs.filter(
       (org) =>
         org.orgname.toLowerCase().includes(search.toLowerCase()) ||
-        org.school.toLowerCase().includes(search.toLowerCase())
+        org.category.toLowerCase().includes(search.toLowerCase())
     );
   }, [search, orgs]);
 
@@ -79,7 +85,7 @@ export default function OrgOversightPage() {
                 key={org.orgid}
                 orgID={org.orgid}
                 title={org.orgname}
-                subtitle={org.school}
+                subtitle={org.category}
                 tagText={org.category}
                 memberCount={0}
                 eventCount={0}
