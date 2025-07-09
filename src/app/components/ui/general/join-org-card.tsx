@@ -23,9 +23,10 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
 
   const filteredOrgs = useMemo(() => {
     if (!search.trim()) return organizations;
-    return organizations.filter(org =>
-      org.title.toLowerCase().includes(search.toLowerCase()) ||
-      org.subtitle.toLowerCase().includes(search.toLowerCase())
+    return organizations.filter(
+      (org) =>
+        org.title.toLowerCase().includes(search.toLowerCase()) ||
+        org.subtitle.toLowerCase().includes(search.toLowerCase())
     );
   }, [search, organizations]);
 
@@ -33,19 +34,25 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
     setIsLoading(orgID);
     try {
       // ... your existing subscribe logic ...
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
       const { data: studentProfile } = await supabase
-        .from('student').select('studentid').eq('user_id', user.id).single();
+        .from("student")
+        .select("studentid")
+        .eq("user_id", user.id)
+        .single();
       if (!studentProfile) throw new Error("Could not find student profile.");
-      
+
       const { error } = await supabase
-        .from('subscribedorg').insert({ orgid: orgID, studentid: studentProfile.studentid });
+        .from("subscribedorg")
+        .insert({ orgid: orgID, studentid: studentProfile.studentid });
       if (error) throw error;
-      
-      setOrganizations(currentOrgs =>
-        currentOrgs.map(org =>
+
+      setOrganizations((currentOrgs) =>
+        currentOrgs.map((org) =>
           org.orgID === orgID
             ? { ...org, joinLabel: "Subscribed", joinDisabled: true }
             : org
@@ -74,7 +81,7 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
           leftIcon={<SearchIcon width={20} height={20} />}
           placeholder="Search Organizations.."
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
       <div className="flex flex-wrap gap-6 justify-center md:justify-start mt-6">
@@ -85,8 +92,14 @@ const JoinOrgCard: React.FC<JoinOrgCardProps> = ({ initialOrgs }) => {
               // --- STEP 4: Pass the correct handlers ---
               onView={() => handleViewClick(orgProps.orgID)}
               onJoin={() => handleSubscribeClick(orgProps.orgID)}
-              joinDisabled={orgProps.joinDisabled || isLoading === orgProps.orgID}
-              joinLabel={isLoading === orgProps.orgID ? "Subscribing..." : orgProps.joinLabel}
+              joinDisabled={
+                orgProps.joinDisabled || isLoading === orgProps.orgID
+              }
+              joinLabel={
+                isLoading === orgProps.orgID
+                  ? "Subscribing..."
+                  : orgProps.joinLabel
+              }
             />
           </div>
         ))}
