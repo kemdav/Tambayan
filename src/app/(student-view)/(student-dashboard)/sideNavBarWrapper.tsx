@@ -100,7 +100,7 @@ export const myButtons: ButtonConfig[] = [
     id: "join-org",
     variant: "sideNavigation",
     href: "/join",
-    children: "Join Organization",
+    children: "Browse Organization",
     className: "sideNavBarButtonText",
     icon: <UserPlus className="size-5" />,
   },
