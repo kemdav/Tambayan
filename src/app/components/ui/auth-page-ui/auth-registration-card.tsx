@@ -87,7 +87,7 @@ export default function AuthRegCard({
           </div>
 
           <div className="lg:order-3">
-            <p className="textAuthResponsive">Middle Name</p>
+            <p className="textAuthResponsive">M. Name</p>
             <Input
               className="inputAuthResponsive"
               value={middleName}
