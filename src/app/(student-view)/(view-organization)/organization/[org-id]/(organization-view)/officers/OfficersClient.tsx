@@ -42,9 +42,14 @@ export default function OfficersClient({ orgId, organization, initialMembers, ca
     const [searchStudentTerm, setSearchStudentTerm] = useState('');
     const [searchResults, setSearchResults] = useState<StudentSearchResult[]>([]);
     const [isSearchingStudents, setIsSearchingStudents] = useState(false);
+    const [presidentCount, setPresidentCount] = useState<number>(0);
     const [currentUniversityId, setCurrentUniversityId] = useState<string | null>(null);
 
     const memberStudentIds = useMemo(() => new Set(members.map(m => m.studentid)), [members]);
+
+    useEffect(() => {
+        setPresidentCount(members.filter(m => m.position === 'President').length);
+    }, [members]);
 
     const handleRoleChange = (studentId: number, newRole: string) => {
         setMembers(currentMembers =>
@@ -53,6 +58,8 @@ export default function OfficersClient({ orgId, organization, initialMembers, ca
             )
         );
     };
+
+
 
     useEffect(() => {
         if (organization?.universityid) {
@@ -69,6 +76,19 @@ export default function OfficersClient({ orgId, organization, initialMembers, ca
             return;
         }
 
+        const isSelf = studentId === currentLoggedInStudentId;
+        const isChangingFromPresident = member.position !== 'President'; // New position is not President
+        const wasPresident = initialMembers.find(m => m.studentid === studentId)?.position === 'President';
+
+        if (isSelf && wasPresident && isChangingFromPresident && presidentCount === 1) {
+            alert("You are the sole President. Please promote another member to President first.");
+            // Revert local state for this specific member back to 'President' for better UX
+            setMembers(currentMembers =>
+                currentMembers.map(m => m.studentid === studentId ? { ...m, position: 'President' } : m)
+            );
+            return;
+        }
+        setIsSubmitting(studentId);
         const result = await updateMemberRole(orgId, studentId, member.position);
         if (result.error) {
             alert(result.error);
@@ -76,9 +96,30 @@ export default function OfficersClient({ orgId, organization, initialMembers, ca
         }
         setIsSubmitting(null);
     };
-
+    const [currentLoggedInStudentId, setCurrentLoggedInStudentId] = useState<number | null>(null)
+    useEffect(() => {
+        const fetchLoggedInStudentId = async () => {
+            const supabase = createClient(); // Use client-side Supabase client
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: student } = await supabase
+                    .from('student')
+                    .select('studentid')
+                    .eq('user_id', user.id)
+                    .single();
+                setCurrentLoggedInStudentId(student?.studentid || null);
+            }
+        };
+        fetchLoggedInStudentId();
+    }, []);
     const handleRemoveMember = async (studentId: number) => {
+        if (studentId === currentLoggedInStudentId) {
+            alert("You cannot remove yourself from the organization here.");
+            return;
+        }
+
         if (!confirm("Are you sure you want to remove this member? This action is permanent.")) return;
+
 
         setIsSubmitting(studentId);
         const result = await removeMember(orgId, studentId);
