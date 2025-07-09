@@ -1,5 +1,15 @@
-"use client"
-import { AddIcon, AddIcon2, LogOutIcon, NavigationButtonIcon, NewsfeedIcon, StudentProfileIcon, SubscribedOrgIcon, TambayanIcon, TambayanTextIcon } from "@/app/components/icons";
+"use client";
+import {
+  AddIcon,
+  AddIcon2,
+  LogOutIcon,
+  NavigationButtonIcon,
+  NewsfeedIcon,
+  StudentProfileIcon,
+  SubscribedOrgIcon,
+  TambayanIcon,
+  TambayanTextIcon,
+} from "@/app/components/icons";
 import { Button } from "@/app/components/ui/general/button";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
 import { CreatePostComponent } from "@/app/components/ui/general/create-post-component";
@@ -10,22 +20,22 @@ import { createClient } from "@/lib/supabase/client";
 import { createPost } from "@/lib/actions/post";
 import { redirect, useRouter } from "next/navigation";
 import { ShowcaseCardProps } from "@/app/components/ui/general/showcase-card-component";
-import { Filter } from 'bad-words';
+import { Filter } from "bad-words";
 import { HamburgerIcon, Navigation2Icon } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
 
 const profanityFilter = new Filter();
 import {
-  UserCircle,      // For Student Profile
-  Users,           // For Joined Organizations
-  UserPlus,        // For Join Organization
-  Newspaper,       // For Newsfeed
-  Star,            // For Subscribed Organizations
-  Megaphone,       // For Broadcasts
-  Search,          // For Search Posts
-  UserSearch,      // For Search Profile
-  LogOut,      
-  KeyRound    // For Logout
+  UserCircle, // For Student Profile
+  Users, // For Joined Organizations
+  UserPlus, // For Join Organization
+  Newspaper, // For Newsfeed
+  Star, // For Subscribed Organizations
+  Megaphone, // For Broadcasts
+  Search, // For Search Posts
+  UserSearch, // For Search Profile
+  LogOut,
+  KeyRound, // For Logout
 } from "lucide-react";
 
 interface Props {
@@ -90,7 +100,7 @@ export const myButtons: ButtonConfig[] = [
     id: "join-org",
     variant: "sideNavigation",
     href: "/join",
-    children: "Join Organization",
+    children: "Browse Organization",
     className: "sideNavBarButtonText",
     icon: <UserPlus className="size-5" />,
   },
@@ -119,7 +129,10 @@ export const myButtons: ButtonConfig[] = [
   },
 ];
 
-const SideBar = ({ onButtonSelect, isExpanded }: {
+const SideBar = ({
+  onButtonSelect,
+  isExpanded,
+}: {
   onButtonSelect: (id: string) => void;
   isExpanded: boolean;
 }) => {
@@ -145,7 +158,7 @@ export default function StudentVerticalNavigation({ children }: Props) {
   // --- STATE FOR THE CREATE POST MODAL ---
   const [isCreatePostOpen, setCreatePostOpen] = useState(false);
   const [orgOptions, setOrgOptions] = useState<OrgOption[]>([]);
-   const [hasMounted, setHasMounted] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
@@ -173,7 +186,9 @@ export default function StudentVerticalNavigation({ children }: Props) {
   useEffect(() => {
     const fetchOrgOptions = async () => {
       const supabase = createClient();
-      const { data, error } = await supabase.rpc('get_user_subscribed_org_options');
+      const { data, error } = await supabase.rpc(
+        "get_user_subscribed_org_options"
+      );
       if (error) {
         console.error("Error fetching subscribed organization options:", error);
       } else if (data) {
@@ -200,14 +215,23 @@ export default function StudentVerticalNavigation({ children }: Props) {
       alert("Post content cannot be empty.");
       return;
     }
+    if (
+      profanityFilter.isProfane(title) ||
+      profanityFilter.isProfane(content)
+    ) {
+      alert(
+        "Your post contains inappropriate language. Please remove it and try again."
+      );
+      return; // Stop the submission
+    }
 
     setIsSubmitting(true);
     const formData = new FormData();
-    formData.append('orgId', org);
-    formData.append('title', title);
-    formData.append('content', content);
+    formData.append("orgId", org);
+    formData.append("title", title);
+    formData.append("content", content);
     if (photoFile) {
-      formData.append('photoFile', photoFile);
+      formData.append("photoFile", photoFile);
     }
 
     const result = await createPost(formData); // This calls the community post action
@@ -223,8 +247,8 @@ export default function StudentVerticalNavigation({ children }: Props) {
   };
   const isSidebarExpanded = isNavOpen || isDesktop;
 
-   if (!hasMounted) {
-    return null; 
+  if (!hasMounted) {
+    return null;
   }
   return (
     <>
@@ -234,7 +258,10 @@ export default function StudentVerticalNavigation({ children }: Props) {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
           onClick={closeAndResetModal}
         >
-          <div className="w-full max-w-sm md:max-w-2xl bg-white rounded-2xl shadow-lg" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="w-full max-w-sm md:max-w-2xl bg-white rounded-2xl shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
             <CreatePostComponent
               className=""
               postType="default" // This is always a default/community post
@@ -252,9 +279,9 @@ export default function StudentVerticalNavigation({ children }: Props) {
               isSubmitting={isSubmitting}
               // Pass dummy props for event fields since they aren't used here
               eventLocation=""
-              onEventLocationChange={() => { }}
+              onEventLocationChange={() => {}}
               eventDate={undefined}
-              onEventDateChange={() => { }}
+              onEventDateChange={() => {}}
             />
           </div>
         </div>
@@ -262,12 +289,11 @@ export default function StudentVerticalNavigation({ children }: Props) {
 
       {/* The Main Page Layout */}
       <div className="flex h-screen bg-gray-50">
-
         {isNavOpen && (
-            <div 
-                className="fixed inset-0 bg-black/50 z-20 md:hidden" 
-                onClick={() => setIsNavOpen(false)}
-            ></div>
+          <div
+            className="fixed inset-0 bg-black/50 z-20 md:hidden"
+            onClick={() => setIsNavOpen(false)}
+          ></div>
         )}
 
         <div
@@ -282,10 +308,12 @@ export default function StudentVerticalNavigation({ children }: Props) {
           `}
         >
           {/* This is the actual sidebar content */}
-          <SideBar onButtonSelect={() => setIsNavOpen(false)} isExpanded={isSidebarExpanded} />
+          <SideBar
+            onButtonSelect={() => setIsNavOpen(false)}
+            isExpanded={isSidebarExpanded}
+          />
         </div>
         <div className="flex flex-col flex-1 w-0 overflow-y-auto">
-
           <div className="p-4 md:hidden">
             <div className="flex justify-between items-center bg-white text-gray-800 p-2 rounded-lg shadow-md">
               <div className="flex items-center gap-2">
@@ -313,7 +341,6 @@ export default function StudentVerticalNavigation({ children }: Props) {
             <AddIcon2 className="size-15 sm:size-20 text-action-moss-green" />
           </Button>
         </div>
-
       </div>
     </>
   );

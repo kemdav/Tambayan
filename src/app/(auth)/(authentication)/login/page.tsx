@@ -3,7 +3,7 @@
 import AuthLoginCard from "@/app/components/ui/auth-page-ui/auth-login-card";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import { login } from '../action'; // Make sure this import is correct
+import { login } from "../action"; // Make sure this import is correct
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,14 +12,17 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const searchParams =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search)
+      : null;
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedRememberMe = localStorage.getItem('rememberMe');
-      if (savedRememberMe === 'true') {
+    if (typeof window !== "undefined") {
+      const savedRememberMe = localStorage.getItem("rememberMe");
+      if (savedRememberMe === "true") {
         setRememberMe(true);
-        const savedEmail = localStorage.getItem('savedEmail');
+        const savedEmail = localStorage.getItem("savedEmail");
         if (savedEmail) {
           setEmail(savedEmail);
         }
@@ -29,7 +32,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (searchParams) {
-      const message = searchParams.get('message');
+      const message = searchParams.get("message");
       if (message) setError(message);
     }
   }, []);
@@ -38,18 +41,18 @@ export default function LoginPage() {
   const handleRememberMeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
     setRememberMe(checked);
-    
+
     // Save to localStorage
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       if (checked) {
-        localStorage.setItem('rememberMe', 'true');
+        localStorage.setItem("rememberMe", "true");
         // Save current email when remember me is checked
         if (email) {
-          localStorage.setItem('savedEmail', email);
+          localStorage.setItem("savedEmail", email);
         }
       } else {
-        localStorage.removeItem('rememberMe');
-        localStorage.removeItem('savedEmail');
+        localStorage.removeItem("rememberMe");
+        localStorage.removeItem("savedEmail");
       }
     }
   };
@@ -58,10 +61,10 @@ export default function LoginPage() {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
     setEmail(newEmail);
-    
+
     // Save email to localStorage if remember me is checked
-    if (rememberMe && typeof window !== 'undefined') {
-      localStorage.setItem('savedEmail', newEmail);
+    if (rememberMe && typeof window !== "undefined") {
+      localStorage.setItem("savedEmail", newEmail);
     }
   };
 
@@ -73,16 +76,16 @@ export default function LoginPage() {
     setError(null);
 
     const formData = new FormData();
-    formData.append('email', email);
-    formData.append('password', password);
-    formData.append('rememberMe', rememberMe.toString());
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("rememberMe", rememberMe.toString());
 
     const result = await login(formData);
     if (result && result.error) {
       setError(result.error);
     } else {
       // Success: redirect to home or dashboard
-      router.push('/');
+      router.push("/");
     }
     setLoading(false);
   };
@@ -96,8 +99,8 @@ export default function LoginPage() {
         loading={loading}
         error={error}
         onEmailChange={handleEmailChange}
-        onPasswordChange={e => setPassword(e.target.value)}
-       onRememberMeChange={handleRememberMeChange}
+        onPasswordChange={(e) => setPassword(e.target.value)}
+        onRememberMeChange={handleRememberMeChange}
         // Here we pass our corrected handleLogin function
         onSubmit={handleLogin}
         onForgotPassword={() => router.push("/forgot-password")}
