@@ -19,6 +19,50 @@ export async function getOrganizationProfile(orgId: string): Promise<Tables<'org
     return data;
 }
 
+export async function addMember(orgId: string, studentId: number) {
+    const supabase = await createClient();
+
+    // RLS will enforce that only authorized users (e.g., President) can add.
+    // It also needs to ensure the student is from the same university.
+
+    // Default new members to 'Member' position
+    const defaultPosition = 'Member'; 
+
+    const { error } = await supabase
+        .from('orgmember')
+        .insert({
+            orgid: orgId,
+            studentid: studentId,
+            position: defaultPosition
+        });
+
+    if (error) {
+        console.error("Error adding member:", error);
+        // Handle specific error codes if needed, e.g., unique violation if already a member
+        if (error.code === '23505') { // Unique violation code
+            return { error: "This student is already a member of this organization." };
+        }
+        return { error: `Failed to add member: ${error.message}` };
+    }
+
+    revalidatePath(`/organization/${orgId}/manage/officers`); // Revalidate to update the list
+    return { success: `Student added as '${defaultPosition}'.` };
+}
+async function getOrganizationPresidentCount(orgId: string): Promise<number> {
+    const supabase = await createClient();
+
+    const { count, error } = await supabase
+        .from('orgmember')
+        .select('studentid', { count: 'exact' }) // Use count: 'exact'
+        .eq('orgid', orgId)
+        .eq('position', 'President');
+
+    if (error) {
+        console.error("Error counting presidents:", error.message);
+        return 0;
+    }
+    return count ?? 0; // Return 0 if count is null
+}
 export async function getOrganizationMembers(orgId: string) {
     const supabase = await createClient();
     
@@ -46,8 +90,46 @@ export async function getOrganizationMembers(orgId: string) {
 // --- Action to update a member's role ---
 export async function updateMemberRole(orgId: string, studentId: number, newRole: string) {
     const supabase = await createClient();
+
+    // Get the current user's student ID (to check if they're updating themselves)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "You must be logged in to update roles." };
+    const { data: currentUserStudent, error: currentStudentError } = await supabase
+        .from('student')
+        .select('studentid')
+        .eq('user_id', user.id)
+        .single();
+    if (currentStudentError || !currentUserStudent) {
+        return { error: "Could not find your student profile." };
+    }
+
+    // Get the CURRENT position of the member being updated
+    const { data: memberToUpdate, error: fetchMemberError } = await supabase
+        .from('orgmember')
+        .select('position')
+        .eq('orgid', orgId)
+        .eq('studentid', studentId)
+        .single();
     
-    // RLS will protect this action
+    if (fetchMemberError || !memberToUpdate) {
+        return { error: "Member not found or not in this organization." };
+    }
+    const oldRole = memberToUpdate.position;
+
+    // --- ENFORCEMENT LOGIC FOR PRESIDENT TRANSFER ---
+    if (studentId === currentUserStudent.studentid && oldRole === 'President' && newRole !== 'President') {
+        // The user is the President, and they are trying to change their OWN role away from President.
+        const currentPresidentCount = await getOrganizationPresidentCount(orgId);
+        
+        // If they are the ONLY President, deny the request.
+        if (currentPresidentCount === 1) {
+            return { error: "You are the sole President. Please promote another member to President before changing your own role." };
+        }
+    }
+    // --- END ENFORCEMENT LOGIC ---
+
+
+    // RLS will protect this action (officers can update roles)
     const { error } = await supabase
         .from('orgmember')
         .update({ position: newRole })
@@ -59,9 +141,8 @@ export async function updateMemberRole(orgId: string, studentId: number, newRole
         return { error: "Failed to update role." };
     }
 
-    // Revalidate the officers page to show the change
     revalidatePath(`/organization/${orgId}/manage/officers`);
-    return { success: true };
+    return { success: `Role updated to '${newRole}'.` };
 }
 
 
