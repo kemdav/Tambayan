@@ -26,9 +26,9 @@ export default function DashboardCombined() {
   useEffect(() => {
     async function fetchData() {
       const [activity, stats, engagement, total] = await Promise.all([
-        getOrgActivity("this_month"), // 👈 fixed here
+        getOrgActivity("this_month"), // ✅ Org activity this month
         getOrgStats(),
-        getStudentEngagement(),
+        getStudentEngagement("this_month"), // ✅ Student engagement this month only
         getTotalEvents(),
       ]);
 

@@ -7,8 +7,10 @@ import {
   getStudentEngagement,
   getOrgActivity,
   getTopOrgs,
+  getEventEngagementMetrics,
   type Organization,
 } from "@/lib/actions/analytics";
+
 import FirstHeader from "./first-header";
 import SecondHeader from "./second-header";
 import ActiveOrganization from "./active-organization";
@@ -37,22 +39,30 @@ export default function Analytics() {
   const [topPerformingOrgs, setTopPerformingOrgs] = useState<Organization[]>(
     []
   );
+  const [eventMetrics, setEventMetrics] = useState({
+    avgComments: "0",
+    avgLikes: "0",
+    avgRegistrations: "0",
+  });
 
   useEffect(() => {
     async function loadAnalytics() {
-      const [events, orgs, engagement, activity, topOrgs] = await Promise.all([
-        getTotalEvents(),
-        getOrgStats(),
-        getStudentEngagement(),
-        getOrgActivity(selectedTimePeriod),
-        getTopOrgs(),
-      ]);
+      const [events, orgs, engagement, activity, topOrgs, engagementData] =
+        await Promise.all([
+          getTotalEvents(),
+          getOrgStats(),
+          getStudentEngagement(selectedTimePeriod),
+          getOrgActivity(selectedTimePeriod),
+          getTopOrgs(),
+          getEventEngagementMetrics(),
+        ]);
 
       setTotalEvents(events);
       setOrgStats(orgs);
       setStudentEngagement(engagement);
       setOrgActivity(activity);
       setTopPerformingOrgs(topOrgs);
+      setEventMetrics(engagementData);
     }
 
     loadAnalytics();
@@ -61,7 +71,6 @@ export default function Analytics() {
   return (
     <div className="p-4 max-w-full">
       <FirstHeader />
-
       <SecondHeader
         timeperiods={timePeriodOptions}
         onTimePeriodChange={(value) => setSelectedTimePeriod(value)}
@@ -83,9 +92,9 @@ export default function Analytics() {
       <div className="mt-4">
         <TopPerformingOrganizations organizations={topPerformingOrgs} />
         <EventEngagementMetrics
-          mostAttendedEvent="0"
-          highestEngagementOrg="0"
-          averageFeedbackScore="0"
+          avgComments={eventMetrics.avgComments}
+          avgLikes={eventMetrics.avgLikes}
+          avgRegistrations={eventMetrics.avgRegistrations}
         />
       </div>
     </div>
