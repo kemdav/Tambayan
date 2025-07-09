@@ -8,12 +8,12 @@ import {
   fetchOrganizations,
   deleteOrganization,
 } from "@/lib/actions/orgoversight";
-import { getUniversityIdFromSession } from "@/lib/actions/orgoversight"; // adjust path if needed
+import { getUniversityIdFromSession } from "@/lib/actions/orgoversight"; 
 
 interface Org {
   orgid: string;
-  orgname: string;
-  category: string;
+  orgname: string | null;
+  category: string | null;
   picture?: string | null;
   cover_photo_path?: string | null;
 }
@@ -32,7 +32,9 @@ export default function OrgOversightPage() {
         }
 
         const data = await fetchOrganizations(universityId);
-        setOrgs(data);
+        if (data) {
+          setOrgs(data);
+        }
       } catch (err) {
         console.error("❌ Failed to fetch organizations:", err);
       }
@@ -59,8 +61,8 @@ export default function OrgOversightPage() {
     if (!search.trim()) return orgs;
     return orgs.filter(
       (org) =>
-        org.orgname.toLowerCase().includes(search.toLowerCase()) ||
-        org.category.toLowerCase().includes(search.toLowerCase())
+        (org.orgname || "").toLowerCase().includes(search.toLowerCase()) ||
+        (org.category || "").toLowerCase().includes(search.toLowerCase())
     );
   }, [search, orgs]);
 
@@ -68,7 +70,7 @@ export default function OrgOversightPage() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
       <div className="w-full max-w-7xl h-[90vh] bg-white border rounded-xl shadow-md p-6 overflow-y-auto">
         <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h1 className="text-2xl font-bold">My Organizations</h1>
+          <h1 className="text-2xl font-bold">School Organizations</h1>
           <Input
             placeholder="Search organizations..."
             value={search}
@@ -84,9 +86,9 @@ export default function OrgOversightPage() {
               <ShowcaseCard
                 key={org.orgid}
                 orgID={org.orgid}
-                title={org.orgname}
-                subtitle={org.category}
-                tagText={org.category}
+                title={org.orgname || "Untitled Organization"} // Also add fallbacks here
+                subtitle={org.category || "Uncategorized"}     // and here for better UI
+                tagText={org.category || "Uncategorized"}
                 memberCount={0}
                 eventCount={0}
                 avatarUrl={org.picture ?? undefined}

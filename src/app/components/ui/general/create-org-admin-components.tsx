@@ -47,7 +47,7 @@ export default function CreateOrgAdminComponents({
         </h1>
       </div>
       {/* Form Card */}
-      <div className="w-full bg-white rounded-xl shadow-md p-8 border rounded-[10px] min-h-[600px]">
+      <div className="w-full bg-white shadow-md p-8 border rounded-[10px] min-h-[600px]">
         <h2 className="text-2xl font-bold mb-6">Create New Organization</h2>
         <div className="mb-6">
           <label className="block font-semibold mb-1">Organization Name</label>

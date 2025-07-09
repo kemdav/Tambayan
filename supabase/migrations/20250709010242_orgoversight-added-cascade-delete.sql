@@ -8,8 +8,6 @@ alter table "public"."orgmember" drop constraint "orgmember_orgid_fkey";
 
 alter table "public"."post" drop constraint "post_orgid_fkey";
 
-drop function if exists "public"."get_current_user_university_id"();
-
 drop function if exists "public"."top_performing_orgs"(uid text);
 
 alter table "public"."accreditations" enable row level security;
