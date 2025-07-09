@@ -1,12 +1,42 @@
-// lib/supabase/queries/fetchOrganizations.ts
+// lib/actions/orgoversight.ts
 import { createClient } from "@/lib/supabase/client";
+
+export async function getUniversityIdFromSession(): Promise<string | null> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user || !user.email) {
+    console.error("❌ Auth error, no user, or email missing:", userError);
+    return null;
+  }
+
+  console.log("📧 Logged-in email:", user.email);
+
+  const { data: university, error: universityError } = await supabase
+    .from("university")
+    .select("universityid")
+    .eq("universityemail", user.email)
+    .maybeSingle();
+
+  if (universityError || !university) {
+    console.error("❌ University lookup failed:", universityError);
+    return null;
+  }
+
+  console.log("🏫 University ID fetched:", university.universityid);
+  return university.universityid;
+}
 
 export async function fetchOrganizations(universityId: string) {
   const supabase = createClient();
 
   const { data, error } = await supabase
     .from("organizations")
-    .select("orgid, orgname, school, category, picture, cover_photo_path")
+    .select("orgid, orgname, category, picture, cover_photo_path")
     .eq("universityid", universityId);
 
   if (error) {
