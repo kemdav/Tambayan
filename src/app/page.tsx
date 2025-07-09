@@ -21,6 +21,13 @@ export default function Home() {
         <Button
           variant="link"
           className="text-action-light-blue text-3xl"
+          onClick={() => router.push("/test/landing-test")}
+        >
+          Go to Landing Page
+        </Button>
+        <Button
+          variant="link"
+          className="text-action-light-blue text-3xl"
           onClick={() => router.push("/login")}
         >
           Authentication Page
