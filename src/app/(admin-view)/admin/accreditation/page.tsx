@@ -178,19 +178,27 @@ export default function AccreditationPage() {
                       <Button
                         variant="link"
                         className="w-full text-left p-2 h-auto text-blue-600 underline bg-transparent shadow-none hover:bg-transparent hover:underline focus:ring-0 focus:outline-none whitespace-normal break-words"
-                        title="Copy the storage path to clipboard"
+                        title="Download the PDF file"
                         onClick={() => {
-                          navigator.clipboard.writeText(filePath || "");
-                          setCopied(true);
-                          setTimeout(() => setCopied(false), 1500);
+                          if (filePath) {
+                            const link = document.createElement("a");
+                            link.href = filePath;
+                            link.download = `accreditation-${
+                              reviewOrg?.orgid || "document"
+                            }.pdf`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            setCopied(true);
+                            setTimeout(() => setCopied(false), 1500);
+                          }
                         }}
                       >
-                        Click here to copy the PDF link, then paste it into your
-                        browser’s address bar.
+                        Click here to download the PDF file.
                       </Button>
                       {copied && (
                         <span className="ml-2 text-green-600 text-sm">
-                          Copied!
+                          Downloading...
                         </span>
                       )}
                     </div>
