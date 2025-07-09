@@ -66,7 +66,7 @@ export async function submitAccreditationFile(orgId: string, academicYear: strin
         const { error } = await supabase
             .from('accreditations')
             .update({
-                submission_status: 'Pending Review',
+                submission_status: 'Pending',
                 file_path: filePath
             })
             .eq('id', existingRecord.id); // Update by primary key
@@ -87,7 +87,7 @@ export async function submitAccreditationFile(orgId: string, academicYear: strin
                 orgid: orgId,
                 universityid: orgData.universityid,
                 academic_year: academicYear,
-                submission_status: 'Pending Review',
+                submission_status: 'Pending',
                 file_path: filePath
             });
         dbError = error;
