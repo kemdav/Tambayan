@@ -80,18 +80,6 @@ export const adminNavButtons: ButtonConfig[] = [
     children: "Change Password",
     icon: <KeyRound className="size-5" />,
   },
-  {
-    id: "staff",
-    children: "Staff",
-    icon: <StudentProfileIcon />,
-    href: "/admin/staff",
-  },
-  {
-    id: "settings",
-    children: "Settings",
-    icon: <LogOutIcon />,
-    href: "/admin/settings",
-  },
   { id: "logout", children: "Logout", icon: <LogOut className="size-5" /> },
 ];
 
@@ -200,14 +188,22 @@ export default function AdminLayout({
   const isSidebarExpanded = isNavOpen || isDesktop;
 
   // Restrict staff from accessing /admin/staff
-  const isStaff = user?.user_metadata?.role === "TSG" || user?.user_metadata?.role === "staff";
-  const isStaffPage = typeof window !== "undefined" && window.location.pathname === "/admin/staff";
+  const isStaff =
+    user?.user_metadata?.role === "TSG" ||
+    user?.user_metadata?.role === "staff";
+  const isStaffPage =
+    typeof window !== "undefined" &&
+    window.location.pathname === "/admin/staff";
   if (!loading && isStaff && isStaffPage) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="bg-white p-8 rounded shadow text-center">
-          <h1 className="text-2xl font-bold mb-4 text-red-600">Access Denied</h1>
-          <p className="text-gray-700">You do not have permission to view this page.</p>
+          <h1 className="text-2xl font-bold mb-4 text-red-600">
+            Access Denied
+          </h1>
+          <p className="text-gray-700">
+            You do not have permission to view this page.
+          </p>
         </div>
       </div>
     );

@@ -38,7 +38,7 @@ export async function createOrganization(orgname: string, assignedStudentId: str
   // Insert into orgmember: orgid, studentid, position: 'president'
   const { error: memberError } = await supabase
     .from("orgmember")
-    .insert({ orgid, studentid: assignedStudentId, position: "president" });
+    .insert({ orgid, studentid: assignedStudentId, position: "President" });
   if (memberError) return { error: memberError.message };
   return { success: true, orgid };
 }

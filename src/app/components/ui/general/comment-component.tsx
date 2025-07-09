@@ -3,7 +3,9 @@ import { AvatarIcon } from "./avatar-icon-component";
 import { Button } from "./button";
 import { addComment } from "@/lib/actions/comment"; // Import the new action
 import type { CommentType } from "@/lib/types/types";
+import { Filter } from "bad-words";
 
+const profanityFilter = new Filter();
 interface CommentComponentProps {
   open: boolean;
   onClose: () => void;
@@ -28,7 +30,8 @@ export const CommentComponent: React.FC<CommentComponentProps> = ({
   initialComments,
 }) => {
   console.log("Received initialComments:", initialComments);
-  const [commentList, setCommentList] = React.useState<CommentType[]>(initialComments);
+  const [commentList, setCommentList] =
+    React.useState<CommentType[]>(initialComments);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [newComment, setNewComment] = React.useState("");
 
@@ -39,7 +42,14 @@ export const CommentComponent: React.FC<CommentComponentProps> = ({
   }, [initialComments, open]);
 
   const handleSaveComment = async () => {
+    const trimmedComment = newComment.trim();
     if (!newComment.trim() || isSubmitting) return;
+    if (profanityFilter.isProfane(trimmedComment)) {
+      alert(
+        "Your comment contains inappropriate language. Please remove it and try again."
+      );
+      return; // Stop the submission if profanity is detected
+    }
 
     setIsSubmitting(true);
     const tempId = `temp-${Date.now()}`;
@@ -49,9 +59,9 @@ export const CommentComponent: React.FC<CommentComponentProps> = ({
       comment_id: tempId, // Temporary key
       comment_text: newComment,
       created_at: new Date().toISOString(),
-      author: { fname: 'You', lname: '', picture: null } // Placeholder for author
+      author: { fname: "You", lname: "", picture: null }, // Placeholder for author
     };
-    setCommentList(prev => [...prev, tempComment]);
+    setCommentList((prev) => [...prev, tempComment]);
     setNewComment("");
 
     const result = await addComment(postID, newComment);
@@ -59,7 +69,9 @@ export const CommentComponent: React.FC<CommentComponentProps> = ({
     if (result.error) {
       alert(result.error);
       // If server fails, remove the temporary comment
-      setCommentList(prev => prev.filter(c => c.comment_id !== tempComment.comment_id));
+      setCommentList((prev) =>
+        prev.filter((c) => c.comment_id !== tempComment.comment_id)
+      );
     }
     // On success, revalidatePath on the server will handle getting the real data on next load.
 
@@ -105,13 +117,18 @@ export const CommentComponent: React.FC<CommentComponentProps> = ({
         </div>
         <div className="mb-4 max-h-48 overflow-y-auto">
           {commentList.length === 0 ? (
-            <div className="text-neutral-mint-white text-sm">No comments yet.</div>
+            <div className="text-neutral-mint-white text-sm">
+              No comments yet.
+            </div>
           ) : (
             commentList.map((c, i) => (
-              <div key={i} className="flex items-start gap-2 mb-3 bg-neutral-pure-white rounded-lg">
+              <div
+                key={i}
+                className="flex items-start gap-2 mb-3 bg-neutral-pure-white rounded-lg"
+              >
                 <AvatarIcon
                   src={c.author?.picture}
-                  alt={c.author?.fname || 'User'}
+                  alt={c.author?.fname || "User"}
                   className="h-6 w-6 text-base"
                 />
                 <div>
