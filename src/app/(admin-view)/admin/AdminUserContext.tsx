@@ -30,6 +30,7 @@ export const AdminUserProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           ...user,
           id: user.id,
           email: user.email ?? '',
+          user_metadata: user.user_metadata || user.app_metadata?.user_metadata || {},
         });
       } else {
         setUser(null);
