@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 import {
   getTotalEvents,
-  getOrgActivityForUniversity,
+  getOrgStats,
   getStudentEngagement,
-  getOrgStatsByUniversity,
-  getTopPerformingOrgs,
+  getOrgActivity,
+  getTopOrgs,
   getEventEngagementMetrics,
-  getAllUniversities,
   type Organization,
 } from "@/lib/actions/analytics";
+
 import FirstHeader from "./first-header";
 import SecondHeader from "./second-header";
 import ActiveOrganization from "./active-organization";
@@ -29,11 +29,7 @@ const timePeriodOptions = [
 ];
 
 export default function Analytics() {
-  const [schoolOptions, setSchoolOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
   const [selectedTimePeriod, setSelectedTimePeriod] = useState("this_week");
-  const [selectedSchool, setSelectedSchool] = useState("");
   const [totalEvents, setTotalEvents] = useState(0);
   const [orgStats, setOrgStats] = useState({ total: 0, active: 0 });
   const [studentEngagement, setStudentEngagement] = useState(0);
@@ -44,35 +40,21 @@ export default function Analytics() {
     []
   );
   const [eventMetrics, setEventMetrics] = useState({
-    mostAttendedEvent: "Loading...",
-    highestEngagementOrg: "Loading...",
-    averageFeedbackScore: "0",
+    avgComments: "0",
+    avgLikes: "0",
+    avgRegistrations: "0",
   });
 
   useEffect(() => {
-    async function loadUniversities() {
-      const options = await getAllUniversities();
-      setSchoolOptions(options);
-      if (options.length > 0) {
-        setSelectedSchool(options[0].value); // auto-select first university
-      }
-    }
-
-    loadUniversities();
-  }, []);
-
-  useEffect(() => {
-    if (!selectedSchool) return;
-
-    const load = async () => {
-      const [events, orgs, engagement, activity, topOrgs, metrics] =
+    async function loadAnalytics() {
+      const [events, orgs, engagement, activity, topOrgs, engagementData] =
         await Promise.all([
-          getTotalEvents(selectedSchool),
-          getOrgStatsByUniversity(selectedSchool),
-          getStudentEngagement(selectedSchool),
-          getOrgActivityForUniversity(selectedSchool, selectedTimePeriod),
-          getTopPerformingOrgs(selectedSchool),
-          getEventEngagementMetrics(selectedSchool),
+          getTotalEvents(),
+          getOrgStats(),
+          getStudentEngagement(selectedTimePeriod),
+          getOrgActivity(selectedTimePeriod),
+          getTopOrgs(),
+          getEventEngagementMetrics(),
         ]);
 
       setTotalEvents(events);
@@ -80,19 +62,17 @@ export default function Analytics() {
       setStudentEngagement(engagement);
       setOrgActivity(activity);
       setTopPerformingOrgs(topOrgs);
-      setEventMetrics(metrics);
-    };
+      setEventMetrics(engagementData);
+    }
 
-    load();
-  }, [selectedSchool, selectedTimePeriod]);
+    loadAnalytics();
+  }, [selectedTimePeriod]);
 
   return (
     <div className="p-4 max-w-full">
       <FirstHeader />
       <SecondHeader
         timeperiods={timePeriodOptions}
-        filters={schoolOptions}
-        onFilterChange={(value) => setSelectedSchool(value)}
         onTimePeriodChange={(value) => setSelectedTimePeriod(value)}
       />
 
@@ -111,13 +91,10 @@ export default function Analytics() {
 
       <div className="mt-4">
         <TopPerformingOrganizations organizations={topPerformingOrgs} />
-      </div>
-
-      <div className="mt-4">
         <EventEngagementMetrics
-          mostAttendedEvent={eventMetrics.mostAttendedEvent}
-          highestEngagementOrg={eventMetrics.highestEngagementOrg}
-          averageFeedbackScore={eventMetrics.averageFeedbackScore}
+          avgComments={eventMetrics.avgComments}
+          avgLikes={eventMetrics.avgLikes}
+          avgRegistrations={eventMetrics.avgRegistrations}
         />
       </div>
     </div>

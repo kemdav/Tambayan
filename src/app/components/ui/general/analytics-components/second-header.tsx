@@ -8,23 +8,13 @@ interface TimePeriod {
   label: string;
   value: string;
 }
-
-interface Filter {
-  label: string;
-  value: string;
-}
-
 interface Props {
   timeperiods?: TimePeriod[];
-  filters?: Filter[];
-  onFilterChange?: (value: string) => void;
   onTimePeriodChange?: (value: string) => void;
 }
 
 export default function SecondHeader({
   timeperiods = [],
-  filters = [],
-  onFilterChange,
   onTimePeriodChange,
 }: Props) {
   return (
@@ -35,15 +25,6 @@ export default function SecondHeader({
           placeholder="This Week"
           options={timeperiods}
           onSelect={onTimePeriodChange}
-        />
-      </div>
-
-      <div className="flex items-center gap-2 text-sm">
-        <span>School:</span>
-        <DropDownRole
-          placeholder="Cebu Institute of Technology"
-          options={filters}
-          onSelect={onFilterChange} // 💡 Pass it down
         />
       </div>
     </div>

@@ -2,131 +2,165 @@
 
 import { createClient } from "@/lib/supabase/server";
 
-export async function getTotalEvents(universityId: string): Promise<number> {
+async function getUniversityIdFromSession(): Promise<string | null> {
   const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user || !user.email) {
+    console.log("❌ Auth error or no user:", userError);
+    return null;
+  }
+
+  console.log("👤 Logged-in university email:", user.email);
+
+  const { data: university, error: universityError } = await supabase
+    .from("university")
+    .select("universityid")
+    .eq("universityemail", user.email)
+    .maybeSingle();
+
+  if (universityError) {
+    console.log("❌ Supabase error while fetching university:", universityError);
+    return null;
+  }
+
+  if (!university) {
+    console.log("⚠️ No matching university found for email:", user.email);
+    return null;
+  }
+
+  console.log("✅ Fetched university ID:", university.universityid);
+  return university.universityid;
+}
+
+export async function getTotalEvents(): Promise<number> {
+  const supabase = await createClient();
+  const universityId = await getUniversityIdFromSession(); // gets from session
+
+  if (!universityId) return 0;
 
   const { count, error } = await supabase
     .from("events")
     .select("*", { count: "exact", head: true })
-    .eq("school", universityId);
+    .eq("universityid", universityId); // ✅ This must match your DB column
 
   if (error) {
     console.error("❌ Failed to fetch events count:", error);
     return 0;
   }
 
-  console.log(`✅ Total events for ${universityId}:`, count);
   return count ?? 0;
 }
 
-export async function getOrgStatsByUniversity(
-  universityId: string
-): Promise<{
-  total: number;
-  active: number;
-}> {
+
+
+
+export async function getOrgStats(): Promise<{ total: number; active: number }> {
   const supabase = await createClient();
+  const universityId = await getUniversityIdFromSession();
+  if (!universityId) return { total: 0, active: 0 };
 
-  const { data: allOrgs, error } = await supabase
+  const { data: orgs, error } = await supabase
     .from("organizations")
-    .select("orgid, universityid, status");
+    .select("status")
+    .eq("universityid", universityId);
 
-  if (error) {
-    console.error("❌ Failed to fetch orgs:", error);
-    return { total: 0, active: 0 };
-  }
+  if (error || !orgs) return { total: 0, active: 0 };
 
-  const filtered = allOrgs?.filter(
-    (org) => org.universityid?.trim().toLowerCase() === universityId
-  );
-
-  const total = filtered?.length ?? 0;
-  const inactive =
-    filtered?.filter((org) => org.status === "inactive").length ?? 0;
+  const total = orgs.length;
+  const inactive = orgs.filter((org) => org.status === "inactive").length;
   const active = total - inactive;
-
-  console.log(`✅ Org stats for ${universityId}:`, { total, active });
 
   return { total, active };
 }
 
-export async function getStudentEngagement(
-  universityId: string
-): Promise<number> {
+
+export async function getStudentEngagement(timePeriod: string = "this_week"): Promise<number> {
   const supabase = await createClient();
+  const universityId = await getUniversityIdFromSession();
+  if (!universityId) return 0;
 
-  // Get all orgs in university
-  const { data: orgs, error: orgError } = await supabase
-    .from("organizations")
-    .select("orgid")
+  // Determine time range
+  const end = new Date();
+  end.setHours(0, 0, 0, 0);
+  end.setDate(end.getDate() + 1);
+
+  const start = new Date(end);
+  switch (timePeriod) {
+    case "this_week":
+      start.setDate(end.getDate() - 7);
+      break;
+    case "this_month":
+      start.setDate(1);
+      break;
+    case "last_month":
+      start.setMonth(end.getMonth() - 1);
+      start.setDate(1);
+      end.setMonth(end.getMonth() - 1);
+      end.setDate(new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate() + 1);
+      break;
+    case "last_6_months":
+      start.setMonth(end.getMonth() - 6);
+      break;
+    case "last_year":
+      start.setFullYear(end.getFullYear() - 1);
+      start.setMonth(0);
+      start.setDate(1);
+      break;
+    default:
+      start.setDate(end.getDate() - 7);
+  }
+
+  // Get all students
+  const { data: students } = await supabase
+    .from("student")
+    .select("studentid")
     .eq("universityid", universityId);
+  const studentIds = students?.map((s) => s.studentid) ?? [];
+  const totalStudents = studentIds.length;
 
-  if (orgError || !orgs) {
-    console.error("❌ Error fetching orgs:", orgError);
-    return 0;
-  }
+  // Get all posts
+  const { count: totalPosts } = await supabase
+    .from("post")
+    .select("*", { count: "exact", head: true })
+    .in("orgid", (
+      await supabase
+        .from("organizations")
+        .select("orgid")
+        .eq("universityid", universityId)
+    ).data?.map((o) => o.orgid) ?? []);
 
-  let totalEngagementSum = 0;
-  let orgWithEventsCount = 0;
+  // Count of comments by university students in selected time frame
+  const { count: commentCount } = await supabase
+    .from("comments")
+    .select("*", { count: "exact", head: true })
+    .in("studentid", studentIds)
+    .gte("posted", start.toISOString())
+    .lt("posted", end.toISOString());
 
-  for (const org of orgs) {
-    const orgId = org.orgid;
+  const denominator = totalStudents + (totalPosts ?? 0);
+  if (!commentCount || denominator === 0) return 0;
 
-    // Get total members in org
-    const { count: memberCount, error: memberError } = await supabase
-      .from("orgmember")
-      .select("*", { count: "exact", head: true })
-      .eq("orgid", orgId);
-
-    if (memberError || !memberCount || memberCount === 0) continue;
-
-    // Get all events for org
-    const { data: events, error: eventsError } = await supabase
-      .from("events")
-      .select("eventid")
-      .eq("orgid", orgId);
-
-    if (eventsError || !events || events.length === 0) continue;
-
-    let orgEventEngagementSum = 0;
-
-    for (const event of events) {
-      const { data: attendees, error: attendanceError } = await supabase
-        .from("eventattendance")
-        .select("studentid")
-        .eq("eventid", event.eventid);
-
-      if (attendanceError || !attendees) continue;
-
-      const uniqueAttendees = new Set(attendees.map((a) => a.studentid));
-      const eventEngagement = uniqueAttendees.size / memberCount;
-
-      orgEventEngagementSum += eventEngagement;
-    }
-
-    const avgOrgEngagement = orgEventEngagementSum / events.length;
-    totalEngagementSum += avgOrgEngagement;
-    orgWithEventsCount++;
-  }
-
-  // Final result: average across all orgs
-  const finalEngagement =
-    orgWithEventsCount > 0 ? (totalEngagementSum / orgWithEventsCount) * 100 : 0;
-
-  return Math.round(finalEngagement);
+  const engagement = commentCount / denominator;
+  return Math.round(engagement * 100);
 }
+
+
+
 
 
 function getBucketLabel(date: Date, timePeriod: string): string {
   const month = date.toLocaleString("en-US", { month: "short" });
-
   switch (timePeriod) {
     case "this_week":
       return `${month} ${date.getDate().toString().padStart(2, "0")}`;
     case "this_month":
     case "last_month":
-      const weekNum = Math.ceil(date.getDate() / 7);
-      return `Week ${weekNum}`;
+      return `Week ${Math.ceil(date.getDate() / 7)}`;
     case "last_6_months":
     case "last_year":
       return month;
@@ -135,19 +169,16 @@ function getBucketLabel(date: Date, timePeriod: string): string {
   }
 }
 
-
-export async function getOrgActivityForUniversity(
-  universityId: string,
-  timePeriod: string = "this_week"
-) {
+export async function getOrgActivity(timePeriod: string = "this_week") {
   const supabase = await createClient();
+  const universityId = await getUniversityIdFromSession();
+  if (!universityId) return [];
 
   const end = new Date();
   end.setHours(0, 0, 0, 0);
   end.setDate(end.getDate() + 1);
 
   const start = new Date(end);
-
   switch (timePeriod) {
     case "this_week":
       start.setDate(end.getDate() - 7);
@@ -175,7 +206,6 @@ export async function getOrgActivityForUniversity(
       break;
     default:
       start.setDate(end.getDate() - 7);
-      break;
   }
 
   const { data: orgs } = await supabase
@@ -183,7 +213,7 @@ export async function getOrgActivityForUniversity(
     .select("orgid")
     .eq("universityid", universityId);
 
-  const orgIds = orgs?.map((org) => org.orgid) ?? [];
+  const orgIds = orgs?.map((o) => o.orgid) ?? [];
 
   const { data: events } = await supabase
     .from("events")
@@ -200,36 +230,27 @@ export async function getOrgActivityForUniversity(
     .lt("posted", end.toISOString());
 
   const result: Record<string, { date: string; events: number; posts: number }> = {};
-
   const cursor = new Date(start);
-  const step = 1;
-
   while (cursor < end) {
     const label = getBucketLabel(cursor, timePeriod);
-    if (!result[label]) result[label] = { date: label, events: 0, posts: 0 };
-    cursor.setDate(cursor.getDate() + step);
+    result[label] = { date: label, events: 0, posts: 0 };
+    cursor.setDate(cursor.getDate() + 1);
   }
 
-  for (const event of events ?? []) {
-    if (!event.date) continue;
-    const label = getBucketLabel(new Date(event.date), timePeriod);
-    if (!result[label]) result[label] = { date: label, events: 0, posts: 0 };
+  for (const e of events ?? []) {
+    if (!e.date) continue;
+    const label = getBucketLabel(new Date(e.date), timePeriod);
     result[label].events++;
   }
 
-  for (const post of posts ?? []) {
-    if (!post.posted) continue;
-    const label = getBucketLabel(new Date(post.posted), timePeriod);
-    if (!result[label]) result[label] = { date: label, events: 0, posts: 0 };
+  for (const p of posts ?? []) {
+    if (!p.posted) continue;
+    const label = getBucketLabel(new Date(p.posted), timePeriod);
     result[label].posts++;
   }
 
   return Object.values(result);
 }
-
-
-
-
 
 export interface Organization {
   name: string;
@@ -237,293 +258,121 @@ export interface Organization {
   events: number;
 }
 
-export async function getTopPerformingOrgs(universityId: string): Promise<Organization[]> {
+export async function getTopOrgs(): Promise<Organization[]> {
   const supabase = await createClient();
+  const universityId = await getUniversityIdFromSession();
+  if (!universityId) {
+    console.log("❌ No university ID found.");
+    return [];
+  }
 
-  const { data: orgs, error: orgError } = await supabase
+  const { data: orgs, error: orgsError } = await supabase
     .from("organizations")
     .select("orgid, orgname")
     .eq("universityid", universityId);
 
-  if (orgError || !orgs) {
-    console.error("❌ Failed to fetch organizations:", orgError);
+  if (orgsError || !orgs) {
+    console.error("❌ Failed to fetch organizations:", orgsError);
     return [];
   }
 
   const results: Organization[] = [];
 
   for (const org of orgs) {
-    const orgId = org.orgid;
+    console.log(`📦 Checking org: ${org.orgname} (${org.orgid})`);
 
-    const { count: memberCount, error: memberError } = await supabase
+    const { count: memberCount } = await supabase
       .from("orgmember")
       .select("*", { count: "exact", head: true })
-      .eq("orgid", orgId);
+      .eq("orgid", org.orgid);
 
-    if (memberError || !memberCount || memberCount === 0) continue;
-
-    const { data: events, error: eventError } = await supabase
-      .from("events")
-      .select("eventid")
-      .eq("orgid", orgId);
-
-    if (eventError || !events || events.length === 0) continue;
-
-    let engagementSum = 0;
-
-    for (const event of events) {
-      const { data: attendees, error: attendError } = await supabase
-        .from("eventattendance")
-        .select("studentid")
-        .eq("eventid", event.eventid);
-
-      if (attendError || !attendees) continue;
-
-      const uniqueAttendees = new Set(attendees.map((a) => a.studentid));
-      engagementSum += uniqueAttendees.size / memberCount;
+    if (!memberCount || memberCount === 0) {
+      console.log(`⛔ Skipping ${org.orgname} — No members`);
+      continue;
     }
 
-    const averageEngagement = (engagementSum / events.length) * 100;
+    const { data: events } = await supabase
+      .from("events")
+      .select("eventid")
+      .eq("orgid", org.orgid);
+
+    if (!events || events.length === 0) {
+      console.log(`⛔ Skipping ${org.orgname} — No events`);
+      continue;
+    }
+
+    let sum = 0;
+    for (const e of events) {
+      const { data: attendees } = await supabase
+        .from("eventattendance")
+        .select("studentid")
+        .eq("eventid", e.eventid);
+
+      const unique = new Set(attendees?.map((a) => a.studentid));
+      sum += unique.size / memberCount;
+    }
+
+    const engagement = Math.round((sum / events.length) * 100);
+    console.log(`✅ ${org.orgname} | Events: ${events.length} | Engagement: ${engagement}%`);
 
     results.push({
       name: org.orgname ?? "Unnamed Org",
-      engagement: Math.round(averageEngagement),
+      engagement,
       events: events.length,
     });
   }
 
-  return results.sort((a, b) => b.engagement - a.engagement).slice(0, 4);
+  const sorted = results.sort((a, b) => b.engagement - a.engagement).slice(0, 4);
+  console.log("🏆 Top Orgs:", sorted);
+
+  return sorted;
 }
 
-export async function getEventEngagementMetrics(universityId: string): Promise<{
-  mostAttendedEvent: string;
-  highestEngagementOrg: string;
-  averageFeedbackScore: string;
-}> {
+export async function getEventEngagementMetrics() {
   const supabase = await createClient();
+  const universityId = await getUniversityIdFromSession();
+  if (!universityId) return { avgComments: "0", avgLikes: "0", avgRegistrations: "0" };
 
-  // 🟢 1. Most Attended Event
-  const { data: attendanceCounts, error: attendanceErr } = await supabase
-    .from("eventattendance")
-    .select("eventid, studentid");
-
-  const { data: events, error: eventErr } = await supabase
-    .from("events")
-    .select("eventid, title")
-    .eq("school", universityId);
-
-  if (attendanceErr || eventErr || !attendanceCounts || !events) {
-    console.error("❌ Error fetching data for most attended event:", {
-      attendanceErr,
-      eventErr,
-    });
-    return {
-      mostAttendedEvent: "N/A",
-      highestEngagementOrg: "N/A",
-      averageFeedbackScore: "0",
-    };
-  }
-
-  const attendanceMap: Record<number, number> = {};
-
-  for (const { eventid } of attendanceCounts) {
-    if (!attendanceMap[eventid]) attendanceMap[eventid] = 0;
-    attendanceMap[eventid]++;
-  }
-
-  let topEvent = { title: "N/A", count: -1 };
-
-  for (const event of events) {
-    const count = attendanceMap[event.eventid] || 0;
-    if (count > topEvent.count) {
-      topEvent = { title: event.title ?? "Untitled", count };
-    }
-  }
-
-  // 🟡 2. Highest Engagement Org
-  const topOrgs = await getTopPerformingOrgs(universityId);
-  const highestEngagementOrg = topOrgs[0]?.name ?? "N/A";
-
-  // 🔵 3. Average Feedback Score (treat nulls as 0 using ??)
-  const { data: feedback, error: feedbackErr } = await supabase
-    .from("eventattendance")
-    .select("rating, eventid");
-
-  if (feedbackErr || !feedback) {
-    console.error("❌ Error fetching feedback ratings:", feedbackErr);
-  }
-
-  const uniEventIds = new Set(events.map((e) => e.eventid));
-
-  const ratings = (feedback ?? [])
-    .filter((r) => uniEventIds.has(r.eventid))
-    .map((r) => r.rating ?? 0); // null => 0
-
-  const avg =
-    ratings.length > 0
-      ? Math.round((ratings.reduce((a, b) => a + b, 0) / ratings.length) * 10) / 10
-      : 0;
-
-  return {
-    mostAttendedEvent: topEvent.title,
-    highestEngagementOrg,
-    averageFeedbackScore: avg.toString(),
-  };
-}
-
-export async function getAllThisMonthEventsAndPosts() {
-  const supabase = await createClient();
-
-  const today = new Date();
-  const start = new Date(today.getFullYear(), today.getMonth(), 1);
-  const end = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-
-  const { data: events } = await supabase
-    .from("events")
-    .select("date")
-    .gte("date", start.toISOString())
-    .lt("date", end.toISOString());
+  const { data: orgs } = await supabase
+    .from("organizations")
+    .select("orgid")
+    .eq("universityid", universityId);
+  const orgIds = orgs?.map((o) => o.orgid) ?? [];
 
   const { data: posts } = await supabase
     .from("post")
-    .select("posted")
-    .gte("posted", start.toISOString())
-    .lt("posted", end.toISOString());
+    .select("postid")
+    .in("orgid", orgIds);
+  const postIds = posts?.map((p) => p.postid) ?? [];
 
-  const result: Record<string, { date: string; events: number; posts: number }> = {};
+  const { count: commentCount } = await supabase
+    .from("comments")
+    .select("*", { count: "exact", head: true })
+    .in("postid", postIds);
 
-  const cursor = new Date(start);
-  while (cursor < end) {
-    const label = getBucketLabel(cursor, "this_month");
-    if (!result[label]) result[label] = { date: label, events: 0, posts: 0 };
-    cursor.setDate(cursor.getDate() + 1);
-  }
+  const { count: likeCount } = await supabase
+    .from("likedby")
+    .select("*", { count: "exact", head: true })
+    .in("postid", postIds);
 
-  for (const event of events ?? []) {
-    if (!event.date) continue;
-    const label = getBucketLabel(new Date(event.date), "this_month");
-    if (!result[label]) result[label] = { date: label, events: 0, posts: 0 };
-    result[label].events++;
-  }
-
-  for (const post of posts ?? []) {
-    if (!post.posted) continue;
-    const label = getBucketLabel(new Date(post.posted), "this_month");
-    if (!result[label]) result[label] = { date: label, events: 0, posts: 0 };
-    result[label].posts++;
-  }
-
-  return Object.values(result);
-}
-
-// Get total events across all universities
-export async function getAllTotalEvents(): Promise<number> {
-  const supabase = await createClient();
-  const { count, error } = await supabase
+  const { data: events } = await supabase
     .from("events")
-    .select("*", { count: "exact", head: true });
+    .select("eventid")
+    .eq("universityid", universityId);
+  const eventIds = events?.map((e) => e.eventid) ?? [];
 
-  if (error) {
-    console.error("❌ Failed to fetch total events:", error);
-    return 0;
-  }
+  const { count: registrationCount } = await supabase
+    .from("eventregistrations")
+    .select("*", { count: "exact", head: true })
+    .in("eventid", eventIds);
 
-  return count ?? 0;
-}
+  const avgComments = postIds.length ? (commentCount ?? 0) / postIds.length : 0;
+  const avgLikes = postIds.length ? (likeCount ?? 0) / postIds.length : 0;
+  const avgRegistrations = eventIds.length ? (registrationCount ?? 0) / eventIds.length : 0;
 
-// Get all organization stats (total & active)
-export async function getAllOrgStats(): Promise<{ total: number; active: number }> {
-  const supabase = await createClient();
-
-  const { data: allOrgs, error } = await supabase
-    .from("organizations")
-    .select("status");
-
-  if (error || !allOrgs) {
-    console.error("❌ Failed to fetch all org stats:", error);
-    return { total: 0, active: 0 };
-  }
-
-  const total = allOrgs.length;
-  const active = allOrgs.filter((org) => org.status === "active").length;
-
-  return { total, active };
-}
-
-// Get student engagement across all orgs
-export async function getAllStudentEngagement(): Promise<number> {
-  const supabase = await createClient();
-
-  const { data: orgs, error } = await supabase
-    .from("organizations")
-    .select("orgid");
-
-  if (error || !orgs) {
-    console.error("❌ Failed to fetch orgs for engagement:", error);
-    return 0;
-  }
-
-  let totalEngagementSum = 0;
-  let orgWithEventsCount = 0;
-
-  for (const org of orgs) {
-    const { count: memberCount, error: memberError } = await supabase
-      .from("orgmember")
-      .select("*", { count: "exact", head: true })
-      .eq("orgid", org.orgid);
-
-    if (memberError || !memberCount || memberCount === 0) continue;
-
-    const { data: events, error: eventError } = await supabase
-      .from("events")
-      .select("eventid")
-      .eq("orgid", org.orgid);
-
-    if (eventError || !events || events.length === 0) continue;
-
-    let orgEventEngagementSum = 0;
-
-    for (const event of events) {
-      const { data: attendees, error: attendError } = await supabase
-        .from("eventattendance")
-        .select("studentid")
-        .eq("eventid", event.eventid);
-
-      if (attendError || !attendees) continue;
-
-      const uniqueAttendees = new Set(attendees.map((a) => a.studentid));
-      const engagement = uniqueAttendees.size / memberCount;
-      orgEventEngagementSum += engagement;
-    }
-
-    totalEngagementSum += orgEventEngagementSum / events.length;
-    orgWithEventsCount++;
-  }
-
-  const result =
-    orgWithEventsCount > 0
-      ? Math.round((totalEngagementSum / orgWithEventsCount) * 100)
-      : 0;
-
-  return result;
-}
-
-export async function getAllUniversities(): Promise<
-  { label: string; value: string }[]
-> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("university")
-    .select("universityid, uname");
-
-  if (error || !data) {
-    console.error("❌ Failed to fetch universities:", error);
-    return [];
-  }
-
-  return data.map((uni) => ({
-    label: uni.uname ?? "Unknown University",
-    value: uni.universityid,
-  }));
+  return {
+    avgComments: avgComments.toFixed(1),
+    avgLikes: avgLikes.toFixed(1),
+    avgRegistrations: avgRegistrations.toFixed(1),
+  };
 }
