@@ -66,7 +66,7 @@ export async function submitAccreditationFile(orgId: string, academicYear: strin
         const { error } = await supabase
             .from('accreditations')
             .update({
-                submission_status: 'Pending',
+                submission_status: 'Pending Review',
                 file_path: filePath
             })
             .eq('id', existingRecord.id); // Update by primary key
@@ -87,7 +87,7 @@ export async function submitAccreditationFile(orgId: string, academicYear: strin
                 orgid: orgId,
                 universityid: orgData.universityid,
                 academic_year: academicYear,
-                submission_status: 'Pending',
+                submission_status: 'Pending Review',
                 file_path: filePath
             });
         dbError = error;
@@ -179,15 +179,28 @@ export async function getOrganizationsByStatus(status: AccreditationStatus): Pro
     console.error("Error fetching organizations by status:", error.message);
     return [];
   }
-  // Map to AccreditationData
-  return (data || []).map((row: any) => ({
-    orgid: row.orgid,
-    orgname: row.organizations?.orgname || null,
-    created: row.organizations?.created || null,
-    university: row.organizations?.university || null,
-    status: row.submission_status,
-    file_path: row.file_path || null,
-  }));
+
+  const dataWithPublicUrls = (data || []).map((row: any) => { // <-- ADD THIS
+    let publicFilePath = null; // <-- ADD THIS
+    if (row.file_path) { // <-- ADD THIS
+      const { data: urlData } = supabase.storage // <-- ADD THIS
+        .from("accreditation-files") // Your bucket name
+        .getPublicUrl(row.file_path); // The path from the database
+      publicFilePath = urlData.publicUrl; // <-- ADD THIS
+    } // <-- ADD THIS
+
+    // Now, create the final object with the full URL
+    return { // <-- ADD THIS
+      orgid: row.orgid,
+      orgname: row.organizations?.orgname || null,
+      created: row.organizations?.created || row.created_at || null, // Fallback to accreditation creation time
+      university: row.organizations?.university || null,
+      status: row.submission_status,
+      file_path: publicFilePath, // <-- CRITICAL: Use the generated public URL
+    };
+  });
+
+  return dataWithPublicUrls;
 }
 
 // Update an organization's accreditation status (admin action)
