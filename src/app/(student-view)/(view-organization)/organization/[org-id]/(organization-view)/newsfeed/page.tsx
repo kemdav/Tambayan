@@ -11,8 +11,9 @@ interface NewsfeedPageProps {
   params: { "org-id": string; };
 }
 
-export default async function NewsfeedPage({ params }: NewsfeedPageProps) {
-  const { "org-id": orgId } = await params;
+export default async function OrganizationNewsfeedPage(props: { params: Promise<{ 'org-id': string }> }) {
+  const params = await props.params;
+    const orgId = params['org-id'];
   const supabase = await createClient(); // Server client
   
 
