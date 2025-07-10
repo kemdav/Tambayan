@@ -7,13 +7,11 @@ import { getAccreditationStatus } from "@/lib/actions/accreditation";
 import AccreditationClient from "./AccreditationClient";
 
 // This is the standard, correct way to type page props
-interface PageProps {
-  params: { 'org-id': string };
-}
 
 // Use destructuring directly in the function arguments
-export default async function AccreditationPage({ params: { 'org-id': orgId } }: PageProps) {
+export default async function AccreditationPage({ params }: { params: { 'org-id': string } }){
     const academicYear = "2024-2025";
+     const { 'org-id': orgId } = params;
 
     const [
         organization,
