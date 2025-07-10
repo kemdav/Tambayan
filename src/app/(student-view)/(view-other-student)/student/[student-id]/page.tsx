@@ -12,7 +12,8 @@ interface PageProps {
   params: { 'student-id': string };
 }
 
-export default async function ViewStudentProfilePage({ params }: PageProps) {
+export default async function OrganizationNewsfeedPage(props: { params: Promise<{ 'student-id': string }> }){
+  const params = await props.params;
   const studentIdToView = Number(params['student-id']);
   const supabase = await createClient();
 
