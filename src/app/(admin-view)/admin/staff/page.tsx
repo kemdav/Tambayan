@@ -79,7 +79,7 @@ export default function AdminStaffPage() {
     const supabase = createClient();
     const universityid = user.user_metadata.universityid;
     // 1. Create user in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    const { error: authError } = await supabase.auth.signUp({
       email: newStaff.email,
       password: "123456",
       options: {
@@ -216,7 +216,7 @@ export default function AdminStaffPage() {
         ) : paginatedStaff.length === 0 ? (
           <div className="text-gray-500">No staff found.</div>
         ) : (
-          paginatedStaff.map((staff, idx) => <StaffCard key={staff.email} staff={staff} />)
+          paginatedStaff.map((staff) => <StaffCard key={staff.email} staff={staff} />)
         )}
         <div className="flex justify-center items-center mt-6 gap-2">
           <button

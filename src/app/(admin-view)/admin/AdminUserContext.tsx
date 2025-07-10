@@ -24,7 +24,7 @@ export const AdminUserProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     const fetchUser = async () => {
       const supabase = createClient();
-      const { data: { user }, error } = await supabase.auth.getUser();
+      const { data: { user }} = await supabase.auth.getUser();
       if (user) {
         setUser({
           ...user,

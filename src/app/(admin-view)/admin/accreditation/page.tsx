@@ -10,11 +10,9 @@ import {
 } from "@/lib/actions/accreditation";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogClose,
 } from "@/app/components/ui/general/dropdown/dialog";
 import { Button } from "@/app/components/ui/general/button";

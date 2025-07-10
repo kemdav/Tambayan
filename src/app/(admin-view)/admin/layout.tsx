@@ -4,13 +4,9 @@
 
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
 import { ButtonConfig } from "@/app/components/ui/general/button-type";
-import { NewsfeedIcon } from "@/app/components/icons/NewsfeedIcon";
 import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
-import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
 import { LogOutIcon } from "@/app/components/icons/LogOutIcon";
-import Image from "next/image";
 import { AdminUserProvider, useAdminUser } from "./AdminUserContext";
-import { AddIcon } from "@/app/components/icons/AddIcon";
 import { createClient } from "@/lib/supabase/client";
 
 // Import your icons from a consistent library like Lucide React
@@ -26,7 +22,7 @@ import {
   LogOut,
   Menu, // A better hamburger icon
 } from "lucide-react";
-import router, { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { signOut } from "@/lib/actions/auth";
 import { useEffect, useState } from "react";
 
@@ -103,13 +99,12 @@ export default function AdminLayout({
   // All hooks must be at the top, before any return or conditional
   const [selected, setSelected] = useState("dashboard");
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const router = useRouter();
   const { user, loading } = useAdminUser();
 
   // Debug state for university info
   const [isDesktop, setIsDesktop] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  const [univInfo, setUnivInfo] = useState<{
+  const [, setUnivInfo] = useState<{
     universityid: string;
     universityemail?: string;
     uname?: string;
@@ -135,11 +130,6 @@ export default function AdminLayout({
       setUnivInfo(universityProfile || null);
     })();
   }, []);
-
-  // Add logout handler
-  const handleLogout = async () => {
-    signOut();
-  };
 
   useEffect(() => {
     setHasMounted(true);
