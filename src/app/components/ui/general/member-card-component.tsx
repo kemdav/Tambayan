@@ -32,8 +32,6 @@ export const MemberCardComponent: React.FC<MemberCardComponentProps> = ({
           placeholder="Role"
           width="w-[160px]"
           height="h-7"
-          dropdownTextColor="text-black text-xs"
-          buttonTextColor="text-black text-xs"
         />
       </div>
       <div className="min-w-[40px]" />
