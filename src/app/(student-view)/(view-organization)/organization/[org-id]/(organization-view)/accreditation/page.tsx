@@ -9,9 +9,10 @@ import AccreditationClient from "./AccreditationClient";
 // This is the standard, correct way to type page props
 
 // Use destructuring directly in the function arguments
-export default async function AccreditationPage({ params }: { params: { 'org-id': string } }){
+export default async function AccreditationPage(props: { params: Promise<{ 'org-id': string }> }){
     const academicYear = "2024-2025";
-     const { 'org-id': orgId } = params;
+    const params = await props.params;
+    const orgId = params['org-id'];
 
     const [
         organization,
