@@ -45,7 +45,7 @@ export default async function OrganizationNewsfeedPage(props: { params: Promise<
   const [posts, comments, { data: studentStats }] = await Promise.all([
     getPostsByStudent(profileToView.studentid),
     getCommentsByStudent(profileToView.studentid),
-    supabase.rpc('get_student_stats', { p_studentid: profileToView.studentid }).single()
+    supabase.rpc('get_student_stats', { p_student_id: profileToView.studentid }).single()
   ]);
 
   // 5. Render the SAME ProfileView component, but pass the correct props
