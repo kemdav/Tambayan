@@ -10,8 +10,10 @@ interface PageProps {
   params: { 'org-id': string };
 }
 
-export default async function OfficersPage({ params: { 'org-id': orgId } }: PageProps) {
+export default async function OrganizationNewsfeedPage(props: { params: Promise<{ 'org-id': string }> }) {
   // Fetch data in parallel
+  const params = await props.params;
+    const orgId = params['org-id'];
   const [
     organization,
     members,

@@ -8,12 +8,10 @@ import { getWikiSections } from "@/lib/actions/wiki"; // Assuming you have an ac
 
 
 // This is the Server Component part of the page
-export default async function WikiListPage(props: { params: Promise<{ 'org-id': string }> }) {
+export default async function OrganizationNewsfeedPage(props: { params: Promise<{ 'org-id': string }> }) {
   const params = await props.params;
+    const orgId = params['org-id'];
 
-  const {
-    'org-id': orgId
-  } = params;
 
   const [
     { role },
