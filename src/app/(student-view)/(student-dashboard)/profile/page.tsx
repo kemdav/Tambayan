@@ -38,7 +38,7 @@ export default async function ProfilePage() {
     getPostsByStudent(initialProfile.studentid),
     getCommentsByStudent(initialProfile.studentid),
     // Call the new RPC function
-    supabase.rpc('get_student_stats', { p_studentid: initialProfile.studentid }).single()
+    supabase.rpc('get_student_stats', { p_student_id: initialProfile.studentid }).single()
   ]);
   console.log("ProfilePage (Server): Value of initialPosts after fetching:", initialPosts);
   console.log("ProfilePage (Server): user.id (currentUserID source) =", user.id);
