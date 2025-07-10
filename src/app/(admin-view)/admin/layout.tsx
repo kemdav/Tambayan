@@ -3,14 +3,8 @@
 "use client";
 
 import SideNavBar from "@/app/components/ui/general/side-navigation-bar-component";
-import { ButtonConfig } from "@/app/components/ui/general/button-type";
-import { NewsfeedIcon } from "@/app/components/icons/NewsfeedIcon";
-import { StudentProfileIcon } from "@/app/components/icons/StudentProfileIcon";
-import { SubscribedOrgIcon } from "@/app/components/icons/SubscribedOrgIcon";
-import { LogOutIcon } from "@/app/components/icons/LogOutIcon";
-import Image from "next/image";
+import { adminNavButtons } from "./nabBarContents"; 
 import { AdminUserProvider, useAdminUser } from "./AdminUserContext";
-import { AddIcon } from "@/app/components/icons/AddIcon";
 import { createClient } from "@/lib/supabase/client";
 
 // Import your icons from a consistent library like Lucide React
@@ -29,59 +23,6 @@ import {
 import router, { useRouter } from "next/navigation";
 import { signOut } from "@/lib/actions/auth";
 import { useEffect, useState } from "react";
-
-// Define the nav buttons directly in the layout for clarity
-export const adminNavButtons: ButtonConfig[] = [
-  {
-    id: "dashboard",
-    href: "/admin/dashboard",
-    children: "Dashboard",
-    icon: <LayoutDashboard className="size-5" />,
-  },
-  {
-    id: "org-oversight",
-    href: "/admin/org-oversight",
-    children: "Organization Oversight",
-    icon: <Users className="size-5" />,
-  },
-  {
-    id: "analytics",
-    href: "/admin/analytics",
-    children: "Campus Analytics",
-    icon: <BarChart2 className="size-5" />,
-  },
-  {
-    id: "event-oversight",
-    href: "/admin/event-oversight",
-    children: "Event Oversight",
-    icon: <Calendar className="size-5" />,
-  },
-  {
-    id: "broadcast-tool",
-    href: "/admin/broadcast-tool",
-    children: "Broadcast Tool",
-    icon: <Megaphone className="size-5" />,
-  },
-  {
-    id: "accreditation",
-    href: "/admin/accreditation",
-    children: "Accreditation",
-    icon: <FileCheck2 className="size-5" />,
-  },
-  {
-    id: "create-org",
-    href: "/admin/create-org",
-    children: "Create New Organization",
-    icon: <PlusCircle className="size-5" />,
-  },
-  {
-    id: "change-password",
-    href: "/admin/change-password",
-    children: "Change Password",
-    icon: <KeyRound className="size-5" />,
-  },
-  { id: "logout", children: "Logout", icon: <LogOut className="size-5" /> },
-];
 
 export default function AdminLayout({
   children,
