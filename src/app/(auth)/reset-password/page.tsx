@@ -1,13 +1,21 @@
-'use client';
-import AuthResetPasswordCard from "@/app/components/ui/auth-page-ui/auth-reset-password-card";
-import { useSearchParams } from "next/navigation";
+// page.tsx
+import { Suspense } from 'react';
+import ResetPasswordForm from './reset-password-client';
 
-export default function Home() {
-  const searchParams = useSearchParams();
-  const code = searchParams.get("code");
+// You can create a more visually appealing loading skeleton if you wish
+const Loading = () => {
+    return (
+        <div className="flex items-center justify-center">
+            <div>Verifying reset link...</div>
+        </div>
+    );
+}
+
+export default function ResetPasswordPage() {
   return (
-    <div className="flex items-center justify-center">
-      <AuthResetPasswordCard code={code} />
-    </div>
+    // Wrap the component that uses the client-side hook in a Suspense boundary.
+    <Suspense fallback={<Loading />}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
