@@ -1,4 +1,4 @@
-// app/.../accreditation/page.tsx
+// src/app/.../accreditation/page.tsx
 "use server";
 
 import { getUserOrgRole } from "@/lib/actions/permissions";
@@ -6,15 +6,15 @@ import { getOrganizationProfile } from "@/lib/actions/organization";
 import { getAccreditationStatus } from "@/lib/actions/accreditation";
 import AccreditationClient from "./AccreditationClient";
 
+// This is the standard, correct way to type page props
 interface PageProps {
   params: { 'org-id': string };
 }
 
+// Use destructuring directly in the function arguments
 export default async function AccreditationPage({ params: { 'org-id': orgId } }: PageProps) {
-    // Define the current academic year (you can make this dynamic later)
     const academicYear = "2024-2025";
 
-    // Fetch all necessary data in parallel
     const [
         organization,
         { role: currentUserRole },
@@ -25,7 +25,6 @@ export default async function AccreditationPage({ params: { 'org-id': orgId } }:
         getAccreditationStatus(orgId, academicYear)
     ]);
 
-    // Define who has permission to submit. Let's say only the President.
     const canSubmit = currentUserRole === 'President';
 
     if (!organization) {
