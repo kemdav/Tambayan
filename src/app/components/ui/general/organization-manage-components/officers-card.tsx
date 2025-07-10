@@ -28,7 +28,7 @@ const OfficialPostPage = () => {
                         daysSincePosted={OfficalPosts.daysSincePosted}
                         content={OfficalPosts.content}
                         likes={OfficalPosts.likes}
-                        comments={OfficalPosts.comments}/>
+                        comments={OfficalPosts.comments} postID={''} posterID={''}/>
                     ))}
                 </ul>
             )}
