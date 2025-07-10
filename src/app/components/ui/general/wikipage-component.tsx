@@ -52,20 +52,8 @@ export default function WikiPageComponent({
             width="w-[466px]"
             height="h-[38px]"
             //Button
-            buttonTextColor="text-[#7DBA9D]"
-            buttonBorderColor="border-[#98BAA9]"
-            buttonBgColor="bg-green-50"
-            buttonHoverTextColor="hover:text-white"
-            buttonHoverBgColor="hover:bg-[#7DBA9D]"
-            buttonActiveBgColor="active:bg-[#358163]"
             //Dropdown
-            dropdownTextColor="text-[#7DBA9D]"
-            dropdownBorderColor="border-[#98BAA9]"
-            dropdownBgColor="bg-white"
-            dropdownHoverTextColor="hover:text-white"
-            dropdownHoverBgColor="hover:bg-[#7DBA9D]"
-            dropdownActiveBgColor="active:bg-[#358163]"
-            // Options
+
             options={options}
           />
         </div>
